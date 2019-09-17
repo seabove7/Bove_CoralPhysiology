@@ -1,8 +1,11 @@
 ---
-title: "Chapter3_Physiology_working"
+title: "Chapter 3: Physiology working"
 author: "CBB"
 date: "9/17/2019"
 output: html_document
+    theme: cerulean
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -52,13 +55,13 @@ date <- Sys.Date()
 
 ```{r, include=FALSE}
 # Set up the dataframes
-phys <- read_csv("/Users/colleen/Dropbox/Boston_Experiment/Physiology/phys_R_code/16Jul16 Update/phys_all_25Jul19.csv")
-
-carb <- read_csv("~/Dropbox/Boston_Experiment/Physiology/Carbohydrate/Calculated_Carbs/Carb_final_10Aug19.csv")
-carb <- carb[,c(2,22)]
-
-df<-phys %>% 
-  left_join(carb, by=c("coral" = "coral"))
+#phys <- read_csv("/Users/colleen/Dropbox/Boston_Experiment/Physiology/phys_R_code/16Jul16 Update/phys_all_25Jul19.csv")
+#
+#carb <- read_csv("~/Dropbox/Boston_Experiment/Physiology/Carbohydrate/Calculated_Carbs/Carb_final_10Aug19.csv")
+#carb <- carb[,c(2,22)]
+#
+#df<-phys %>% 
+#  left_join(carb, by=c("coral" = "coral"))
 
 #write.csv(df, file="phys_all_13Aug19.csv")  
 df <- read_csv("/Users/colleen/Dropbox/Boston_Experiment/Physiology/phys_R_code/16Jul16 Update/Physiology_for_Chapter_3_files/phys_all_13Aug19.csv")
@@ -69,9 +72,10 @@ df$ftemp <- as.factor(df$ftemp)
 df$fpco2 <- as.factor(df$fpco2)
 df$colony <- as.factor(df$colony)
 df$species <- factor(df$species, levels = c("S", "P", "A", "T"))
-df$treat <- factor(df$treat, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 df$fpco2 <- factor(df$fpco2, c("280", "400", "700", "2800"))
 df$den <- df$den / 1000000
+df$treat[df$T0_T90 == "T0"] <- "control"
+df$treat <- factor(df$treat, c("control", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 ```
 
 
@@ -119,12 +123,21 @@ comp.fig <-ggplot(comp.sum, aes(colour=treat, shape = treat))+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   xlab("time point")+
   ylab("")+
-  geom_errorbar(aes(x = T0_T90, ymin=value-se, ymax=value+se, width=0.5), position=dodge2, colour="black")+
-  geom_point(aes(T0_T90, value), position = dodge2, size=2)+
-  scale_colour_manual("Treatment", labels=c("280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c("blue", "red","blue", "red","blue", "red","blue", "red"))+
-  scale_shape_manual("Treatment", labels=c("280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c(18, 18, 15, 15, 16, 16, 17, 17))+
-  facet_grid(param~species, scales = "free_y", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "SSID", P = "PSTR", A = "PAST", T = "UTEN")))
+  geom_errorbar(aes(x = T0_T90, ymin=value-se, ymax=value+se, width=0.5, colour=treat), position=dodge2)+
+  geom_point(aes(T0_T90, value), position = dodge2, size=3)+
+  scale_colour_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c("#009E73", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00"))+
+  scale_shape_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c(8, 18, 18, 15, 15, 16, 16, 17, 17))+
+  facet_wrap(param~species, scales = "free", strip.position = "left", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "SSID", P = "PSTR", A = "PAST", T = "UTEN")))
 comp.fig
+
+
+#p <- ggplot2::ggplot(iris, aes(x = Sepal.Length, fill = Species)) +  ggplot2::geom_density(alpha = 0.7)
+#p2 <- cowplot::ggdraw() + cowplot::draw_image("", scale = 0.9)
+#cowplot::plot_grid(p, p2, labels = "AUTO")
+#
+#https://github.com/wilkelab/cowplot/issues/84
+
+
 
 #
 #fig2 <- paste("T0_T90_fig", date, sep="_") 
