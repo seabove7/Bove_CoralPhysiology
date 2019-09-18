@@ -82,9 +82,10 @@ df$treat <- factor(df$treat, c("control", "288_28", "311_31", "447_28", "405_31"
 
 # T0 samples parameter plots 
 <font color='darkmagenta'>Coloured points are individual samples with the black cross as the mean with the 95% CI</font> 
-```{r, echo=FALSE, fig.height = 4, fig.width = 8, fig.align = "center", results = 'hide'}
+```{r, echo=FALSE, fig.height = 4, fig.width = 10, fig.align = "center", results = 'hide'}
 T0.df <- subset(df, T0_T90=="T0") # dataframe of T0 only
 T0.df <- T0.df[,c(1:16,38)]
+
 
 T0.df <- gather(T0.df, param, value, den:carb) # make column of parameter and value
 T0.df$param <- factor(T0.df$param, levels = c("pro", "carb", "den", "chla"))
@@ -118,21 +119,38 @@ df2 <- df[,c(1:16,38)]
 df.comp <- gather(df2, param, value, den:carb) # make column of parameter and value
 df.comp$param <- factor(df.comp$param, levels = c("pro", "carb", "den", "chla"))
 
-comp.sum <- summarySE(data = df.comp, measurevar = "value", groupvars = c("param", "species", "treat", "T0_T90"), na.rm = TRUE)
 
-comp.fig <-ggplot(comp.sum, aes(colour=treat, shape = treat))+
-  theme(legend.position="bottom", panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  xlab("time point")+
+# make a 'treat' column for better spacing of plot
+df.comp$treat2 <- df.comp$treat
+df.comp$treat <- gsub("control", 2, df.comp$treat)
+df.comp$treat <- gsub("288_28", 4, df.comp$treat)
+df.comp$treat <- gsub("311_31", 4.5, df.comp$treat)
+df.comp$treat <- gsub("447_28", 6, df.comp$treat)
+df.comp$treat <- gsub("405_31", 6.5, df.comp$treat)
+df.comp$treat <- gsub("673_28", 8, df.comp$treat)
+df.comp$treat <- gsub("701_31", 8.5, df.comp$treat)
+df.comp$treat <- gsub("3285_28", 10, df.comp$treat)
+df.comp$treat <- gsub("3309_31", 10.5, df.comp$treat)
+
+df.comp$treat <- as.numeric(df.comp$treat)
+
+
+comp.sum <- summarySE(data = df.comp, measurevar = "value", groupvars = c("param", "species", "treat", "T0_T90", "treat2"), na.rm = TRUE)
+
+comp.fig <-ggplot(comp.sum, aes(colour=treat2, shape = treat2))+
+  theme(legend.position="bottom", panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1), axis.text.x = element_text(angle=45))+
+  scale_x_discrete(breaks=c(2, 4, 6, 8, 10))+
   ylab("")+
-  geom_point(data=df.comp, aes(T0_T90, value), position = dodge2, alpha=0.3, size=1)+
-  geom_linerange(aes(x = T0_T90, ymin=value-se, ymax=value+se, colour=treat), position=dodge2)+
-  geom_point(aes(T0_T90, value), position = dodge2, size=2)+
+  geom_vline(xintercept = 3)+
+  geom_point(data=df.comp, aes(treat, value), position = dodge2, alpha=0.3, size=1)+
+  geom_linerange(aes(x = treat, ymin=value-se, ymax=value+se, colour=treat2), position=dodge2)+
+  geom_point(aes(treat, value), position = dodge2, size=2)+
   scale_colour_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c("#009E73", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00"))+
   scale_shape_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c(8, 18, 18, 15, 15, 16, 16, 17, 17))+
   facet_wrap(param~species, scales = "free", strip.position = "top", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "SSID", P = "PSTR", A = "PAST", T = "UTEN")))
 
 
-
+comp.fig
 
 # make cowplot of all coral images
 s <- cowplot::ggdraw() + cowplot::draw_image("SSID.png", scale = 0.9) 
@@ -146,9 +164,6 @@ full.T0.fig <- plot_grid(corals, comp.fig, ncol = 1, align = "v", axis = 'lb', r
 full.T0.fig
 
 
-
-
-
 #
 #fig2 <- paste("T0_T90_fig", date, sep="_") 
 #fig2 <- paste(fig2, ".pdf", sep="") 
@@ -159,9 +174,8 @@ full.T0.fig
 ```
 
 
-#T90 plot of all parameters 
-<font color='darkmagenta'>Plotting physiology</font> 
-```{r, echo=FALSE, fig.height = 10, fig.width = 9, fig.align = "center", results = 'hide'}
+# Total Protein Model Estimates and 95% CI
+```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 #modify dataframe
 T90.df <- df[,c(1:18,38)]
 T90.df <- subset(T90.df, T0_T90=="T90")
@@ -172,6 +186,220 @@ T90.df$fpco2 <- factor(T90.df$fpco2, c("280", "400", "700", "2800"))
 T90.df$species <- revalue(x = T90.df$species, c("S" = "SSID", "P" = "PSTR", 
   "A" = "PAST", "T" = "UTEN"))
 
+
+T90.df.pro <- subset(T90.df, param=="pro")
+#T90.df.pro <- subset(T90.df.pro2, species != "UTEN")
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.pro)
+
+summary(T90.pro.model) # view summary of model
+
+### Performing the parametric bootstrapping of the model:
+
+bootnum = 1500 # set number of iterations (we used 1500) between 999 and 9999
+seed = 4 #seed to make results replicatable (our seed was 4)
+
+out <- simulate(T90.pro.model,nsim=bootnum,seed=seed,re.form=NULL) # simulate your model set number of times in a dataframe (samples using random effects)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.pro),re.form=NA)) # applies the predict (does not use random effects) FUNCTION to the columns of the 'out' dataframe to ...
+
+boots <- cbind(predict(T90.pro.model,re.form=NA), boots) #combines boots matrix created above with the predicted values based on the model into a single matrix
+T90.df.pro.a <- (cbind(T90.df.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) #estimates mean and 95% confidence intercals for the prediction values and adds them to your new dataframe
+
+head(T90.df.pro.a) # view your new dataframe so you can rename the mean and CI columns
+colnames(T90.df.pro.a)[16:18] <- c("mean", "lowerci", "upperci") # rename mean/CI columns
+
+
+
+ggplot(T90.df.pro.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("total protein (mg / cm2)")+
+  xlab("pCO2")+
+  geom_point(aes(fpco2, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, scales = "free_y", ncol=4)
+```
+
+
+# Carbohydrate Model Estimates and 95% CI
+```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+T90.df.carb <- subset(T90.df, param=="carb")
+#T90.df.carb <- subset(T90.df.carb2, species != "UTEN")
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.carb.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.carb)
+
+summary(T90.carb.model) # view summary of model
+
+### Performing the parametric bootstrapping of the model:
+
+out <- simulate(T90.carb.model,nsim=bootnum,seed=seed,re.form=NULL) # simulate your model set number of times in a dataframe (samples using random effects)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.carb),re.form=NA)) # applies the predict (does not use random effects) FUNCTION to the columns of the 'out' dataframe to ...
+
+boots <- cbind(predict(T90.carb.model,re.form=NA), boots) #combines boots matrix created above with the predicted values based on the model into a single matrix
+T90.df.carb.a <- (cbind(T90.df.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) #estimates mean and 95% conficarbce intercals for the prediction values and adds them to your new dataframe
+
+head(T90.df.carb.a) # view your new dataframe so you can rename the mean and CI columns
+colnames(T90.df.carb.a)[16:18] <- c("mean", "lowerci", "upperci") # rename mean/CI columns
+
+
+
+ggplot(T90.df.carb.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Carbohydrate (mg / cm2)")+
+  xlab("pCO2")+
+  geom_point(aes(fpco2, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, scales = "free_y", ncol=4)
+```
+
+
+
+# Symbiont Density Model Estimates and 95% CI
+```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+T90.df.den <- subset(T90.df, param=="den")
+#T90.df.den <- subset(T90.df.den2, species != "UTEN")
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.den.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.den)
+
+summary(T90.den.model) # view summary of model
+
+### Performing the parametric bootstrapping of the model:
+
+out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL) # simulate your model set number of times in a dataframe (samples using random effects)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.den),re.form=NA)) # applies the predict (does not use random effects) FUNCTION to the columns of the 'out' dataframe to ...
+
+boots <- cbind(predict(T90.den.model,re.form=NA), boots) #combines boots matrix created above with the predicted values based on the model into a single matrix
+T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) #estimates mean and 95% confidence intercals for the prediction values and adds them to your new dataframe
+
+head(T90.df.den.a) # view your new dataframe so you can rename the mean and CI columns
+colnames(T90.df.den.a)[16:18] <- c("mean", "lowerci", "upperci") # rename mean/CI columns
+
+
+
+ggplot(T90.df.den.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Symbiont Density (10^6 cells / cm2)")+
+  xlab("pCO2")+
+  geom_point(aes(fpco2, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, scales = "free_y", ncol=4)
+```
+
+
+
+# Chlorophyll a Model Estimates and 95% CI
+```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+T90.df.chla <- subset(T90.df, param=="chla")
+#T90.df.chla <- subset(T90.df.chla2, species != "UTEN")
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.chla.model <- lmer(value ~ species * fpco2 * ftemp + (1 | colony), REML=F, data = T90.df.chla)
+
+summary(T90.chla.model) # view summary of model
+
+### Performing the parametric bootstrapping of the model:
+
+out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL) # simulate your model set number of times in a dataframe (samples using random effects)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * fpco2 * ftemp + (1 | colony), REML=F, data = T90.df.chla),re.form=NA)) # applies the predict (does not use random effects) FUNCTION to the columns of the 'out' dataframe to ...
+
+boots <- cbind(predict(T90.chla.model,re.form=NA), boots) #combines boots matrix created above with the predicted values based on the model into a single matrix
+T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) #estimates mean and 95% confichlace intercals for the prediction values and adds them to your new dataframe
+
+head(T90.df.chla.a) # view your new dataframe so you can rename the mean and CI columns
+colnames(T90.df.chla.a)[16:18] <- c("mean", "lowerci", "upperci") # rename mean/CI columns
+
+
+
+ggplot(T90.df.chla.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Chlorophyll a (10^6 cells / cm2)")+
+  xlab("pCO2")+
+  geom_point(aes(fpco2, value, colour=ftemp, shape = reef), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, scales = "free_y", ncol=4)
+```
+
+
+# Colour Intensity Model Estimates and 95% CI
+```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+T90.df.sum <- subset(T90.df, param=="sum_bw5")
+#T90.df.sum <- subset(T90.df.sum2, species != "UTEN")
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.sum <- completeFun(T90.df.sum, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.sum.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.sum)
+
+summary(T90.sum.model) # view summary of model
+
+### Performing the parametric bootstrapping of the model:
+
+out <- simulate(T90.sum.model,nsim=bootnum,seed=seed,re.form=NULL) # simulate your model set number of times in a dataframe (samples using random effects)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.sum),re.form=NA)) # applies the predict (does not use random effects) FUNCTION to the columns of the 'out' dataframe to ...
+
+boots <- cbind(predict(T90.sum.model,re.form=NA), boots) #combines boots matrix created above with the predicted values based on the model into a single matrix
+T90.df.sum.a <- (cbind(T90.df.sum, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) #estimates mean and 95% confisumce intercals for the prediction values and adds them to your new dataframe
+
+head(T90.df.sum.a) # view your new dataframe so you can rename the mean and CI columns
+colnames(T90.df.sum.a)[16:18] <- c("mean", "lowerci", "upperci") # rename mean/CI columns
+
+
+
+ggplot(T90.df.sum.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Chlorophyll a (10^6 cells / cm2)")+
+  xlab("pCO2")+
+  geom_point(aes(fpco2, value, colour=ftemp, shape = reef), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, scales = "free_y", ncol=4)
+```
+
+
+
+
+#T90 plot of all parameters 
+<font color='darkmagenta'>Plotting physiology</font> 
+```{r, include=FALSE, fig.height = 10, fig.width = 9, fig.align = "center", results = 'hide'}
 # create summary data
 T90.sum <- summarySE(data = T90.df, measurevar = "value", groupvars = c("param", "species", "fpco2", "ftemp"), na.rm = TRUE)
 
