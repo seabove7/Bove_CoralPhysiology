@@ -29,9 +29,7 @@ library("ggfortify")
 library("kableExtra")
 library("readr")
 library("lme4")
-
-#test
-
+library("magick")
 ```
 
 
@@ -123,15 +121,29 @@ df.comp$param <- factor(df.comp$param, levels = c("pro", "carb", "den", "chla"))
 comp.sum <- summarySE(data = df.comp, measurevar = "value", groupvars = c("param", "species", "treat", "T0_T90"), na.rm = TRUE)
 
 comp.fig <-ggplot(comp.sum, aes(colour=treat, shape = treat))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  theme(legend.position="bottom", panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   xlab("time point")+
   ylab("")+
   geom_errorbar(aes(x = T0_T90, ymin=value-se, ymax=value+se, width=0.5, colour=treat), position=dodge2)+
-  geom_point(aes(T0_T90, value), position = dodge2, size=3)+
+  geom_point(aes(T0_T90, value), position = dodge2, size=2)+
   scale_colour_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c("#009E73", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00"))+
   scale_shape_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c(8, 18, 18, 15, 15, 16, 16, 17, 17))+
-  facet_wrap(param~species, scales = "free", strip.position = "left", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "SSID", P = "PSTR", A = "PAST", T = "UTEN")))
-comp.fig
+  facet_wrap(param~species, scales = "free", strip.position = "left", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "", P = "", A = "", T = "")))
+
+
+
+
+
+s <- cowplot::ggdraw() + cowplot::draw_image("SSID.png", scale = 0.9) 
+p <- cowplot::ggdraw() + cowplot::draw_image("PSTR.png", scale = 0.9)
+a <- cowplot::ggdraw() + cowplot::draw_image("PAST.png", scale = 0.9)
+u <- cowplot::ggdraw() + cowplot::draw_image("UTEN.png", scale = 0.9)
+
+
+corals <- cowplot::plot_grid(s, p, a, u, labels = "AUTO", ncol = 4)
+
+full.T0.fig <- plot_grid(corals, comp.fig, ncol = 1, align = "v", axis = 'l', rel_heights = c(1,4))
+full.T0.fig
 
 
 
