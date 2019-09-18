@@ -2,7 +2,8 @@
 title: "Chapter 3: Physiology working"
 author: "CBB"
 date: "9/17/2019"
-output: html_document
+output: 
+  html_document:
     theme: cerulean
 editor_options: 
   chunk_output_type: console
@@ -12,7 +13,6 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 options(warn = -1)
 library("knitr")
-opts_knit$set(root.dir = "~/Dropbox/Boston_Experiment/Physiology/phys_R_code/16Jul16 Update/Physiology_for_Chapter_3_files")
 ```
 
 
@@ -65,7 +65,7 @@ date <- Sys.Date()
 #  left_join(carb, by=c("coral" = "coral"))
 
 #write.csv(df, file="phys_all_13Aug19.csv")  
-df <- read_csv("/Users/colleen/Dropbox/Boston_Experiment/Physiology/phys_R_code/16Jul16 Update/Physiology_for_Chapter_3_files/phys_all_13Aug19.csv")
+df <- read_csv("phys_all_13Aug19.csv")
 
 df$X1 <- NULL
 names(df)[38]<-"carb"
@@ -113,7 +113,7 @@ T0.fig
 
 # Comparing T0 samples with T90 samples
 <font color='darkmagenta'>Points are the mean with the bars representing standard error</font> 
-```{r, echo=FALSE, fig.height = 7, fig.width = 9, fig.align = "center", results = 'hide'}
+```{r, echo=FALSE, fig.height = 16, fig.width = 10, fig.align = "center", results = 'hide'}
 df2 <- df[,c(1:16,38)]
 df.comp <- gather(df2, param, value, den:carb) # make column of parameter and value
 df.comp$param <- factor(df.comp$param, levels = c("pro", "carb", "den", "chla"))
@@ -124,43 +124,28 @@ comp.fig <-ggplot(comp.sum, aes(colour=treat, shape = treat))+
   theme(legend.position="bottom", panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   xlab("time point")+
   ylab("")+
-  geom_errorbar(aes(x = T0_T90, ymin=value-se, ymax=value+se, width=0.5, colour=treat), position=dodge2)+
-<<<<<<< HEAD
-  geom_point(aes(T0_T90, value), position = dodge2, size=3)+
-  scale_colour_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c("#009E73", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00"))+
-  scale_shape_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c(8, 18, 18, 15, 15, 16, 16, 17, 17))+
-  facet_wrap(param~species, scales = "free", strip.position = "left", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "SSID", P = "PSTR", A = "PAST", T = "UTEN")))
-comp.fig
-=======
+  geom_point(data=df.comp, aes(T0_T90, value), position = dodge2, alpha=0.3, size=1)+
+  geom_linerange(aes(x = T0_T90, ymin=value-se, ymax=value+se, colour=treat), position=dodge2)+
   geom_point(aes(T0_T90, value), position = dodge2, size=2)+
   scale_colour_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c("#009E73", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00", "#0072B2", "#D55E00"))+
   scale_shape_manual("Treatment", labels=c("control", "280_28", "280_31", "400_28", "400_31", "700_28", "700_31", "2800_28", "2800_31"), values = c(8, 18, 18, 15, 15, 16, 16, 17, 17))+
-  facet_wrap(param~species, scales = "free", strip.position = "left", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "", P = "", A = "", T = "")))
+  facet_wrap(param~species, scales = "free", strip.position = "top", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "SSID", P = "PSTR", A = "PAST", T = "UTEN")))
 
 
 
 
-
+# make cowplot of all coral images
 s <- cowplot::ggdraw() + cowplot::draw_image("SSID.png", scale = 0.9) 
 p <- cowplot::ggdraw() + cowplot::draw_image("PSTR.png", scale = 0.9)
 a <- cowplot::ggdraw() + cowplot::draw_image("PAST.png", scale = 0.9)
 u <- cowplot::ggdraw() + cowplot::draw_image("UTEN.png", scale = 0.9)
+corals <- cowplot::plot_grid(s, p, a, u, ncol = 4)
 
-
-corals <- cowplot::plot_grid(s, p, a, u, labels = "AUTO", ncol = 4)
-
-full.T0.fig <- plot_grid(corals, comp.fig, ncol = 1, align = "v", axis = 'l', rel_heights = c(1,4))
+# full T0 plot with coral images
+full.T0.fig <- plot_grid(corals, comp.fig, ncol = 1, align = "v", axis = 'lb', rel_heights = c(3,12))
 full.T0.fig
 
 
->>>>>>> 2f7207804f289f2afc4595a2088bec2bc7a0240a
-
-
-#p <- ggplot2::ggplot(iris, aes(x = Sepal.Length, fill = Species)) +  ggplot2::geom_density(alpha = 0.7)
-#p2 <- cowplot::ggdraw() + cowplot::draw_image("", scale = 0.9)
-#cowplot::plot_grid(p, p2, labels = "AUTO")
-#
-#https://github.com/wilkelab/cowplot/issues/84
 
 
 
