@@ -45,11 +45,11 @@ theme_set(theme_classic())
 # set parameter labels
 Tlab<-"Temperature (°C)"
 alab<-expression(paste(italic("p"),"CO" [2]~ "("*mu,'atm)'))
-dlab<-expression(paste("Symbiont density (10"^6,"cells cm"^-2,")"))
-plab<-expression(paste("Total protein (mg cm"^-2,")"))
-calab<-expression(paste("Carbohydrate (mg cm"^-2,")"))
-clab<-expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")"))
-rlab<-expression(paste("Calcification rate (mg cm"^-2~"day"^-1,")"))
+dlab<-expression(paste("Symbiont density \n (10"^6,"cells cm"^-2,")"))
+plab<-expression(paste("Total protein \n (mg cm"^-2,")"))
+calab<-expression(paste("Carbohydrate \n (mg cm"^-2,")"))
+clab<-expression(paste("Chlorophyll a \n ("*mu,"g cm"^-2,")"))
+rlab<-expression(paste("Calcification rate \n (mg cm"^-2~"day"^-1,")"))
 date <- Sys.Date() 
 ```
 
@@ -150,7 +150,10 @@ comp.fig <-ggplot(comp.sum, aes(colour=treat2, shape = treat2))+
   facet_wrap(param~species, scales = "free", strip.position = "top", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)", S = "SSID", P = "PSTR", A = "PAST", T = "UTEN")))
 
 
+<<<<<<< HEAD
 comp.fig
+=======
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 
 # make cowplot of all coral images
 s <- cowplot::ggdraw() + cowplot::draw_image("SSID.png", scale = 0.9) 
@@ -174,8 +177,12 @@ full.T0.fig
 ```
 
 
+<<<<<<< HEAD
 # Total Protein Model Estimates and 95% CI
 ```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+=======
+```{r protein model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 #modify dataframe
 T90.df <- df[,c(1:18,38)]
 T90.df <- subset(T90.df, T0_T90=="T90")
@@ -188,7 +195,10 @@ T90.df$species <- revalue(x = T90.df$species, c("S" = "SSID", "P" = "PSTR",
 
 
 T90.df.pro <- subset(T90.df, param=="pro")
+<<<<<<< HEAD
 #T90.df.pro <- subset(T90.df.pro2, species != "UTEN")
+=======
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 
 # this function remove rows with any missing values
 completeFun <- function(data, desiredCols) {
@@ -200,6 +210,7 @@ T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any miss
 # mixed effect model run using lmer()
 T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.pro)
 
+<<<<<<< HEAD
 summary(T90.pro.model) # view summary of model
 
 ### Performing the parametric bootstrapping of the model:
@@ -231,6 +242,41 @@ ggplot(T90.df.pro.a)+
 
 # Carbohydrate Model Estimates and 95% CI
 ```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+=======
+### Performing the parametric bootstrapping of the model:
+bootnum = 1500 # set number of iterations (we used 1500) between 999 and 9999
+seed = 4 #seed to make results replicatable (our seed was 4)
+
+#out <- simulate(T90.pro.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, #data = T90.df.pro),re.form=NA))
+#
+#boots <- cbind(predict(T90.pro.model,re.form=NA), boots)
+#T90.df.pro.a <- (cbind(T90.df.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.pro.a)[16:18] <- c("mean", "lowerci", "upperci")
+
+
+#pro.df <- paste("Protein_model_T90", date, sep="_") 
+#pro.df <- paste(pro.df, ".csv", sep="") 
+#write.csv(T90.df.pro.a, file=pro.df)  
+
+T90.df.pro.a <- read.csv("Protein_model_T90_2019-09-19.csv", head=T)
+T90.df.pro.a$ftemp <- as.factor(T90.df.pro.a$ftemp)
+T90.df.pro.a$fpco2 <- as.factor(T90.df.pro.a$fpco2)
+T90.df.pro.a$species <- factor(T90.df.pro.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+pro.model.fig <- ggplot(T90.df.pro.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(),
+  strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Total Protein")+
+  xlab("")+
+  geom_point(aes(fpco2, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, ncol=4)
+```
+
+```{r carb model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 T90.df.carb <- subset(T90.df, param=="carb")
 #T90.df.carb <- subset(T90.df.carb2, species != "UTEN")
 
@@ -244,6 +290,7 @@ T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any mi
 # mixed effect model run using lmer()
 T90.carb.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.carb)
 
+<<<<<<< HEAD
 summary(T90.carb.model) # view summary of model
 
 ### Performing the parametric bootstrapping of the model:
@@ -273,6 +320,37 @@ ggplot(T90.df.carb.a)+
 
 # Symbiont Density Model Estimates and 95% CI
 ```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+=======
+### Performing the parametric bootstrapping of the model:
+#out <- simulate(T90.carb.model,nsim=bootnum,seed=seed,re.form=NULL) 
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=F, #data = T90.df.carb),re.form=NA)) 
+#
+#boots <- cbind(predict(T90.carb.model,re.form=NA), boots) 
+#T90.df.carb.a <- (cbind(T90.df.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975)))))))) 
+#colnames(T90.df.carb.a)[16:18] <- c("mean", "lowerci", "upperci") 
+
+#carb.df <- paste("Carbohydrate_model_T90", date, sep="_") 
+#carb.df <- paste(carb.df, ".csv", sep="") 
+#write.csv(T90.df.carb.a, file=carb.df)  
+
+T90.df.carb.a <- read.csv("Carbohydrate_model_T90_2019-09-19.csv", head=T)
+T90.df.carb.a$ftemp <- as.factor(T90.df.carb.a$ftemp)
+T90.df.carb.a$fpco2 <- as.factor(T90.df.carb.a$fpco2)
+T90.df.carb.a$species <- factor(T90.df.carb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+carb.model.fig <- ggplot(T90.df.carb.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(),  strip.background = element_blank(),
+  strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  facet_wrap(~species, ncol=4)+
+  ylab("Carbohydrate")+
+  xlab("")+
+  geom_point(aes(fpco2, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))
+```
+
+```{r denisty model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 T90.df.den <- subset(T90.df, param=="den")
 #T90.df.den <- subset(T90.df.den2, species != "UTEN")
 
@@ -286,6 +364,7 @@ T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any miss
 # mixed effect model run using lmer()
 T90.den.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.den)
 
+<<<<<<< HEAD
 summary(T90.den.model) # view summary of model
 
 ### Performing the parametric bootstrapping of the model:
@@ -315,6 +394,41 @@ ggplot(T90.df.den.a)+
 
 # Chlorophyll a Model Estimates and 95% CI
 ```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+=======
+
+### Performing the parametric bootstrapping of the model:
+
+#out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=F, #data = T90.df.den),re.form=NA))
+#
+#boots <- cbind(predict(T90.den.model,re.form=NA), boots)
+#T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.den.a)[16:18] <- c("mean", "lowerci", "upperci")
+
+
+#den.df <- paste("Density_model_T90", date, sep="_") 
+#den.df <- paste(den.df, ".csv", sep="") 
+#write.csv(T90.df.den.a, file=den.df)  
+
+T90.df.den.a <- read.csv("Density_model_T90_2019-09-19.csv", head=T)
+T90.df.den.a$ftemp <- as.factor(T90.df.den.a$ftemp)
+T90.df.den.a$fpco2 <- as.factor(T90.df.den.a$fpco2)
+T90.df.den.a$species <- factor(T90.df.den.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+
+den.model.fig <- ggplot(T90.df.den.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(),  strip.background = element_blank(),
+  strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Symbiont Density")+
+  xlab("")+
+  geom_point(aes(fpco2, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, ncol=4)
+```
+
+```{r chlorophyll model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 T90.df.chla <- subset(T90.df, param=="chla")
 #T90.df.chla <- subset(T90.df.chla2, species != "UTEN")
 
@@ -328,6 +442,7 @@ T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any mi
 # mixed effect model run using lmer()
 T90.chla.model <- lmer(value ~ species * fpco2 * ftemp + (1 | colony), REML=F, data = T90.df.chla)
 
+<<<<<<< HEAD
 summary(T90.chla.model) # view summary of model
 
 ### Performing the parametric bootstrapping of the model:
@@ -356,6 +471,40 @@ ggplot(T90.df.chla.a)+
 
 # Colour Intensity Model Estimates and 95% CI
 ```{r, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+=======
+
+### Performing the parametric bootstrapping of the model:
+#out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL) 
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * fpco2 * ftemp + (1 | colony), REML=F, #data = T90.df.chla),re.form=NA)) 
+#
+#boots <- cbind(predict(T90.chla.model,re.form=NA), boots) 
+#T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975)))))))) 
+#colnames(T90.df.chla.a)[16:18] <- c("mean", "lowerci", "upperci")
+
+
+#chla.df <- paste("Chlorophyll_model_T90", date, sep="_") 
+#chla.df <- paste(chla.df, ".csv", sep="") 
+#write.csv(T90.df.chla.a, file=chla.df)  
+
+T90.df.chla.a <- read.csv("Chlorophyll_model_T90_2019-09-19.csv", head=T)
+T90.df.chla.a$ftemp <- as.factor(T90.df.chla.a$ftemp)
+T90.df.chla.a$fpco2 <- as.factor(T90.df.chla.a$fpco2)
+T90.df.chla.a$species <- factor(T90.df.chla.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+
+chla.model.fig <- ggplot(T90.df.chla.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(),  strip.background = element_blank(),
+  strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Chlorophyll a")+
+  xlab("")+
+  geom_point(aes(fpco2, value, colour=ftemp, shape = reef), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, ncol=4)
+```
+
+```{r colour model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 T90.df.sum <- subset(T90.df, param=="sum_bw5")
 #T90.df.sum <- subset(T90.df.sum2, species != "UTEN")
 
@@ -369,6 +518,7 @@ T90.df.sum <- completeFun(T90.df.sum, "value") # run function to remove any miss
 # mixed effect model run using lmer()
 T90.sum.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.sum)
 
+<<<<<<< HEAD
 summary(T90.sum.model) # view summary of model
 
 ### Performing the parametric bootstrapping of the model:
@@ -394,6 +544,45 @@ ggplot(T90.df.sum.a)+
   facet_wrap(~species, scales = "free_y", ncol=4)
 ```
 
+=======
+### Performing the parametric bootstrapping of the model:
+#out <- simulate(T90.sum.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, #data = T90.df.sum),re.form=NA))
+#
+#boots <- cbind(predict(T90.sum.model,re.form=NA), boots)
+#T90.df.sum.a <- (cbind(T90.df.sum, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.sum.a)[16:18] <- c("mean", "lowerci", "upperci") 
+#
+#
+#sum.df <- paste("Colour_model_T90", date, sep="_") 
+#sum.df <- paste(sum.df, ".csv", sep="") 
+#write.csv(T90.df.sum.a, file=sum.df)  
+
+T90.df.sum.a <- read.csv("Colour_model_T90_2019-09-19.csv", head=T)
+T90.df.sum.a$ftemp <- as.factor(T90.df.sum.a$ftemp)
+T90.df.sum.a$fpco2 <- as.factor(T90.df.sum.a$fpco2)
+T90.df.sum.a$species <- factor(T90.df.sum.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+
+sum.model.fig <- ggplot(T90.df.sum.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(),  strip.background = element_blank(),
+  strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ylab("Colour Intensity")+
+  xlab(alab)+
+  geom_point(aes(fpco2, value, colour=ftemp, shape = reef), position = dodge2, alpha = 0.3, shape = 17)+
+  geom_linerange(aes(x=fpco2, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("blue", "red"))+
+  facet_wrap(~species, ncol=4)
+```
+
+# Model estimate 95% confidence interval for physiologies
+```{r, echo=FALSE, fig.height = 20, fig.width = 10, fig.align = "center", results = 'hide'}
+# full T90 plot with coral images
+full.T90.model.fig <- plot_grid(corals, pro.model.fig, carb.model.fig, den.model.fig, chla.model.fig, sum.model.fig, ncol = 1, rel_heights = c(3,3,3,3,3,3))
+
+full.T90.model.fig
+```
+>>>>>>> 14853594f80c2e3a3218ded1c5c998fe5816dabf
 
 
 
