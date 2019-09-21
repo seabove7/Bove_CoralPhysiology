@@ -1,21 +1,21 @@
 ---
 title: "Chapter 3: Physiology results"
 author: "CBB"
-date: "9/17/2019"
 output: 
   html_document:
     theme: cerulean
 editor_options: 
   chunk_output_type: console
 ---
-
+<br/>
+<br/>
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 options(warn = -1)
 library("knitr")
 ```
 
-```{r, include=FALSE}
+```{r packages, include=FALSE}
 #Packages to load
 library("readr")
 library("ggplot2")
@@ -31,7 +31,7 @@ library("lme4")
 library("magick")
 ```
 
-```{r, include=FALSE}
+```{r setup2, include=FALSE}
 #Set some standards and units
 #dodge width
 dodge=position_dodge(width=0.3)
@@ -43,15 +43,15 @@ theme_set(theme_classic())
 # set parameter labels
 Tlab<-"Temperature (°C)"
 alab<-expression(paste(italic("p"),"CO" [2]~ "("*mu,'atm)'))
-dlab<-expression(paste("Symbiont density \n (10"^6,"cells cm"^-2,")"))
-plab<-expression(paste("Total protein \n (mg cm"^-2,")"))
-calab<-expression(paste("Carbohydrate \n (mg cm"^-2,")"))
-clab<-expression(paste("Chlorophyll a \n ("*mu,"g cm"^-2,")"))
-rlab<-expression(paste("Calcification rate \n (mg cm"^-2~"day"^-1,")"))
+dlab<-expression(paste("Symbiont density (10"^6,"cells cm"^-2,")"))
+plab<-expression(paste("Total protein (mg cm"^-2,")"))
+calab<-expression(paste("Carbohydrate (mg cm"^-2,")"))
+clab<-expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")"))
+rlab<-expression(paste("Calcification rate (mg cm"^-2~"day"^-1,")"))
 date <- Sys.Date() 
 ```
 
-```{r, include=FALSE}
+```{r initial dataframe, include=FALSE}
 # Set up the dataframes
 #phys <- read_csv("/Users/colleen/Dropbox/Boston_Experiment/Physiology/phys_R_code/16Jul16 Update/phys_all_25Jul19.csv")
 #
@@ -72,13 +72,11 @@ df$colony <- as.factor(df$colony)
 df$species <- factor(df$species, levels = c("S", "P", "A", "T"))
 df$fpco2 <- factor(df$fpco2, c("280", "400", "700", "2800"))
 df$den <- df$den / 1000000
-df$treat[df$T0_T90 == "T0"] <- "control"
-df$treat <- factor(df$treat, c("control", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+df$treat[df$T0_T90 == "T0"] <- "T0"
+df$treat <- factor(df$treat, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 ```
 
-
 # **Part 1:** *T0 versus T90 physiology* 
-<br/>
 
 ### Figure 1
 
@@ -95,13 +93,29 @@ T0.sum <- summarySE(data = T0.df, measurevar = "value", groupvars = c("param", "
 T0.fig <- ggplot()+
   theme(panel.grid.major=element_blank(), legend.position="none", panel.grid.minor=element_blank(), panel.background=element_blank(),legend.key=element_blank(),strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(labels = c(S = "SSID", P = "PSTR", A = "PAST", T = "UTEN"))+
-  xlab("Species")+
+  xlab("")+
   ylab("")+
+  ggtitle("A")+
   geom_point(data=T0.df, aes(x=species, y=value, colour=col, shape = reef),size = 2.5, position=dodge)+
   geom_linerange(data=T0.sum, aes(x = species, ymin = value - se, ymax = value + se))+
   geom_point(data=T0.sum, aes(x=species, y=value), shape=95, colour="black", size = 7)+
   facet_wrap(~param, scales = "free_y",strip.position = "left", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)")))
 T0.fig
+
+T0.sum2 <- summarySE(data = T0.df, measurevar = "value", groupvars = c("param", "species", "reef"), na.rm = T)
+
+T0.fig2 <- ggplot()+
+  theme(panel.grid.major=element_blank(), legend.position="bottom", panel.grid.minor=element_blank(), panel.background=element_blank(),legend.key=element_blank(),strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(labels = c(S = "SSID", P = "PSTR", A = "PAST", T = "UTEN"))+
+  xlab("Species")+
+  ylab("")+
+  ggtitle("B")+
+  geom_point(data=T0.df, aes(x=species, y=value, colour=reef),size = 2.5, position=dodge, alpha = 0.5)+
+  geom_linerange(data=T0.sum2, aes(x = species, ymin = value - se, ymax = value + se, colour = reef), position = dodge2)+
+  geom_point(data=T0.sum2, aes(x=species, y=value, colour=reef), shape=95, size = 7, position = dodge2)+
+  scale_color_manual("Reef Environment", values = c("darkgrey", "black"))+
+  facet_wrap(~param, scales = "free_y",strip.position = "left", labeller = as_labeller( c(chla = "Chlorophyll \n (ug/cm2)", den = "Symbiont Density \n (10^6 cells cm2)", pro = "Total Protein \n (mg/cm2)", carb = "Carbohydrate \n (mg/cm2)")))
+T0.fig2
 
 
 #fig <- paste("T0.fig", date, sep="_") 
@@ -111,7 +125,7 @@ T0.fig
 #T0.fig
 #dev.set(dev.next())
 ```
-**Figure 1.** True mean (+/- SE) physiology of T0 coral fragments (one per colony; n = 8-14) denoted by black cross with individual colony physiology denoted by coloured shape (triangle = offshore, circle = inshore).
+**Figure 1.** True mean (+/- SE) physiology of T0 coral fragments (one per colony; n = 8-14) denoted by black cross with (A) individual colony physiology denoted by coloured shape or (B) native reef environment.
 <br/>
 <br/>
 
@@ -124,7 +138,7 @@ df.comp$param <- factor(df.comp$param, levels = c("pro", "carb", "den", "chla"))
 
 # make a 'treat' column for better spacing of plot
 df.comp$treat2 <- df.comp$treat
-df.comp$treat <- gsub("control", 2, df.comp$treat)
+df.comp$treat <- gsub("T0", 2, df.comp$treat)
 df.comp$treat <- gsub("288_28", 4, df.comp$treat)
 df.comp$treat <- gsub("311_31", 4.5, df.comp$treat)
 df.comp$treat <- gsub("447_28", 6, df.comp$treat)
@@ -172,9 +186,10 @@ full.T0.fig
 #comp.fig
 #dev.set(dev.next())
 ```
-**Figure 2.** True mean (+/- SE) T0 and T90 coral fragment physiology of *(a) S. siderea*, *(b) P. strigosa*, *(c) P. astreoides*, and *(d) U. tenuifolia* with individual coral fragment physiology denoted by points. T0 corals are represented by green stars. Blue denotes 28$^\circ$C, red denotes 31$^\circ$C, and shape corresponds to *p*CO2 treatment conditions of T90 fragments.
+**Figure 2.** True mean (+/- SE) T0 and T90 coral fragment physiology of *(a) S. siderea*, *(b) P. strigosa*, *(c) P. astreoides*, and *(d) U. tenuifolia* with individual coral fragment physiology denoted by points. T0 corals are represented by green stars. Blue denotes 28C, red denotes 31C, and shape corresponds to *p*CO2 treatment conditions of T90 fragments.
 <br/>
 <br/>
+
 
 # **Part 2:** *Effects of treatment on T90 physiology* 
 <br/>
@@ -201,7 +216,7 @@ completeFun <- function(data, desiredCols) {
 T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any missing values from "rate"
 
 # mixed effect model run using lmer()
-T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.pro)
+T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.pro)
 
 
 ### Performing the parametric bootstrapping of the model:
@@ -209,13 +224,13 @@ bootnum = 1500 # set number of iterations (we used 1500) between 999 and 9999
 seed = 4 #seed to make results replicatable (our seed was 4)
 
 #out <- simulate(T90.pro.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, #data = T90.df.pro),re.form=NA))
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, #data = T90.df.pro),re.form=NA))
 #
 #boots <- cbind(predict(T90.pro.model,re.form=NA), boots)
 #T90.df.pro.a <- (cbind(T90.df.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
 #colnames(T90.df.pro.a)[16:18] <- c("mean", "lowerci", "upperci")
-
-
+#
+#
 #pro.df <- paste("Protein_model_T90", date, sep="_") 
 #pro.df <- paste(pro.df, ".csv", sep="") 
 #write.csv(T90.df.pro.a, file=pro.df)  
@@ -248,16 +263,16 @@ completeFun <- function(data, desiredCols) {
 T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values from "rate"
 
 # mixed effect model run using lmer()
-T90.carb.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.carb)
+T90.carb.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=T, data = T90.df.carb)
 
-### Performing the parametric bootstrapping of the model:
+## Performing the parametric bootstrapping of the model:
 #out <- simulate(T90.carb.model,nsim=bootnum,seed=seed,re.form=NULL) 
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=F, #data = T90.df.carb),re.form=NA)) 
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=T, #data = T90.df.carb),re.form=NA)) 
 #
 #boots <- cbind(predict(T90.carb.model,re.form=NA), boots) 
 #T90.df.carb.a <- (cbind(T90.df.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975)))))))) 
 #colnames(T90.df.carb.a)[16:18] <- c("mean", "lowerci", "upperci") 
-
+#
 #carb.df <- paste("Carbohydrate_model_T90", date, sep="_") 
 #carb.df <- paste(carb.df, ".csv", sep="") 
 #write.csv(T90.df.carb.a, file=carb.df)  
@@ -291,17 +306,17 @@ completeFun <- function(data, desiredCols) {
 T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any missing values from "rate"
 
 # mixed effect model run using lmer()
-T90.den.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=F, data = T90.df.den)
+T90.den.model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony), REML=T, data = T90.df.den)
 
-### Performing the parametric bootstrapping of the model:
+## Performing the parametric bootstrapping of the model:
 #out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=F, #data = T90.df.den),re.form=NA))
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony), REML=T, #data = T90.df.den),re.form=NA))
 #
 #boots <- cbind(predict(T90.den.model,re.form=NA), boots)
 #T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
 #colnames(T90.df.den.a)[16:18] <- c("mean", "lowerci", "upperci")
-
-
+#
+#
 #den.df <- paste("Density_model_T90", date, sep="_") 
 #den.df <- paste(den.df, ".csv", sep="") 
 #write.csv(T90.df.den.a, file=den.df)  
@@ -334,17 +349,17 @@ completeFun <- function(data, desiredCols) {
 T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any missing values from "rate"
 
 # mixed effect model run using lmer()
-T90.chla.model <- lmer(value ~ species * fpco2 * ftemp + (1 | colony), REML=F, data = T90.df.chla)
+T90.chla.model <- lmer(value ~ species * fpco2 * ftemp + (1 | colony), REML=T, data = T90.df.chla)
 
-### Performing the parametric bootstrapping of the model:
+## Performing the parametric bootstrapping of the model:
 #out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL) 
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * fpco2 * ftemp + (1 | colony), REML=F, #data = T90.df.chla),re.form=NA)) 
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * fpco2 * ftemp + (1 | colony), REML=T, #data = T90.df.chla),re.form=NA)) 
 #
 #boots <- cbind(predict(T90.chla.model,re.form=NA), boots) 
 #T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975)))))))) 
 #colnames(T90.df.chla.a)[16:18] <- c("mean", "lowerci", "upperci")
-
-
+#
+#
 #chla.df <- paste("Chlorophyll_model_T90", date, sep="_") 
 #chla.df <- paste(chla.df, ".csv", sep="") 
 #write.csv(T90.df.chla.a, file=chla.df)  
@@ -377,11 +392,11 @@ completeFun <- function(data, desiredCols) {
 T90.df.sum <- completeFun(T90.df.sum, "value") # run function to remove any missing values from "rate"
 
 # mixed effect model run using lmer()
-T90.sum.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, data = T90.df.sum)
+T90.sum.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.sum)
 
-### Performing the parametric bootstrapping of the model:
+## Performing the parametric bootstrapping of the model:
 #out <- simulate(T90.sum.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=F, #data = T90.df.sum),re.form=NA))
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, #data = T90.df.sum),re.form=NA))
 #
 #boots <- cbind(predict(T90.sum.model,re.form=NA), boots)
 #T90.df.sum.a <- (cbind(T90.df.sum, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
@@ -506,22 +521,381 @@ phys_plot
 #phys_plot
 #dev.set(dev.next())
 ```
-**Figure 2.** Modelled 95% confidence interval of *(a) S. siderea*, *(b) P. strigosa*, *(c) P. astreoides*, and *(d) U. tenuifolia* physiology with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+**Figure 3.** Modelled 95% confidence interval of *(a) S. siderea*, *(b) P. strigosa*, *(c) P. astreoides*, and *(d) U. tenuifolia* physiology with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
 <br/>
 <br/>
 
-# *Working analyses*
-<font color='darkmagenta'>Plotting sum colour intensity metrics</font>  
-```{r, echo=FALSE, fig.height = 7, fig.width = 11, fig.align = "center", results = 'hide'}
+
+# **Part 3:** *Bleaching over time (using colour intensity)* 
+```{r chla sum5 comparison, fig.height=3, fig.width=10, echo=F, include=F}
+
+# subset by species
+df.s <- subset(df, species=="S")
+df.p <- subset(df, species=="P")
+df.a <- subset(df, species=="A")
+df.t <- subset(df, species=="T")
+
+# linear models per species (sum5 * chla)
+lm1.s <- summary(lm(chla ~ sum_bw5, data = df.s))
+lm1.p <- summary(lm(chla ~ sum_bw5, data = df.p))
+lm1.a <- summary(lm(chla ~ sum_bw5, data = df.a))
+lm1.t <- summary(lm(chla ~ sum_bw5, data = df.t))
+
+# extract R2 values
+lm1.s.R2 <- lm1.s$adj.r.squared
+lm1.p.R2 <- lm1.p$adj.r.squared
+lm1.a.R2 <- lm1.a$adj.r.squared
+lm1.t.R2 <- lm1.t$adj.r.squared
+
+# extract p values
+lm1.s.p <- lm1.s$coefficients[2,4]
+lm1.p.p <- lm1.p$coefficients[2,4]
+lm1.a.p <- lm1.a$coefficients[2,4]
+lm1.t.p <- lm1.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (sum_bw5 * -1), y = chla, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(clab)+
+  theme(legend.position="none")+
+  xlab("Sum Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm1.s.R2)~ ";  Rp"^2 == .(lm1.p.R2)~"; Ra"^2 == .(lm1.a.R2)~ ";  Rt"^2 == .(lm1.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r chla red5 comparison, fig.height=3, fig.width=10, echo=F, include=F}
+
+# linear models per species (red5 * chla)
+lm2.s <- summary(lm(chla ~ red_bw5, data = df.s))
+lm2.p <- summary(lm(chla ~ red_bw5, data = df.p))
+lm2.a <- summary(lm(chla ~ red_bw5, data = df.a))
+lm2.t <- summary(lm(chla ~ red_bw5, data = df.t))
+
+# extract R2 values
+lm2.s.R2 <- lm2.s$adj.r.squared
+lm2.p.R2 <- lm2.p$adj.r.squared
+lm2.a.R2 <- lm2.a$adj.r.squared
+lm2.t.R2 <- lm2.t$adj.r.squared
+
+# extract p values
+lm2.s.p <- lm2.s$coefficients[2,4]
+lm2.p.p <- lm2.p$coefficients[2,4]
+lm2.a.p <- lm2.a$coefficients[2,4]
+lm2.t.p <- lm2.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (red_bw5 * -1), y = chla, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(clab)+
+  theme(legend.position="none")+
+  xlab("Red Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm2.s.R2)~ ";  Rp"^2 == .(lm2.p.R2)~"; Ra"^2 == .(lm2.a.R2)~ ";  Rt"^2 == .(lm2.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r chla blue5 comparison, fig.height=3, fig.width=10, echo=F, include=F}
+
+# linear models per species (blue5 * chla)
+lm3.s <- summary(lm(chla ~ blue_bw5, data = df.s))
+lm3.p <- summary(lm(chla ~ blue_bw5, data = df.p))
+lm3.a <- summary(lm(chla ~ blue_bw5, data = df.a))
+lm3.t <- summary(lm(chla ~ blue_bw5, data = df.t))
+
+# extract R2 values
+lm3.s.R2 <- lm3.s$adj.r.squared
+lm3.p.R2 <- lm3.p$adj.r.squared
+lm3.a.R2 <- lm3.a$adj.r.squared
+lm3.t.R2 <- lm3.t$adj.r.squared
+
+# extract p values
+lm3.s.p <- lm3.s$coefficients[2,4]
+lm3.p.p <- lm3.p$coefficients[2,4]
+lm3.a.p <- lm3.a$coefficients[2,4]
+lm3.t.p <- lm3.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (blue_bw5 * -1), y = chla, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(clab)+
+  theme(legend.position="none")+
+  xlab("Blue Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm3.s.R2)~ ";  Rp"^2 == .(lm3.p.R2)~"; Ra"^2 == .(lm3.a.R2)~ ";  Rt"^2 == .(lm3.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r chla green5 comparison, fig.height=3, fig.width=10, echo=F, include=F}
+
+# linear models per species (green5 * chla)
+lm4.s <- summary(lm(chla ~ green_bw5, data = df.s))
+lm4.p <- summary(lm(chla ~ green_bw5, data = df.p))
+lm4.a <- summary(lm(chla ~ green_bw5, data = df.a))
+lm4.t <- summary(lm(chla ~ green_bw5, data = df.t))
+
+# extract R2 values
+lm4.s.R2 <- lm4.s$adj.r.squared
+lm4.p.R2 <- lm4.p$adj.r.squared
+lm4.a.R2 <- lm4.a$adj.r.squared
+lm4.t.R2 <- lm4.t$adj.r.squared
+
+# extract p values
+lm4.s.p <- lm4.s$coefficients[2,4]
+lm4.p.p <- lm4.p$coefficients[2,4]
+lm4.a.p <- lm4.a$coefficients[2,4]
+lm4.t.p <- lm4.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (green_bw5 * -1), y = chla, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(clab)+
+  theme(legend.position="none")+
+  xlab("Green Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm4.s.R2)~ ";  Rp"^2 == .(lm4.p.R2)~"; Ra"^2 == .(lm4.a.R2)~ ";  Rt"^2 == .(lm4.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r den sum5 comparison, fig.height=3, fig.width=10, echo=F, include=F}
+
+# linear models per species (sum5 * den)
+lm5.s <- summary(lm(den ~ sum_bw5, data = df.s))
+lm5.p <- summary(lm(den ~ sum_bw5, data = df.p))
+lm5.a <- summary(lm(den ~ sum_bw5, data = df.a))
+lm5.t <- summary(lm(den ~ sum_bw5, data = df.t))
+
+# extract R2 values
+lm5.s.R2 <- lm5.s$adj.r.squared
+lm5.p.R2 <- lm5.p$adj.r.squared
+lm5.a.R2 <- lm5.a$adj.r.squared
+lm5.t.R2 <- lm5.t$adj.r.squared
+
+# extract p values
+lm5.s.p <- lm5.s$coefficients[2,4]
+lm5.p.p <- lm5.p$coefficients[2,4]
+lm5.a.p <- lm5.a$coefficients[2,4]
+lm5.t.p <- lm5.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (sum_bw5 * -1), y = den, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(dlab)+
+  theme(legend.position="none")+
+  xlab("Sum Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm5.s.R2)~ ";  Rp"^2 == .(lm5.p.R2)~"; Ra"^2 == .(lm5.a.R2)~ ";  Rt"^2 == .(lm5.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r den red5 comparison, fig.height=3, fig.width=10, echo=F, include=F}
+
+# linear models per species (red5 * den)
+lm6.s <- summary(lm(den ~ red_bw5, data = df.s))
+lm6.p <- summary(lm(den ~ red_bw5, data = df.p))
+lm6.a <- summary(lm(den ~ red_bw5, data = df.a))
+lm6.t <- summary(lm(den ~ red_bw5, data = df.t))
+
+# extract R2 values
+lm6.s.R2 <- lm6.s$adj.r.squared
+lm6.p.R2 <- lm6.p$adj.r.squared
+lm6.a.R2 <- lm6.a$adj.r.squared
+lm6.t.R2 <- lm6.t$adj.r.squared
+
+# extract p values
+lm6.s.p <- lm6.s$coefficients[2,4]
+lm6.p.p <- lm6.p$coefficients[2,4]
+lm6.a.p <- lm6.a$coefficients[2,4]
+lm6.t.p <- lm6.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (red_bw5 * -1), y = den, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(dlab)+
+  theme(legend.position="none")+
+  xlab("Red Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm6.s.R2)~ ";  Rp"^2 == .(lm6.p.R2)~"; Ra"^2 == .(lm6.a.R2)~ ";  Rt"^2 == .(lm6.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r den blue5 comparison, fig.height=3, fig.width=10, echo=F, include=F}
+
+# linear models per species (blue5 * den)
+lm7.s <- summary(lm(den ~ blue_bw5, data = df.s))
+lm7.p <- summary(lm(den ~ blue_bw5, data = df.p))
+lm7.a <- summary(lm(den ~ blue_bw5, data = df.a))
+lm7.t <- summary(lm(den ~ blue_bw5, data = df.t))
+
+# extract R2 values
+lm7.s.R2 <- lm7.s$adj.r.squared
+lm7.p.R2 <- lm7.p$adj.r.squared
+lm7.a.R2 <- lm7.a$adj.r.squared
+lm7.t.R2 <- lm7.t$adj.r.squared
+
+# extract p values
+lm7.s.p <- lm7.s$coefficients[2,4]
+lm7.p.p <- lm7.p$coefficients[2,4]
+lm7.a.p <- lm7.a$coefficients[2,4]
+lm7.t.p <- lm7.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (blue_bw5 * -1), y = den, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(dlab)+
+  theme(legend.position="none")+
+  xlab("Blue Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm7.s.R2)~ ";  Rp"^2 == .(lm7.p.R2)~"; Ra"^2 == .(lm7.a.R2)~ ";  Rt"^2 == .(lm7.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r den green5 comparison, fig.height=3, fig.width=10, include=FALSE}
+
+# linear models per species (green5 * den)
+lm8.s <- summary(lm(den ~ green_bw5, data = df.s))
+lm8.p <- summary(lm(den ~ green_bw5, data = df.p))
+lm8.a <- summary(lm(den ~ green_bw5, data = df.a))
+lm8.t <- summary(lm(den ~ green_bw5, data = df.t))
+
+# extract R2 values
+lm8.s.R2 <- lm8.s$adj.r.squared
+lm8.p.R2 <- lm8.p$adj.r.squared
+lm8.a.R2 <- lm8.a$adj.r.squared
+lm8.t.R2 <- lm8.t$adj.r.squared
+
+# extract p values
+lm8.s.p <- lm8.s$coefficients[2,4]
+lm8.p.p <- lm8.p$coefficients[2,4]
+lm8.a.p <- lm8.a$coefficients[2,4]
+lm8.t.p <- lm8.t$coefficients[2,4]
+
+
+ggplot(df, aes(x = (green_bw5 * -1), y = den, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  ylab(dlab)+
+  theme(legend.position="none")+
+  xlab("Green Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(atop("Rs"^2 == .(lm8.s.R2)~ ";  Rp"^2 == .(lm8.p.R2)~"; Ra"^2 == .(lm8.a.R2)~ ";  Rt"^2 == .(lm8.t.R2))))+
+  facet_wrap(~species, scales = "free_y", ncol = 4)
+
+```
+
+```{r tables of colours, echo=F}
+# SSID table for colour intensity
+table.s <- data_frame("comparison" = c("chla v sum", "chla v red", "chla v blue", "chla v green", "den v sum", "den v red", "den v blue", "den v green"), "R2" = c(lm1.s.R2, lm2.s.R2, lm3.s.R2, lm4.s.R2, lm5.s.R2, lm6.s.R2, lm7.s.R2, lm8.s.R2), "p.value" = c(lm1.s.p, lm2.s.p, lm3.s.p, lm4.s.p, lm5.s.p, lm6.s.p, lm7.s.p, lm8.s.p))
+
+# PSTR table for colour intensity
+table.p <- data_frame("comparison" = c("chla v sum", "chla v red", "chla v blue", "chla v green", "den v sum", "den v red", "den v blue", "den v green"), "R2" = c(lm1.p.R2, lm2.p.R2, lm3.p.R2, lm4.p.R2, lm5.p.R2, lm6.p.R2, lm7.p.R2, lm8.p.R2), "p.value" = c(lm1.p.p, lm2.p.p, lm3.p.p, lm4.p.p, lm5.p.p, lm6.p.p, lm7.p.p, lm8.p.p))
+
+# PAST table for colour intensity
+table.a <- data_frame("comparison" = c("chla v sum", "chla v red", "chla v blue", "chla v green", "den v sum", "den v red", "den v blue", "den v green"), "R2" = c(lm1.a.R2, lm2.a.R2, lm3.a.R2, lm4.a.R2, lm5.a.R2, lm6.a.R2, lm7.a.R2, lm8.a.R2), "p.value" = c(lm1.a.p, lm2.a.p, lm3.a.p, lm4.a.p, lm5.a.p, lm6.a.p, lm7.a.p, lm8.a.p))
+
+# UTEN table for colour intensity
+table.t <- data_frame("comparison" = c("chla v sum", "chla v red", "chla v blue", "chla v green", "den v sum", "den v red", "den v blue", "den v green"), "R2" = c(lm1.t.R2, lm2.t.R2, lm3.t.R2, lm4.t.R2, lm5.t.R2, lm6.t.R2, lm7.t.R2, lm8.t.R2), "p.value" = c(lm1.t.p, lm2.t.p, lm3.t.p, lm4.t.p, lm5.t.p, lm6.t.p, lm7.t.p, lm8.t.p))
+
+table.s$R2 <- round(table.s$R2, 3)
+table.p$R2 <- round(table.p$R2, 3)
+table.a$R2 <- round(table.a$R2, 3)
+table.t$R2 <- round(table.t$R2, 3)
+
+table.s$p.value <- round(table.s$p.value, 4)
+table.p$p.value <- round(table.p$p.value, 4)
+table.a$p.value <- round(table.a$p.value, 4)
+table.t$p.value <- round(table.t$p.value, 4)
+
+table.full <- cbind(table.s, table.p, table.a, table.t)
+
+kable(table.full, caption = "Table 1. Colour Intensity Linear Models") %>%
+  kable_styling(font_size = 12, full_width = F) %>% 
+  column_spec(1:3, background = "lightgrey") %>%
+  column_spec(7:9, background = "lightgrey") %>% 
+  column_spec(1, bold = T) %>% 
+  column_spec(4, bold = T) %>% 
+  column_spec(7, bold = T) %>% 
+  column_spec(10, bold = T) %>%
+  add_header_above(c("SSID" = 3, "PSTR" = 3, "PAST" = 3, "UTEN" = 3))
+
+```
+<br/>
+
+### Figure 4
+```{r col best figs, fig.height=3, fig.width=10, echo=F}
+# SSID with density (specifically red)
+s.sumplot <- ggplot(df.s, aes(x = (red_bw5 * -1), y = den, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm", colour = "black", se=F)+
+  ylab(dlab)+
+  theme(legend.position="none")+
+  xlab("Red Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(bold("SSID Best Fit:")~ "R"^2 == .(lm6.s.R2)))
+
+# PSTR best with red chla, but good with any (except blue)
+p.sumplot <- ggplot(df.p, aes(x = (red_bw5 * -1), y = chla, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm", colour = "black", se=F)+
+  ylab(clab)+
+  theme(legend.position="none")+
+  xlab("Red Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(bold("PSTR Best Fit:")~ "R"^2 == .(lm2.p.R2)))
+
+# PAST chla
+a.sumplot <- ggplot(df.a, aes(x = (sum_bw5 * -1), y = chla, colour = ftemp, shape = fpco2, group = species))+
+  geom_point()+
+  geom_smooth(method="lm", colour = "black", se=F)+
+  ylab(clab)+
+  theme(legend.position="none")+
+  xlab("Sum Colour Intensity")+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  ggtitle(bquote(bold("PAST Best Fit:")~ "R"^2 == .(lm1.a.R2)))
+
+plot_grid(s.sumplot, p.sumplot, a.sumplot, labels="auto", nrow = 1)
+```
+**Figure 4.** Text goes here
+<br/>
+
+*Notes:*
+
+* Red best predicts denisty, but colour overall predicts density better than chlorophyll in SSID
+* Red best predicts chlorophyll, but any channel (with the exception of blue) predicts both density and chlorophyll in PSTRs
+* Colour intensity predicts chlorophyll, but not density in PAST
+* No colour analysis predicts UTEN bleaching
+
+<br/>
+
+### Figure 5
+```{r sum PAST fig, echo=FALSE, fig.height = 3, fig.width = 11, fig.align = "center", results = 'hide'}
 col.df <- df[,c(1:12,17:36)]
-col.df <- col.df[,c(1:13,17,21,25,29)]
+col.df.red <- col.df[,c(1:12,14,18,22,26,30)] # red channel
+
+# sum fig for PAST
+col.df <- col.df[,c(1:13,17,21,25,29)] # sum channels
 col.df <- subset(col.df, T0_T90=="T90")
 col.df <- gather(col.df, col.metric, value, sum_bw5:sum_bw4) # make column of parameter and value
 col.df$col.metric <- gsub("sum_bw", "tp", col.df$col.metric)
 col.df$value <- col.df$value * -1
 col.df$fpco2 <- factor(col.df$fpco2, c("280", "400", "700", "2800"))
+col.df <- subset(col.df, species == "A")
 
-col.sum <- summarySE(data = col.df, measurevar = "value", groupvars = c("col.metric", "species", "fpco2", "ftemp"), na.rm = TRUE)
+col.sum <- summarySE(data = col.df, measurevar = "value", groupvars = c("col.metric", "fpco2", "ftemp"), na.rm = TRUE)
 
 colour.fig <-ggplot(col.sum, aes(colour=ftemp, group=ftemp))+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -529,22 +903,51 @@ colour.fig <-ggplot(col.sum, aes(colour=ftemp, group=ftemp))+
   geom_line(aes(col.metric, value), position = dodge, size=0.5)+
   xlab("time point")+
   ylab("")+
+  ggtitle("(a) Sum Channel Colour Intensity")+
   geom_errorbar(aes(x = col.metric, ymin=value-se, ymax=value+se, width=0.3), position=dodge, colour="black")+
   geom_point(aes(col.metric, value), position = dodge, size=2)+
   scale_colour_manual("Temperature", labels=c("28C", "31C"), values = c("blue", "red"))+
-  facet_grid(species~fpco2, scales = "free_y", labeller = as_labeller( c(S = "SSID", P = "PSTR", A = "PAST", T = "UTEN", "280" = "280 uatm", "400" = "400 uatm", "700" = "700 uatm", "2800" = "2800 uatm")))
-  #facet_grid(col.metric~species, scales = "free_y", labeller = as_labeller( c(S = "SSID", P = "PSTR", A = "PAST", T = "UTEN", sum_bw1 = "Pre-Acc (sum)", sum_bw2 = "T0 (sum)", sum_bw3 = "T30 (sum)", sum_bw4 = "T60 (sum)", sum_bw5 = "T90 (sum)")))
+  facet_grid(~fpco2, scales = "free_y", labeller = as_labeller( c("280" = "280 uatm", "400" = "400 uatm", "700" = "700 uatm", "2800" = "2800 uatm")))
 colour.fig
 
-
-#fig4 <- paste("colour_fig", date, sep="_") 
-#fig4 <- paste(fig4, ".pdf", sep="") 
-#
-#pdf(fig4, width = 7, height = 5)
-#colour.fig
-#dev.set(dev.next())
 ```
 
+```{r red SSID PSTR fig, echo=FALSE, fig.height = 5.5, fig.width = 11, fig.align = "center", results = 'hide'}
+# red fig for SSID and PSTR
+col.df.red <- subset(col.df.red, T0_T90=="T90")
+col.df.red <- gather(col.df.red, col.metric, value, red_bw1:red_bw4) # make column of parameter and value
+col.df.red$col.metric <- gsub("red_bw", "tp", col.df.red$col.metric)
+col.df.red$value <- col.df.red$value * -1
+col.df.red$fpco2 <- factor(col.df.red$fpco2, c("280", "400", "700", "2800"))
+col.df.red <- subset(col.df.red, species != "A")
+col.df.red <- subset(col.df.red, species != "T")
+
+red.sum <- summarySE(data = col.df.red, measurevar = "value", groupvars = c("col.metric", "species", "fpco2", "ftemp"), na.rm = TRUE)
+
+red.fig <-ggplot(red.sum, aes(colour=ftemp, group=ftemp))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  geom_point(data=col.df.red, aes(col.metric, value), position = jitter, alpha=0.3, size=1.5, shape = 20)+
+  geom_line(aes(col.metric, value), position = dodge, size=0.5)+
+  xlab("time point")+
+  ylab("")+
+  ggtitle("(b) Red Channel Colour Intensity")+
+  geom_errorbar(aes(x = col.metric, ymin=value-se, ymax=value+se, width=0.3), position=dodge, colour="black")+
+  geom_point(aes(col.metric, value), position = dodge, size=2)+
+  scale_colour_manual("Temperature", labels=c("28C", "31C"), values = c("blue", "red"))+
+  facet_grid(species~fpco2, scales = "free_y", labeller = as_labeller( c("280" = "280 uatm", "400" = "400 uatm", "700" = "700 uatm", "2800" = "2800 uatm", "S" = "SSID", "P" = "PSTR")))
+red.fig
+
+```
+
+
+**Figure 5.** Text goes here
+<br/>
+<br/>
+<br/>
+<br/>
+
+
+# *Working analyses*
 
 ## Preliminary statistics (basic linear model and anova)
 ```{r, echo = FALSE}
@@ -817,7 +1220,7 @@ kable(ten.stat.df2, caption = "UTEN linear models p-values") %>%
 
 
 
-#T90 plot of all parameters by reefzone
+T90 plot of all parameters by reefzone
 ```{r, echo=FALSE, fig.height = 10, fig.width = 9, fig.align = "center", results = 'hide'}
 # create summary data
 T90.reef.sum <- summarySE(data = T90.df, measurevar = "value", groupvars = c("param", "species", "fpco2", "ftemp", "reef"), na.rm = TRUE)
@@ -903,7 +1306,7 @@ phys_reef_plot
 ```
 
 
-# PCA of physiology at T90
+PCA of physiology at T90
 ```{r, echo=FALSE, fig.height = 4.5, fig.width = 7, fig.align = "center"}
 df3 <- df[, -c(18:36)]
 names(df3)[17]<-"sum"
@@ -1079,7 +1482,7 @@ ten.pca.plot
 
 
 
-# Comparison between physiological parameters per fragment
+Comparison between physiological parameters per fragment
 <font color='darkmagenta'>Linear Regression between carbohydrate and protein</font>  
 <div style= "float:left;position:">
 ```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
