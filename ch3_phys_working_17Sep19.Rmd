@@ -836,6 +836,7 @@ kable(table.full, caption = "Table 1. Colour Intensity Linear Models") %>%
 <br/>
 
 ### Figure 4
+
 ```{r col best figs, fig.height=3, fig.width=10, echo=F}
 # SSID with density (specifically red)
 s.sumplot <- ggplot(df.s, aes(x = (red_bw5 * -1), y = den, colour = ftemp, shape = fpco2, group = species))+
@@ -872,7 +873,7 @@ plot_grid(s.sumplot, p.sumplot, a.sumplot, labels="auto", nrow = 1)
 **Figure 4.** Text goes here
 <br/>
 
-*Notes:*
+Notes:
 
 * Red best predicts denisty, but colour overall predicts density better than chlorophyll in SSID
 * Red best predicts chlorophyll, but any channel (with the exception of blue) predicts both density and chlorophyll in PSTRs
