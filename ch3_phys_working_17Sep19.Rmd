@@ -836,7 +836,9 @@ kable(table.full, caption = "Table 1. Colour Intensity Linear Models") %>%
 <br/>
 
 ### Figure 4
+
 ```{r col best figs, fig.height=3, fig.width=10, echo=F}
+
 # SSID with density (specifically red)
 s.sumplot <- ggplot(df.s, aes(x = (red_bw5 * -1), y = den, colour = ftemp, shape = fpco2, group = species))+
   geom_point()+
@@ -868,11 +870,12 @@ a.sumplot <- ggplot(df.a, aes(x = (sum_bw5 * -1), y = chla, colour = ftemp, shap
   ggtitle(bquote(bold("PAST Best Fit:")~ "R"^2 == .(lm1.a.R2)))
 
 plot_grid(s.sumplot, p.sumplot, a.sumplot, labels="auto", nrow = 1)
+
 ```
 **Figure 4.** Text goes here
 <br/>
 
-*Notes:*
+Notes:
 
 * Red best predicts denisty, but colour overall predicts density better than chlorophyll in SSID
 * Red best predicts chlorophyll, but any channel (with the exception of blue) predicts both density and chlorophyll in PSTRs
@@ -883,6 +886,7 @@ plot_grid(s.sumplot, p.sumplot, a.sumplot, labels="auto", nrow = 1)
 
 ### Figure 5
 ```{r sum PAST fig, echo=FALSE, fig.height = 3, fig.width = 11, fig.align = "center", results = 'hide'}
+
 col.df <- df[,c(1:12,17:36)]
 col.df.red <- col.df[,c(1:12,14,18,22,26,30)] # red channel
 
@@ -913,6 +917,7 @@ colour.fig
 ```
 
 ```{r red SSID PSTR fig, echo=FALSE, fig.height = 5.5, fig.width = 11, fig.align = "center", results = 'hide'}
+
 # red fig for SSID and PSTR
 col.df.red <- subset(col.df.red, T0_T90=="T90")
 col.df.red <- gather(col.df.red, col.metric, value, red_bw1:red_bw4) # make column of parameter and value
@@ -945,6 +950,163 @@ red.fig
 <br/>
 <br/>
 <br/>
+
+
+# **Part 4:** *Comparison of physiological parameters*
+
+<br/>
+
+### Figure 6: *Siderastrea siderea*
+*Models were fit by either temperature (blue/red) or pCO2 (pink/green/orange/darkred) depending on best linear model fit*
+
+```{r SSID comp model, echo=FALSE}
+
+# adjust dataframe for SSID physiology parameters only
+phys.s <- df.s[ , -c(13, 17:33, 35:36)] 
+phys.s <- subset(phys.s, T0_T90 == "T90")
+phys.s$red <- phys.s$red_bw5 * -1 # inverse of colour intensity so that lower values represent 'bleaching'
+phys.s$red_bw5 <- NULL
+
+# reorder and revalue factors 
+phys.s$fpco2 <- factor(phys.s$fpco2, c("280", "400", "700", "2800"))
+phys.s$species <- revalue(x = phys.s$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN"))
+
+
+# Perform simple linear models (only showing best fit)
+pro.carb.mod.s <- lm(carb ~ pro * ftemp, data = phys.s)
+pro.den.mod.s <- lm(den ~ pro * ftemp, data = phys.s) 
+pro.chla.mod.s <- lm(chla ~ pro * fpco2, data = phys.s)
+pro.red.mod.s <- lm(red ~ pro * fpco2, data = phys.s)
+carb.den.mod.s <- lm(den ~ carb * fpco2, data = phys.s)
+carb.chla.mod.s <- lm(chla ~ carb * fpco2, data = phys.s)
+carb.red.mod.s <- lm(red ~ carb * fpco2, data = phys.s)
+den.chla.mod.s <- lm(chla ~ den * fpco2, data = phys.s)
+den.red.mod.s <- lm(red ~ den * fpco2, data = phys.s)
+chla.red.mod.s <- lm(red ~ chla * fpco2, data = phys.s)
+
+# extract R2 for best fit models
+pc.R2.s  <- summary(pro.carb.mod.s)$adj.r.squared
+pd.R2.s  <- summary(pro.den.mod.s)$adj.r.squared
+pa.R2.s  <- summary(pro.chla.mod.s)$adj.r.squared
+pr.R2.s  <- summary(pro.red.mod.s)$adj.r.squared
+cd.R2.s  <- summary(carb.den.mod.s)$adj.r.squared
+ca.R2.s  <- summary(carb.chla.mod.s)$adj.r.squared
+cr.R2.s  <- summary(carb.red.mod.s)$adj.r.squared
+da.R2.s  <- summary(den.chla.mod.s)$adj.r.squared
+dr.R2.s  <- summary(den.red.mod.s)$adj.r.squared
+ar.R2.s  <- summary(chla.red.mod.s)$adj.r.squared
+
+```
+```{r SSID comp figures, echo=FALSE}
+
+# individual figures comparing physiology parameters
+SSID.pro.carb <- ggplot(phys.s, aes(x = pro, y = carb, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Carbohydrate")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pc.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+SSID.pro.den <- ggplot(phys.s, aes(x = pro, y = den, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+  
+SSID.pro.chla <- ggplot(phys.s, aes(x = pro, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pa.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+SSID.pro.red <- ggplot(phys.s, aes(x = pro, y = red, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pr.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+SSID.carb.den <- ggplot(phys.s, aes(x = carb, y = den, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(cd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+SSID.carb.chla <- ggplot(phys.s, aes(x = carb, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(ca.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+SSID.carb.red <- ggplot(phys.s, aes(x = carb, y = red, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(cr.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+SSID.den.chla <- ggplot(phys.s, aes(x = den, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Density")+
+  ggtitle(bquote(bold("R"^2 == .(da.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+SSID.den.red <- ggplot(phys.s, aes(x = den, y = red, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Density")+
+  ggtitle(bquote(bold("R"^2 == .(dr.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+SSID.chla.red <- ggplot(phys.s, aes(x = chla, y = red, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Chlorophyll")+
+  ggtitle(bquote(bold("R"^2 == .(ar.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+
+plot_grid(SSID.den.chla, SSID.carb.chla, SSID.pro.chla, SSID.pro.den, SSID.den.red, SSID.carb.den, SSID.pro.carb, SSID.chla.red, SSID.pro.red, SSID.carb.red, labels = c("a)", "b)", "c)", "d)", "e)", "f)", "g)", "h)", "i)", "j)"))
+
+```
+
+**Figure 5.** Text goes here
+
 
 
 # *Working analyses*
