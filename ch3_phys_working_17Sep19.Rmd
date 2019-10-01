@@ -997,7 +997,7 @@ dr.R2.s  <- summary(den.red.mod.s)$adj.r.squared
 ar.R2.s  <- summary(chla.red.mod.s)$adj.r.squared
 
 ```
-```{r SSID comp figures, echo=FALSE}
+```{r SSID comp figures, echo=FALSE, fig.height=8, fig.width=10}
 
 # individual figures comparing physiology parameters
 SSID.pro.carb <- ggplot(phys.s, aes(x = pro, y = carb, colour = ftemp, shape = fpco2, group = ftemp))+
@@ -1105,9 +1105,157 @@ plot_grid(SSID.den.chla, SSID.carb.chla, SSID.pro.chla, SSID.pro.den, SSID.den.r
 
 ```
 
-**Figure 5.** Text goes here
+**Figure 6.** Text goes here
+
+<br/>
+
+### Figure 7: *Pseudodiploria strigosa*
+*Models were fit by overall correlation (black), temperature (blue/red), or pCO2 (pink/green/orange/darkred) depending on best linear model fit*
+  
+```{r PSTR comp model, echo=FALSE}
+
+# adjust dataframe for PSTR physiology parameters only
+phys.p <- df.p[ , -c(13, 17:33, 35:36)] 
+phys.p <- subset(phys.p, T0_T90 == "T90")
+phys.p$red <- phys.p$red_bw5 * -1 # inverse of colour intensity so that lower values represent 'bleaching'
+phys.p$red_bw5 <- NULL
+
+# reorder and revalue factors 
+phys.p$fpco2 <- factor(phys.p$fpco2, c("280", "400", "700", "2800"))
 
 
+# Perform simple linear models (only showing best fit)
+pro.carb.mod.s <- lm(carb ~ pro, data = phys.p)
+pro.den.mod.s <- lm(den ~ pro * ftemp, data = phys.p) 
+pro.chla.mod.s <- lm(chla ~ pro * fpco2, data = phys.p) 
+pro.red.mod.s <- lm(red ~ pro * ftemp, data = phys.p) 
+carb.den.mod.s <- lm(den ~ carb * ftemp, data = phys.p) 
+carb.chla.mod.s <- lm(chla ~ carb * fpco2, data = phys.p)
+carb.red.mod.s <- lm(red ~ carb * ftemp, data = phys.p)
+den.chla.mod.s <- lm(chla ~ den * fpco2, data = phys.p)
+den.red.mod.s <- lm(red ~ den * ftemp, data = phys.p)
+chla.red.mod.s <- lm(chla ~ red * fpco2, data = phys.p)
+
+# extract R2 for best fit models
+pc.R2.s  <- summary(pro.carb.mod.s)$adj.r.squared
+pd.R2.s  <- summary(pro.den.mod.s)$adj.r.squared
+pa.R2.s  <- summary(pro.chla.mod.s)$adj.r.squared
+pr.R2.s  <- summary(pro.red.mod.s)$adj.r.squared
+cd.R2.s  <- summary(carb.den.mod.s)$adj.r.squared
+ca.R2.s  <- summary(carb.chla.mod.s)$adj.r.squared
+cr.R2.s  <- summary(carb.red.mod.s)$adj.r.squared
+da.R2.s  <- summary(den.chla.mod.s)$adj.r.squared
+dr.R2.s  <- summary(den.red.mod.s)$adj.r.squared
+ar.R2.s  <- summary(chla.red.mod.s)$adj.r.squared
+
+```
+```{r PSTR comp figures, echo=FALSE, fig.height=8, fig.width=10}
+
+# individual figures comparing physiology parameters
+PSTR.pro.carb <- ggplot(phys.p, aes(x = pro, y = carb, group = species))+
+  geom_point()+
+  ylab("Carbohydrate")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pc.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE, colour = "black")
+
+PSTR.pro.den <- ggplot(phys.p, aes(x = pro, y = den, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+PSTR.pro.chla <- ggplot(phys.p, aes(x = pro, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pa.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PSTR.pro.red <- ggplot(phys.p, aes(x = pro, y = red, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pr.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+PSTR.carb.den <- ggplot(phys.p, aes(x = carb, y = den, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(cd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+PSTR.carb.chla <- ggplot(phys.p, aes(x = carb, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(ca.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PSTR.carb.red <- ggplot(phys.p, aes(x = carb, y = red, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(cr.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+PSTR.den.chla <- ggplot(phys.p, aes(x = den, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Density")+
+  ggtitle(bquote(bold("R"^2 == .(da.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PSTR.den.red <- ggplot(phys.p, aes(x = den, y = red, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Density")+
+  ggtitle(bquote(bold("R"^2 == .(dr.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+PSTR.chla.red <- ggplot(phys.p, aes(x = chla, y = red, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Chlorophyll")+
+  ggtitle(bquote(bold("R"^2 == .(ar.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+
+plot_grid(PSTR.carb.chla, PSTR.chla.red, PSTR.den.red, PSTR.carb.red, PSTR.den.chla, PSTR.pro.red, PSTR.carb.den, PSTR.pro.carb, PSTR.pro.den, PSTR.pro.chla, labels = c("a)", "b)", "c)", "d)", "e)", "f)", "g)", "h)", "i)", "j)"))
+
+```
+
+**Figure 7.** Text goes here
 
 # *Working analyses*
 
