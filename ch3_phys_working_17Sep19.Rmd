@@ -1259,7 +1259,6 @@ plot_grid(PSTR.carb.chla, PSTR.chla.red, PSTR.den.red, PSTR.carb.red, PSTR.den.c
 
 
 
-
 ### Figure 8: *Porites astreoides*
 *Models were fit by overall correlation (black), temperature (blue/red), or pCO2 (pink/green/orange/darkred) depending on best linear model fit*
   
@@ -1408,367 +1407,110 @@ plot_grid(PAST.chla.red, PAST.pro.carb, PAST.pro.chla, PAST.carb.chla, PAST.den.
 **Figure 8.** Text goes here
 
 
+### Figure 9: *Undaria tenuifolia*
+*Models were fit by overall correlation (black), temperature (blue/red), or pCO2 (pink/green/orange/darkred) depending on best linear model fit*
+  
+```{r UTEN comp model, echo=FALSE}
+
+# adjust dataframe for UTEN physiology parameters only
+phys.t <- df.t[ , -c(13, 17:36)] 
+phys.t <- subset(phys.t, T0_T90 == "T90")
+
+# reorder and revalue factors 
+phys.t$fpco2 <- factor(phys.t$fpco2, c("280", "400", "700", "2800"))
+
+
+# Perform simple linear models (only showing best fit)
+pro.carb.mod.s <- lm(carb ~ pro, data = phys.t)
+pro.den.mod.s <- lm(den ~ pro * fpco2, data = phys.t)
+pro.chla.mod.s <- lm(chla ~ pro * ftemp, data = phys.t)
+carb.den.mod.s <- lm(den ~ carb * ftemp, data = phys.t)
+carb.chla.mod.s <- lm(chla ~ carb * ftemp, data = phys.t)
+den.chla.mod.s <- lm(chla ~ den * ftemp, data = phys.t)
+
+# extract R2 for best fit models
+pc.R2.s  <- summary(pro.carb.mod.s)$adj.r.squared
+pd.R2.s  <- summary(pro.den.mod.s)$adj.r.squared
+pa.R2.s  <- summary(pro.chla.mod.s)$adj.r.squared
+cd.R2.s  <- summary(carb.den.mod.s)$adj.r.squared
+ca.R2.s  <- summary(carb.chla.mod.s)$adj.r.squared
+da.R2.s  <- summary(den.chla.mod.s)$adj.r.squared
+
+
+```
+```{r UTEN comp figures, echo=FALSE, fig.height=4, fig.width=9}
+
+# individual figures comparing physiology parameters
+UTEN.pro.carb <- ggplot(phys.t, aes(x = pro, y = carb, group = species))+
+  geom_point()+
+  ylab("Carbohydrate")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pc.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE, colour = "black")
+
+UTEN.pro.den <- ggplot(phys.t, aes(x = pro, y = den, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+UTEN.pro.chla <- ggplot(phys.t, aes(x = pro, y = chla, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pa.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+UTEN.carb.den <- ggplot(phys.t, aes(x = carb, y = den, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(cd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+UTEN.carb.chla <- ggplot(phys.t, aes(x = carb, y = chla, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(ca.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+UTEN.den.chla <- ggplot(phys.t, aes(x = den, y = chla, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Density")+
+  ggtitle(bquote(bold("R"^2 == .(da.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+
+plot_grid(UTEN.pro.carb, UTEN.carb.chla, UTEN.pro.den, UTEN.pro.chla, UTEN.carb.den, UTEN.den.chla, labels = c("a)", "b)", "c)", "d)", "e)", "f)"))
+
+```
+
+
+**Figure 9.** Text goes here
+
+
 
 # *Working analyses*
-
-## Preliminary statistics (basic linear model and anova)
-```{r, echo = FALSE}
-# Select for only T90 values and remove excess colour intensity columns (only sum_T90)
-df.stat <- subset(df, T0_T90=="T90")
-df.stat <- df.stat[,-c(18:36)]
-df.stat$fpco2 <- factor(df.stat$fpco2, levels = c("400", "280", "700", "2800"))
-df.stat$sum.in <- df.stat$sum_bw5 * -1
-
-sid.stat <- subset(df.stat, species=="S")
-dip.stat <- subset(df.stat, species=="P")
-por.stat <- subset(df.stat, species=="A")
-ten.stat <- subset(df.stat, species=="T")
-
-# Basic linear models for SSID
-sid.carb.lm <- lm <- lm(carb ~ ftemp + fpco2 + reef, data=sid.stat)
-sid.pro.lm <- lm <- lm(pro ~ ftemp + fpco2 + reef + reef:ftemp, data=sid.stat)
-sid.den.lm <- lm <- lm(den ~ ftemp + fpco2 + reef + reef:ftemp, data=sid.stat)
-sid.chla.lm <- lm <- lm(chla ~ ftemp + fpco2 + reef, data=sid.stat)
-sid.col.lm <- lm <- lm(sum.in ~ ftemp + fpco2 + reef, data=sid.stat)
-
-
-sid.stat.df <- data.frame("Parameter" = c("Carbohydrate", "Protein", "Symbiont Density", "Chlorophyll a", "Colour Intensity"))
-
-sid.stat.df$`Temperature` <- round(c(summary(sid.carb.lm)$coefficients[2,4],
-                                       summary(sid.pro.lm)$coefficients[2,4],
-                                       summary(sid.den.lm)$coefficients[2,4], 
-                                       summary(sid.chla.lm)$coefficients[2,4],
-                                       summary(sid.col.lm)$coefficients[2,4]), 4)
-
-sid.stat.df$`280 pCO2` <- round(c(summary(sid.carb.lm)$coefficients[3,4],
-                                       summary(sid.pro.lm)$coefficients[3,4],
-                                       summary(sid.den.lm)$coefficients[3,4], 
-                                       summary(sid.chla.lm)$coefficients[3,4],
-                                       summary(sid.col.lm)$coefficients[3,4]), 4)
-
-sid.stat.df$`700 pCO2` <- round(c(summary(sid.carb.lm)$coefficients[4,4],
-                                       summary(sid.pro.lm)$coefficients[4,4],
-                                       summary(sid.den.lm)$coefficients[4,4], 
-                                       summary(sid.chla.lm)$coefficients[4,4],
-                                       summary(sid.col.lm)$coefficients[4,4]), 4)
-
-sid.stat.df$`2800 pCO2` <- round(c(summary(sid.carb.lm)$coefficients[5,4],
-                                       summary(sid.pro.lm)$coefficients[5,4],
-                                       summary(sid.den.lm)$coefficients[5,4], 
-                                       summary(sid.chla.lm)$coefficients[5,4],
-                                       summary(sid.col.lm)$coefficients[5,4]), 4)
-
-sid.stat.df$`Reef Environment` <- round(c(summary(sid.carb.lm)$coefficients[6,4],
-                                       summary(sid.pro.lm)$coefficients[6,4],
-                                       summary(sid.den.lm)$coefficients[6,4], 
-                                       summary(sid.chla.lm)$coefficients[6,4],
-                                       summary(sid.col.lm)$coefficients[6,4]), 4)    
-
-sid.stat.df$`Temperature x Reef` <-  c("NA",
-                                       round(summary(sid.pro.lm)$coefficients[7,4], 4),
-                                       round(summary(sid.den.lm)$coefficients[7,4], 4), 
-                                       "NA",
-                                       "NA")   
-
-sid.stat.df2 <- data.frame(t(sid.stat.df[-1]))
-colnames(sid.stat.df2) <- sid.stat.df[, 1]
-
-sid.stat.df2$Carbohydrate <- as.numeric(as.character(sid.stat.df2$Carbohydrate))
-sid.stat.df2$Protein <- as.numeric(as.character(sid.stat.df2$Protein))
-sid.stat.df2$`Symbiont Density` <- as.numeric(as.character(sid.stat.df2$`Symbiont Density`))
-sid.stat.df2$`Chlorophyll a` <- as.numeric(as.character(sid.stat.df2$`Chlorophyll a`))
-sid.stat.df2$`Colour Intensity` <- as.numeric(as.character(sid.stat.df2$`Colour Intensity`))
-
-kable(sid.stat.df2, caption = "SSID linear models p-values") %>%
-  kable_styling(font_size = 12, full_width = F) %>% 
-  row_spec(0, background = "lightgrey") %>% 
-  column_spec(1, italic = T, color = "black", background = "lightgrey") %>% 
-  column_spec(2:3, color = "#333333", background ="#FF9999") %>%
-  column_spec(4:6, color = "#333333", background = "#99CC66")
-
-```
-
-```{r, echo = FALSE}
-# Basic linear models for PSTR
-dip.carb.lm <- lm <- lm(carb ~ ftemp + fpco2 + reef, data=dip.stat)
-dip.pro.lm <- lm <- lm(pro ~ ftemp + fpco2 + reef, data=dip.stat)
-dip.den.lm <- lm <- lm(den ~ ftemp + fpco2 + reef + ftemp:reef, data=dip.stat)
-dip.chla.lm <- lm <- lm(chla ~ ftemp + fpco2 + reef, data=dip.stat)
-dip.col.lm <- lm <- lm(sum.in ~ ftemp + fpco2 + reef + ftemp:reef, data=dip.stat)
-
-
-dip.stat.df <- data.frame("Parameter" = c("Carbohydrate", "Protein", "Symbiont Density", "Chlorophyll a", "Colour Intensity"))
-
-dip.stat.df$`Temperature` <- round(c(summary(dip.carb.lm)$coefficients[2,4],
-                                       summary(dip.pro.lm)$coefficients[2,4],
-                                       summary(dip.den.lm)$coefficients[2,4], 
-                                       summary(dip.chla.lm)$coefficients[2,4],
-                                       summary(dip.col.lm)$coefficients[2,4]), 4)
-
-dip.stat.df$`280 pCO2` <- round(c(summary(dip.carb.lm)$coefficients[3,4],
-                                       summary(dip.pro.lm)$coefficients[3,4],
-                                       summary(dip.den.lm)$coefficients[3,4], 
-                                       summary(dip.chla.lm)$coefficients[3,4],
-                                       summary(dip.col.lm)$coefficients[3,4]), 4)
-
-dip.stat.df$`700 pCO2` <- round(c(summary(dip.carb.lm)$coefficients[4,4],
-                                       summary(dip.pro.lm)$coefficients[4,4],
-                                       summary(dip.den.lm)$coefficients[4,4], 
-                                       summary(dip.chla.lm)$coefficients[4,4],
-                                       summary(dip.col.lm)$coefficients[4,4]), 4)
-
-dip.stat.df$`2800 pCO2` <- round(c(summary(dip.carb.lm)$coefficients[5,4],
-                                       summary(dip.pro.lm)$coefficients[5,4],
-                                       summary(dip.den.lm)$coefficients[5,4], 
-                                       summary(dip.chla.lm)$coefficients[5,4],
-                                       summary(dip.col.lm)$coefficients[5,4]), 4)
-
-dip.stat.df$`Reef Environment` <- round(c(summary(dip.carb.lm)$coefficients[6,4],
-                                       summary(dip.pro.lm)$coefficients[6,4],
-                                       summary(dip.den.lm)$coefficients[6,4], 
-                                       summary(dip.chla.lm)$coefficients[6,4],
-                                       summary(dip.col.lm)$coefficients[6,4]), 4)    
-
-dip.stat.df$`Temperature x Reef` <-  c("NA",
-                                       "NA",
-                                       round(summary(dip.den.lm)$coefficients[7,4], 4), 
-                                       "NA",
-                                       round(summary(dip.col.lm)$coefficients[7,4], 4))  
-
-dip.stat.df2 <- data.frame(t(dip.stat.df[-1]))
-colnames(dip.stat.df2) <- dip.stat.df[, 1]
-
-dip.stat.df2$Carbohydrate <- as.numeric(as.character(dip.stat.df2$Carbohydrate))
-dip.stat.df2$Protein <- as.numeric(as.character(dip.stat.df2$Protein))
-dip.stat.df2$`Symbiont Density` <- as.numeric(as.character(dip.stat.df2$`Symbiont Density`))
-dip.stat.df2$`Chlorophyll a` <- as.numeric(as.character(dip.stat.df2$`Chlorophyll a`))
-dip.stat.df2$`Colour Intensity` <- as.numeric(as.character(dip.stat.df2$`Colour Intensity`))
-
-kable(dip.stat.df2, caption = "PSTR linear models p-values") %>%
-  kable_styling(font_size = 12, full_width = F) %>% 
-  row_spec(0, background = "lightgrey") %>% 
-  column_spec(1, italic = T, color = "black", background = "lightgrey") %>% 
-  column_spec(2:3, color = "#333333", background ="#FF9999") %>%
-  column_spec(4:6, color = "#333333", background = "#99CC66")
-
-```
-
-```{r, echo = FALSE}
-# Basic linear models for PAST
-por.carb.lm <- lm <- lm(carb ~ ftemp + fpco2 + reef, data=por.stat)
-por.pro.lm <- lm <- lm(pro ~ ftemp + fpco2 + reef, data=por.stat)
-por.den.lm <- lm <- lm(den ~ ftemp + fpco2 + reef , data=por.stat)
-por.chla.lm <- lm <- lm(chla ~ ftemp + fpco2 + reef + ftemp:fpco2, data=por.stat)
-por.col.lm <- lm <- lm(sum.in ~ ftemp + fpco2 + reef, data=por.stat)
-
-
-por.stat.df <- data.frame("Parameter" = c("Carbohydrate", "Protein", "Symbiont Density", "Chlorophyll a", "Colour Intensity"))
-
-por.stat.df$`Temperature` <- round(c(summary(por.carb.lm)$coefficients[2,4],
-                                       summary(por.pro.lm)$coefficients[2,4],
-                                       summary(por.den.lm)$coefficients[2,4], 
-                                       summary(por.chla.lm)$coefficients[2,4],
-                                       summary(por.col.lm)$coefficients[2,4]), 4)
-
-por.stat.df$`280 pCO2` <- round(c(summary(por.carb.lm)$coefficients[3,4],
-                                       summary(por.pro.lm)$coefficients[3,4],
-                                       summary(por.den.lm)$coefficients[3,4], 
-                                       summary(por.chla.lm)$coefficients[3,4],
-                                       summary(por.col.lm)$coefficients[3,4]), 4)
-
-por.stat.df$`700 pCO2` <- round(c(summary(por.carb.lm)$coefficients[4,4],
-                                       summary(por.pro.lm)$coefficients[4,4],
-                                       summary(por.den.lm)$coefficients[4,4], 
-                                       summary(por.chla.lm)$coefficients[4,4],
-                                       summary(por.col.lm)$coefficients[4,4]), 4)
-
-por.stat.df$`2800 pCO2` <- round(c(summary(por.carb.lm)$coefficients[5,4],
-                                       summary(por.pro.lm)$coefficients[5,4],
-                                       summary(por.den.lm)$coefficients[5,4], 
-                                       summary(por.chla.lm)$coefficients[5,4],
-                                       summary(por.col.lm)$coefficients[5,4]), 4)
-
-por.stat.df$`Reef Environment` <- round(c(summary(por.carb.lm)$coefficients[6,4],
-                                       summary(por.pro.lm)$coefficients[6,4],
-                                       summary(por.den.lm)$coefficients[6,4], 
-                                       summary(por.chla.lm)$coefficients[6,4],
-                                       summary(por.col.lm)$coefficients[6,4]), 4)    
-
-por.stat.df$`Temperature x 280 pCO2` <-  c("NA",
-                                       "NA",
-                                       "NA", 
-                                       summary(por.chla.lm)$coefficients[7,4],
-                                       "NA")  
-
-por.stat.df$`Temperature x 700 pCO2` <-  c("NA",
-                                       "NA",
-                                       "NA", 
-                                       summary(por.chla.lm)$coefficients[8,4],
-                                       "NA") 
-
-por.stat.df$`Temperature x 2800 pCO2` <-  c("NA",
-                                       "NA",
-                                       "NA", 
-                                       summary(por.chla.lm)$coefficients[9,4],
-                                       "NA")  
-
-por.stat.df2 <- data.frame(t(por.stat.df[-1]))
-colnames(por.stat.df2) <- por.stat.df[, 1]
-
-kable(por.stat.df2, caption = "PAST linear models p-values") %>%
-  kable_styling(font_size = 12, full_width = F) %>% 
-  row_spec(0, background = "lightgrey") %>% 
-  column_spec(1, italic = T, color = "black", background = "lightgrey") %>% 
-  column_spec(2:3, color = "#333333", background ="#FF9999") %>%
-  column_spec(4:6, color = "#333333", background = "#99CC66")
-
-```
-
-
-```{r, echo = FALSE}
-# Basic linear models for UTEN
-ten.carb.lm <- lm <- lm(carb ~ ftemp + fpco2 + reef, data=ten.stat)
-ten.pro.lm <- lm <- lm(pro ~ ftemp + fpco2 + reef, data=ten.stat)
-ten.den.lm <- lm <- lm(den ~ ftemp + fpco2 + reef , data=ten.stat)
-ten.chla.lm <- lm <- lm(chla ~ ftemp + fpco2 + reef, data=ten.stat)
-ten.col.lm <- lm <- lm(sum.in ~ ftemp + fpco2 + reef, data=ten.stat)
-
-
-ten.stat.df <- data.frame("Parameter" = c("Carbohydrate", "Protein", "Symbiont Density", "Chlorophyll a", "Colour Intensity"))
-
-ten.stat.df$`Temperature` <- round(c(summary(ten.carb.lm)$coefficients[2,4],
-                                       summary(ten.pro.lm)$coefficients[2,4],
-                                       summary(ten.den.lm)$coefficients[2,4], 
-                                       summary(ten.chla.lm)$coefficients[2,4],
-                                       summary(ten.col.lm)$coefficients[2,4]), 4)
-
-ten.stat.df$`280 pCO2` <- round(c(summary(ten.carb.lm)$coefficients[3,4],
-                                       summary(ten.pro.lm)$coefficients[3,4],
-                                       summary(ten.den.lm)$coefficients[3,4], 
-                                       summary(ten.chla.lm)$coefficients[3,4],
-                                       summary(ten.col.lm)$coefficients[3,4]), 4)
-
-ten.stat.df$`700 pCO2` <- round(c(summary(ten.carb.lm)$coefficients[4,4],
-                                       summary(ten.pro.lm)$coefficients[4,4],
-                                       summary(ten.den.lm)$coefficients[4,4], 
-                                       summary(ten.chla.lm)$coefficients[4,4],
-                                       summary(ten.col.lm)$coefficients[4,4]), 4)
-
-ten.stat.df$`2800 pCO2` <- round(c(summary(ten.carb.lm)$coefficients[5,4],
-                                       summary(ten.pro.lm)$coefficients[5,4],
-                                       summary(ten.den.lm)$coefficients[5,4], 
-                                       summary(ten.chla.lm)$coefficients[5,4],
-                                       summary(ten.col.lm)$coefficients[5,4]), 4)
-
-ten.stat.df$`Reef Environment` <- round(c(summary(ten.carb.lm)$coefficients[6,4],
-                                       summary(ten.pro.lm)$coefficients[6,4],
-                                       summary(ten.den.lm)$coefficients[6,4], 
-                                       summary(ten.chla.lm)$coefficients[6,4],
-                                       summary(ten.col.lm)$coefficients[6,4]), 4)    
-
-
-ten.stat.df2 <- data.frame(t(ten.stat.df[-1]))
-colnames(ten.stat.df2) <- ten.stat.df[, 1]
-
-kable(ten.stat.df2, caption = "UTEN linear models p-values") %>%
-  kable_styling(font_size = 12, full_width = F) %>% 
-  row_spec(0, background = "lightgrey") %>% 
-  column_spec(1, italic = T, color = "black", background = "lightgrey") %>% 
-  column_spec(2:3, color = "#333333", background ="#FF9999") %>%
-  column_spec(4:6, color = "#333333", background = "#99CC66")
-
-```
-
-
-
-
-T90 plot of all parameters by reefzone
-```{r, echo=FALSE, fig.height = 10, fig.width = 9, fig.align = "center", results = 'hide'}
-# create summary data
-T90.reef.sum <- summarySE(data = T90.df, measurevar = "value", groupvars = c("param", "species", "fpco2", "ftemp", "reef"), na.rm = TRUE)
-
-# plot total protein
-pro.T90.reef.sum <- subset(T90.reef.sum, param=="pro")
-
-pro.reef.T90.fig <-ggplot(pro.T90.reef.sum, aes(colour=reef, shape = ftemp, group=ftemp))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.placement = "outside", legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ylab("total protein")+
-  xlab("")+
-  geom_point(data=pro.T90, aes(fpco2, value), position = jitter, alpha=0.3, size=1)+
-  geom_errorbar(aes(x = fpco2, ymin=value-se, ymax=value+se, width=0.5), position=dodge2, colour="black")+
-  geom_point(aes(fpco2, value), position = dodge2, size=2)+
-  scale_colour_manual("REef Environment", labels=c("Inshore", "Offshore"), values = c("darkgrey", "orange"))+
-  facet_wrap(~species, scales = "free_y", ncol=4)
-
-# plot carbohydrate
-carb.T90.reef.sum <- subset(T90.reef.sum, param=="carb")
-
-carb.reef.T90.fig <-ggplot(carb.T90.reef.sum, aes(colour=reef, shape = ftemp, group=ftemp))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ylab("carbohydrate")+
-  xlab("")+
-  geom_point(data=carb.T90, aes(fpco2, value), position = jitter, alpha=0.3, size=1)+
-  geom_errorbar(aes(x = fpco2, ymin=value-se, ymax=value+se, width=0.5), position=dodge2, colour="black")+
-  geom_point(aes(fpco2, value), position = dodge2, size=2)+
-  scale_colour_manual("REef Environment", labels=c("Inshore", "Offshore"), values = c("darkgrey", "orange"))+
-  facet_wrap(~species, scales = "free_y", ncol=4)
-
-# plot symbiont density
-den.T90.reef.sum <- subset(T90.reef.sum, param=="den")
-
-den.reef.T90.fig <-ggplot(den.T90.reef.sum, aes(colour=reef, shape = ftemp, group=ftemp))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ylab("symb. density")+
-  xlab("")+  
-  geom_point(data=den.T90, aes(fpco2, value), position = jitter, alpha=0.3, size=1)+
-  geom_errorbar(aes(x = fpco2, ymin=value-se, ymax=value+se, width=0.5), position=dodge2, colour="black")+
-  geom_point(aes(fpco2, value), position = dodge2, size=2)+
-  scale_colour_manual("REef Environment", labels=c("Inshore", "Offshore"), values = c("darkgrey", "orange"))+
-  facet_wrap(~species, scales = "free_y", ncol=4)
-
-# plot chlorophyll
-chla.T90.reef.sum <- subset(T90.reef.sum, param=="chla")
-
-chla.reef.T90.fig <-ggplot(chla.T90.reef.sum, aes(colour=reef, shape = ftemp, group=ftemp))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  xlab("")+
-  ylab("chlorophyll")+
-  geom_point(data=chla.T90, aes(fpco2, value), position = jitter, alpha=0.3, size=1)+
-  geom_errorbar(aes(x = fpco2, ymin=value-se, ymax=value+se, width=0.5), position=dodge2, colour="black")+
-  geom_point(aes(fpco2, value), position = dodge2, size=2)+
-  scale_colour_manual("REef Environment", labels=c("Inshore", "Offshore"), values = c("darkgrey", "orange"))+
-  facet_wrap(~species, scales = "free_y", ncol=4)
-
-# plot colour intensity
-sum_bw5.T90.reef.sum <- subset(T90.reef.sum, param=="sum_bw5")
-
-sum_bw5.reef.T90.fig <-ggplot(sum_bw5.T90.reef.sum, aes(colour=reef, shape = ftemp, group=ftemp))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), strip.text.x = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  xlab(alab)+
-  ylab("colour intensity")+
-  geom_point(data=sum_bw5.T90, aes(fpco2, value), position = jitter, alpha=0.3, size=1)+
-  geom_errorbar(aes(x = fpco2, ymin=value-se, ymax=value+se, width=0.5), position=dodge2, colour="black")+
-  geom_point(aes(fpco2, value), position = dodge2, size=2)+
-  scale_colour_manual("REef Environment", labels=c("Inshore", "Offshore"), values = c("darkgrey", "orange"))+
-  facet_wrap(~species, scales = "free_y", ncol=4)
-
-
-# Combine all the plots
-phys_reef_plot<- plot_grid(pro.reef.T90.fig, carb.reef.T90.fig, den.reef.T90.fig, chla.reef.T90.fig, sum_bw5.reef.T90.fig, ncol = 1, labels = c('A', 'B', 'C', 'D', 'E'), label_size = 12)
-phys_reef_plot
-
-## Create figure name
-#fig5 <- paste("T90_reef_noCol_fig", date, sep="_") 
-#fig5 <- paste(fig5, ".pdf", sep="") 
-#
-## save figure as PDF
-#pdf(fig5, width = 7, height = 8)
-#phys_reef_plot
-#dev.set(dev.next())
-```
-
-
-PCA of physiology at T90
+## PCA of physiology at T90
 ```{r, echo=FALSE, fig.height = 4.5, fig.width = 7, fig.align = "center"}
 df3 <- df[, -c(18:36)]
 names(df3)[17]<-"sum"
@@ -1941,374 +1683,3 @@ ten.reef.PCA <- autoplot(ten.pca.out, data = t.df,
 ten.pca.plot <- plot_grid(ten.pco2.PCA, ten.temp.PCA, ten.reef.PCA, ncol=3)
 ten.pca.plot
 ```
-
-
-
-Comparison between physiological parameters per fragment
-<font color='darkmagenta'>Linear Regression between carbohydrate and protein</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-df$sum_bw5 <- df$sum_bw5 * -1
-df.90b <- df[,c(1:17, 37:38)]
-
-df.90b.S <- subset(df.90b, species=="S")
-df.90b.P <- subset(df.90b, species=="P")
-df.90b.A <- subset(df.90b, species=="A")
-df.90b.T <- subset(df.90b, species=="T")
-
-carb.pro.lm <- summary(lm(pro ~ carb, data=df.90b))
-carb.pro.R2 <- carb.pro.lm$adj.r.squared
-
-Scarb.pro.lm <- summary(lm(pro ~ carb, data=df.90b.S))
-Scarb.pro.R2 <- Scarb.pro.lm$adj.r.squared
-
-Pcarb.pro.lm <- summary(lm(pro ~ carb, data=df.90b.P))
-Pcarb.pro.R2 <- Pcarb.pro.lm$adj.r.squared
-
-Acarb.pro.lm <- summary(lm(pro ~ carb, data=df.90b.A))
-Acarb.pro.R2 <- Acarb.pro.lm$adj.r.squared
-
-Tcarb.pro.lm <- summary(lm(pro ~ carb, data=df.90b.T))
-Tcarb.pro.R2 <- Tcarb.pro.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = pro, y = carb, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, scales = "free", ncol=2, labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(calab)+
-  ylab(plab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Scarb.pro.R2)~ ";  Rp"^2 == .(Pcarb.pro.R2),
-                           ~" Ra"^2 == .(Acarb.pro.R2)~ ";  Rt"^2 == .(Tcarb.pro.R2)))))
-```
-</div>
-***
-```{r, echo=FALSE}
-carb.pro.lm
-```
-***
-<font color='darkmagenta'>Linear Regression between chlorophyll and symbiont density</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-den.chla.lm <- summary(lm(chla ~ den, data=df.90b))
-den.chla.R2 <- den.chla.lm$adj.r.squared
-
-Sden.chla.lm <- summary(lm(chla ~ den, data=df.90b.S))
-Sden.chla.R2 <- Sden.chla.lm$adj.r.squared
-
-Pden.chla.lm <- summary(lm(chla ~ den, data=df.90b.P))
-Pden.chla.R2 <- Pden.chla.lm$adj.r.squared
-
-Aden.chla.lm <- summary(lm(chla ~ den, data=df.90b.A))
-Aden.chla.R2 <- Aden.chla.lm$adj.r.squared
-
-Tden.chla.lm <- summary(lm(chla ~ den, data=df.90b.T))
-Tden.chla.R2 <- Tden.chla.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = chla, y = den, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(clab)+
-  ylab(dlab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Sden.chla.R2)~ ";  Rp"^2 == .(Pden.chla.R2),
-                           ~"Ra"^2 == .(Aden.chla.R2)~ ";  Rt"^2 == .(Tden.chla.R2)))))
-```
-</div>
-***
-```{r, echo=FALSE}
-den.chla.lm
-```
-***
-
-<font color='darkmagenta'>Linear Regression between colour intensity and symbiont density</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-den.sum_bw5.lm <- summary(lm(sum_bw5 ~ den, data=df.90b))
-den.sum_bw5.R2 <- den.sum_bw5.lm$adj.r.squared
-
-Sden.sum_bw5.lm <- summary(lm(sum_bw5 ~ den, data=df.90b.S))
-Sden.sum_bw5.R2 <- Sden.sum_bw5.lm$adj.r.squared
-
-Pden.sum_bw5.lm <- summary(lm(sum_bw5 ~ den, data=df.90b.P))
-Pden.sum_bw5.R2 <- Pden.sum_bw5.lm$adj.r.squared
-
-Aden.sum_bw5.lm <- summary(lm(sum_bw5 ~ den, data=df.90b.A))
-Aden.sum_bw5.R2 <- Aden.sum_bw5.lm$adj.r.squared
-
-Tden.sum_bw5.lm <- summary(lm(sum_bw5 ~ den, data=df.90b.T))
-Tden.sum_bw5.R2 <- Tden.sum_bw5.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = sum_bw5, y = den, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab("colour intensity")+
-  ylab(dlab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Sden.sum_bw5.R2)~ ";  Rp"^2 == .(Pden.sum_bw5.R2),
-                           ~"Ra"^2 == .(Aden.sum_bw5.R2)~ ";  Rt"^2 == .(Tden.sum_bw5.R2)))))
-```
-</div>
-***
-```{r, echo=FALSE}
-den.sum_bw5.lm
-```
-***
-
-<font color='darkmagenta'>Linear Regression between colour intensity and chlorophyll</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-chla.sum_bw5.lm <- summary(lm(sum_bw5 ~ chla, data=df.90b))
-chla.sum_bw5.R2 <- chla.sum_bw5.lm$adj.r.squared
-
-Schla.sum_bw5.lm <- summary(lm(sum_bw5 ~ chla, data=df.90b.S))
-Schla.sum_bw5.R2 <- Schla.sum_bw5.lm$adj.r.squared
-
-Pchla.sum_bw5.lm <- summary(lm(sum_bw5 ~ chla, data=df.90b.P))
-Pchla.sum_bw5.R2 <- Pchla.sum_bw5.lm$adj.r.squared
-
-Achla.sum_bw5.lm <- summary(lm(sum_bw5 ~ chla, data=df.90b.A))
-Achla.sum_bw5.R2 <- Achla.sum_bw5.lm$adj.r.squared
-
-Tchla.sum_bw5.lm <- summary(lm(sum_bw5 ~ chla, data=df.90b.T))
-Tchla.sum_bw5.R2 <- Tchla.sum_bw5.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = sum_bw5, y = chla, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab("colour intensity")+
-  ylab(clab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Schla.sum_bw5.R2)~ ";  Rp"^2 == .(Pchla.sum_bw5.R2),
-                           ~"Ra"^2 == .(Achla.sum_bw5.R2)~ ";  Rt"^2 == .(Tchla.sum_bw5.R2)))))
-```
-</div>
-***  
-```{r, echo=FALSE}
-chla.sum_bw5.lm
-```
-***
-  
-<font color='darkmagenta'>Linear Regression between protein and chlorophyll</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-df.90b.S <- subset(df.90b, species=="S")
-df.90b.P <- subset(df.90b, species=="P")
-df.90b.A <- subset(df.90b, species=="A")
-df.90b.T <- subset(df.90b, species=="T")
-
-chla.pro.lm <- summary(lm(pro ~ chla, data=df.90b))
-chla.pro.R2 <- chla.pro.lm$adj.r.squared
-
-Schla.pro.lm <- summary(lm(pro ~ chla, data=df.90b.S))
-Schla.pro.R2 <- Schla.pro.lm$adj.r.squared
-
-Pchla.pro.lm <- summary(lm(pro ~ chla, data=df.90b.P))
-Pchla.pro.R2 <- Pchla.pro.lm$adj.r.squared
-
-Achla.pro.lm <- summary(lm(pro ~ chla, data=df.90b.A))
-Achla.pro.R2 <- Achla.pro.lm$adj.r.squared
-
-Tchla.pro.lm <- summary(lm(pro ~ chla, data=df.90b.T))
-Tchla.pro.R2 <- Tchla.pro.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = pro, y = chla, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(plab)+
-  ylab(clab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Schla.pro.R2)~ ";  Rp"^2 == .(Pchla.pro.R2),
-                           ~"Ra"^2 == .(Achla.pro.R2)~ ";  Rt"^2 == .(Tchla.pro.R2)))))
-```
-</div>
-***  
-```{r, echo=FALSE}
-    chla.pro.lm
-```
-***
-  
-<font color='darkmagenta'>Linear Regression between carbohydrate and chlorophyll</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-df.90b.S <- subset(df.90b, species=="S")
-df.90b.P <- subset(df.90b, species=="P")
-df.90b.A <- subset(df.90b, species=="A")
-df.90b.T <- subset(df.90b, species=="T")
-
-chla.carb.lm <- summary(lm(carb ~ chla, data=df.90b))
-chla.carb.R2 <- chla.carb.lm$adj.r.squared
-
-Schla.carb.lm <- summary(lm(carb ~ chla, data=df.90b.S))
-Schla.carb.R2 <- Schla.carb.lm$adj.r.squared
-
-Pchla.carb.lm <- summary(lm(carb ~ chla, data=df.90b.P))
-Pchla.carb.R2 <- Pchla.carb.lm$adj.r.squared
-
-Achla.carb.lm <- summary(lm(carb ~ chla, data=df.90b.A))
-Achla.carb.R2 <- Achla.carb.lm$adj.r.squared
-
-Tchla.carb.lm <- summary(lm(carb ~ chla, data=df.90b.T))
-Tchla.carb.R2 <- Tchla.carb.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = carb, y = chla, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(calab)+
-  ylab(clab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Schla.carb.R2)~ ";  Rp"^2 == .(Pchla.carb.R2),
-                           ~"Ra"^2 == .(Achla.carb.R2)~ ";  Rt"^2 == .(Tchla.carb.R2)))))
-```
-</div>
-***  
-```{r, echo=FALSE}
-chla.carb.lm
-```
-***
-
-<font color='darkmagenta'>Linear Regression between protein and calcification rate</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-rate.pro.lm <- summary(lm(pro ~ rate, data=df.90b))
-rate.pro.R2 <- rate.pro.lm$adj.r.squared
-
-Srate.pro.lm <- summary(lm(pro ~ rate, data=df.90b.S))
-Srate.pro.R2 <- Srate.pro.lm$adj.r.squared
-
-Prate.pro.lm <- summary(lm(pro ~ rate, data=df.90b.P))
-Prate.pro.R2 <- Prate.pro.lm$adj.r.squared
-
-Arate.pro.lm <- summary(lm(pro ~ rate, data=df.90b.A))
-Arate.pro.R2 <- Arate.pro.lm$adj.r.squared
-
-Trate.pro.lm <- summary(lm(pro ~ rate, data=df.90b.T))
-Trate.pro.R2 <- Trate.pro.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = pro, y = rate, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(plab)+
-  ylab(rlab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Srate.pro.R2)~ ";  Rp"^2 == .(Prate.pro.R2),
-                           ~"Ra"^2 == .(Arate.pro.R2)~ ";  Rt"^2 == .(Trate.pro.R2)))))
-```
-</div>
-***
-```{r, echo=FALSE}
-rate.pro.lm
-```
-***
- 
-<font color='darkmagenta'>Linear Regression between carbohydrate and calcification rate</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-rate.carb.lm <- summary(lm(carb ~ rate, data=df.90b))
-rate.carb.R2 <- rate.carb.lm$adj.r.squared
-
-Srate.carb.lm <- summary(lm(carb ~ rate, data=df.90b.S))
-Srate.carb.R2 <- Srate.carb.lm$adj.r.squared
-
-Prate.carb.lm <- summary(lm(carb ~ rate, data=df.90b.P))
-Prate.carb.R2 <- Prate.carb.lm$adj.r.squared
-
-Arate.carb.lm <- summary(lm(carb ~ rate, data=df.90b.A))
-Arate.carb.R2 <- Arate.carb.lm$adj.r.squared
-
-Trate.carb.lm <- summary(lm(carb ~ rate, data=df.90b.T))
-Trate.carb.R2 <- Trate.carb.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = carb, y = rate, colour = treat, group = species))+
- geom_point()+
- theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(calab)+
-  ylab(rlab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Srate.carb.R2)~ ";  Rp"^2 == .(Prate.carb.R2),
-                           ~"Ra"^2 == .(Arate.carb.R2)~ ";  Rt"^2 == .(Trate.carb.R2)))))
-```
-</div>
-***
-```{r, echo=FALSE}
-rate.carb.lm
-```    
-
-***
-  
-<font color='darkmagenta'>Linear Regression between chlorophyll and calcification rate</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-rate.chla.lm <- summary(lm(chla ~ rate, data=df.90b))
-rate.chla.R2 <- rate.chla.lm$adj.r.squared
-
-Srate.chla.lm <- summary(lm(chla ~ rate, data=df.90b.S))
-Srate.chla.R2 <- Srate.chla.lm$adj.r.squared
-
-Prate.chla.lm <- summary(lm(chla ~ rate, data=df.90b.P))
-Prate.chla.R2 <- Prate.chla.lm$adj.r.squared
-
-Arate.chla.lm <- summary(lm(chla ~ rate, data=df.90b.A))
-Arate.chla.R2 <- Arate.chla.lm$adj.r.squared
-
-Trate.chla.lm <- summary(lm(chla ~ rate, data=df.90b.T))
-Trate.chla.R2 <- Trate.chla.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = chla, y = rate, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(clab)+
-  ylab(rlab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Srate.chla.R2)~ ";  Rp"^2 == .(Prate.chla.R2),
-                           ~"Ra"^2 == .(Arate.chla.R2)~ ";  Rt"^2 == .(Trate.chla.R2)))))
-```
-</div>
-***
-```{r, echo=FALSE}
-rate.chla.lm
-```  
-
-***
-
-<font color='darkmagenta'>Linear Regression between symbiont density and calcification rate</font>  
-<div style= "float:left;position:">
-```{r, echo=FALSE, fig.height = 4.5, fig.width = 4.5, fig.align = "center"}
-rate.den.lm <- summary(lm(den ~ rate, data=df.90b))
-rate.den.R2 <- rate.den.lm$adj.r.squared
-
-Srate.den.lm <- summary(lm(den ~ rate, data=df.90b.S))
-Srate.den.R2 <- Srate.den.lm$adj.r.squared
-
-Prate.den.lm <- summary(lm(den ~ rate, data=df.90b.P))
-Prate.den.R2 <- Prate.den.lm$adj.r.squared
-
-Arate.den.lm <- summary(lm(den ~ rate, data=df.90b.A))
-Arate.den.R2 <- Arate.den.lm$adj.r.squared
-
-Trate.den.lm <- summary(lm(den ~ rate, data=df.90b.T))
-Trate.den.R2 <- Trate.den.lm$adj.r.squared
-
-ggplot(df.90b, aes(x = den, y = rate, colour = treat, group = species))+
-  geom_point()+
-  theme(plot.title = element_text(hjust = 0.5, size = 10), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")+
-  geom_smooth(method="lm", colour="darkgrey", se=FALSE)+
-  facet_wrap(~species, ncol=2, scales = "free", labeller = as_labeller(c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")))+
-  xlab(dlab)+
-  ylab(rlab)+
-  ggtitle(bquote(bold(atop("Rs"^2 == .(Srate.den.R2)~ ";  Rp"^2 == .(Prate.den.R2),
-                           ~"Ra"^2 == .(Arate.den.R2)~ ";  Rt"^2 == .(Trate.den.R2)))))
-```
-</div>
-***
-```{r, echo=FALSE}
-rate.den.lm
-```    
