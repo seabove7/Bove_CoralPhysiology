@@ -1257,6 +1257,158 @@ plot_grid(PSTR.carb.chla, PSTR.chla.red, PSTR.den.red, PSTR.carb.red, PSTR.den.c
 
 **Figure 7.** Text goes here
 
+
+
+
+### Figure 8: *Porites astreoides*
+*Models were fit by overall correlation (black), temperature (blue/red), or pCO2 (pink/green/orange/darkred) depending on best linear model fit*
+  
+```{r PAST comp model, echo=FALSE}
+
+# adjust dataframe for PAST physiology parameters only
+phys.a <- df.a[ , -c(13, 18:36)] 
+phys.a <- subset(phys.a, T0_T90 == "T90")
+phys.a$sum <- phys.a$sum_bw5 * -1 # inverse of colour intensity so that lower values represent 'bleaching'
+phys.a$sum_bw5 <- NULL
+
+# reorder and revalue factors 
+phys.a$fpco2 <- factor(phys.a$fpco2, c("280", "400", "700", "2800"))
+
+
+# Perform simple linear models (only showing best fit)
+pro.carb.mod.s <- lm(carb ~ pro, data = phys.a)
+pro.den.mod.s <- lm(den ~ pro * ftemp, data = phys.a) 
+pro.chla.mod.s <- lm(chla ~ pro * fpco2, data = phys.a)
+pro.sum.mod.s <- lm(sum ~ pro * ftemp, data = phys.a) 
+carb.den.mod.s <- lm(den ~ carb, data = phys.a)
+carb.chla.mod.s <- lm(chla ~ carb * fpco2, data = phys.a)
+carb.sum.mod.s <- lm(sum ~ carb * fpco2, data = phys.a)
+den.chla.mod.s <- lm(chla ~ den * fpco2, data = phys.a)
+den.sum.mod.s <- lm(sum ~ den * fpco2, data = phys.a)
+chla.sum.mod.s <- lm(chla ~ sum * fpco2, data = phys.a)
+
+# extract R2 for best fit models
+pc.R2.s  <- summary(pro.carb.mod.s)$adj.r.squared
+pd.R2.s  <- summary(pro.den.mod.s)$adj.r.squared
+pa.R2.s  <- summary(pro.chla.mod.s)$adj.r.squared
+ps.R2.s  <- summary(pro.sum.mod.s)$adj.r.squared
+cd.R2.s  <- summary(carb.den.mod.s)$adj.r.squared
+ca.R2.s  <- summary(carb.chla.mod.s)$adj.r.squared
+cs.R2.s  <- summary(carb.sum.mod.s)$adj.r.squared
+da.R2.s  <- summary(den.chla.mod.s)$adj.r.squared
+ds.R2.s  <- summary(den.sum.mod.s)$adj.r.squared
+as.R2.s  <- summary(chla.sum.mod.s)$adj.r.squared
+
+```
+```{r PAST comp figures, echo=FALSE, fig.height=8, fig.width=10}
+
+# individual figures comparing physiology parameters
+PAST.pro.carb <- ggplot(phys.a, aes(x = pro, y = carb, group = species))+
+  geom_point()+
+  ylab("Carbohydrate")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pc.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE, colour = "black")
+
+PAST.pro.den <- ggplot(phys.a, aes(x = pro, y = den, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+PAST.pro.chla <- ggplot(phys.a, aes(x = pro, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(pa.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PAST.pro.red <- ggplot(phys.a, aes(x = pro, y = sum, colour = ftemp, shape = fpco2, group = ftemp))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Protein")+
+  ggtitle(bquote(bold("R"^2 == .(ps.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("Temperature", values = c("blue", "red"))+
+  scale_shape_manual("pCO2", values = c(18,15,16,17))
+
+PAST.carb.den <- ggplot(phys.a, aes(x = carb, y = den,group = species))+
+  geom_point()+
+  ylab("Density")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(cd.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE, colour = "black")
+
+PAST.carb.chla <- ggplot(phys.a, aes(x = carb, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(ca.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PAST.carb.red <- ggplot(phys.a, aes(x = carb, y = sum, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Carbohydrate")+
+  ggtitle(bquote(bold("R"^2 == .(cs.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PAST.den.chla <- ggplot(phys.a, aes(x = den, y = chla, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Chlorophyll")+
+  xlab("Density")+
+  ggtitle(bquote(bold("R"^2 == .(da.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PAST.den.red <- ggplot(phys.a, aes(x = den, y = sum, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Density")+
+  ggtitle(bquote(bold("R"^2 == .(ds.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+PAST.chla.red <- ggplot(phys.a, aes(x = chla, y = sum, colour = fpco2, shape = ftemp, group = fpco2))+
+  geom_point()+
+  ylab("Colour Intensity")+
+  xlab("Chlorophyll")+
+  ggtitle(bquote(bold("R"^2 == .(as.R2.s))))+
+  theme(legend.position = "none")+
+  geom_smooth(method = 'lm', se = FALSE)+
+  scale_colour_manual("pCO2", values = c("lightpink", "seagreen", "orange", "darkred"))+
+  scale_shape_manual("Temperature", values = c(17,15))
+
+
+plot_grid(PAST.chla.red, PAST.pro.carb, PAST.pro.chla, PAST.carb.chla, PAST.den.chla, PAST.pro.red, PAST.carb.red, PAST.den.red, PAST.pro.den, PAST.carb.den, labels = c("a)", "b)", "c)", "d)", "e)", "f)", "g)", "h)", "i)", "j)"))
+
+```
+
+
+**Figure 8.** Text goes here
+
+
+
 # *Working analyses*
 
 ## Preliminary statistics (basic linear model and anova)
