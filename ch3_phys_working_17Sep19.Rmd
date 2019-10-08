@@ -1021,15 +1021,21 @@ phys.s$species <- revalue(x = phys.s$species, c("S" = "SSID", "P" = "PSTR", "A" 
 
 # Perform simple linear models (only showing best fit)
 pro.carb.mod.s <- lm(carb ~ pro * ftemp, data = phys.s)
-pro.den.mod.s <- lm(den ~ pro * ftemp, data = phys.s) 
-pro.chla.mod.s <- lm(chla ~ pro * fpco2, data = phys.s)
-pro.red.mod.s <- lm(red ~ pro * fpco2, data = phys.s)
+pro.den.mod.s <- lm(en ~ pro * ftemp * fpco2, data = phys.s) # ftemp and fpco2
+pro.chla.mod.s <- lm(chla ~ pro * ftemp * fpco2 * reef, data = phys.s) # ftemp, fpco2, reef
+pro.red.mod.s <- lm(red ~ pro * ftemp * fpco2 * reef, data = phys.s) # ftemp and fpco2
 carb.den.mod.s <- lm(den ~ carb * fpco2, data = phys.s)
 carb.chla.mod.s <- lm(chla ~ carb * fpco2, data = phys.s)
 carb.red.mod.s <- lm(red ~ carb * fpco2, data = phys.s)
-den.chla.mod.s <- lm(chla ~ den * fpco2, data = phys.s)
-den.red.mod.s <- lm(red ~ den * fpco2, data = phys.s)
+den.chla.mod.s <- lm(chla ~ den * ftemp * fpco2 * reef, data = phys.s) # ftemp, fpco2, reef
+den.red.mod.s <- lm(red ~ den * ftemp * fpco2 * reef, data = phys.s) # ftemp, fpco2, reef
 chla.red.mod.s <- lm(red ~ chla * fpco2, data = phys.s)
+
+### Calcification models (R2~0.3 == not great fit)
+#sid.calc.pro <- lm(rate ~ pro * fpco2, data = phys.s)
+#sid.calc.carb <- lm(rate ~ carb * fpco2, data = phys.s)
+#sid.calc.den <- lm(rate ~ den * fpco2, data = phys.s)
+#sid.calc.chla <- lm(rate ~ chla * fpco2, data = phys.s)
 
 # extract R2 for best fit models
 pc.R2.s  <- summary(pro.carb.mod.s)$adj.r.squared
@@ -1182,6 +1188,12 @@ carb.red.mod.s <- lm(red ~ carb * ftemp, data = phys.p)
 den.chla.mod.s <- lm(chla ~ den * fpco2, data = phys.p)
 den.red.mod.s <- lm(red ~ den * ftemp, data = phys.p)
 chla.red.mod.s <- lm(chla ~ red * fpco2, data = phys.p)
+
+### Calcification models (R2~0.4-0.8, but really complex models)
+#dip.calc.pro <- lm(rate ~ pro * ftemp * fpco2 * reef, data = phys.p)
+#dip.calc.carb <- lm(rate ~ carb * ftemp * fpco2 * reef, data = phys.p)
+#dip.calc.den <- lm(rate ~ den * fpco2 * reef, data = phys.p)
+#dip.calc.chla <- lm(rate ~ chla * ftemp * fpco2 * reef, data = phys.p)
 
 # extract R2 for best fit models
 pc.R2.s  <- summary(pro.carb.mod.s)$adj.r.squared
