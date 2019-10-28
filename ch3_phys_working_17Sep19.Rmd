@@ -43,7 +43,7 @@ theme_set(theme_classic())
 # set parameter labels
 Tlab<-"Temperature (°C)"
 alab<-expression(paste(italic("p"),"CO" [2]~ "("*mu,'atm)'))
-dlab<-expression(paste("Symbiont density (10"^6,"cells cm"^-2,")"))
+dlab<-expression(paste("Cell density (10"^6,"cells cm"^-2,")"))
 plab<-expression(paste("Total protein (mg cm"^-2,")"))
 calab<-expression(paste("Carbohydrate (mg cm"^-2,")"))
 clab<-expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")"))
@@ -79,8 +79,8 @@ df$fpco2 <- as.factor(df$fpco2)
 df$colony <- as.factor(df$colony)
 df$species <- factor(df$species, levels = c("S", "P", "A", "T"))
 df$fpco2 <- factor(df$fpco2, c("280", "400", "700", "2800"))
-df$symb <- df$chla / df$den
 df$den <- df$den / 1000000
+df$symb <- (df$chla) / (df$den)
 df$host <- df$pro + df$carb + df$lipid
 df$treat[df$T0_T90 == "T0"] <- "T0"
 df$treat <- factor(df$treat, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
@@ -706,7 +706,7 @@ host.model.fig <- ggplot(T90.df.host.a)+
   geom_point(data=df.comp.host, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   geom_linerange(data=comp.sum.host, aes(x=treat, ymin=value-ci, ymax=value+ci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
-  ylab("host")+
+  ylab("Total host energy \n reserves (mg cm )")+
   xlab("")+
   geom_point( aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
   geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
@@ -714,9 +714,10 @@ host.model.fig <- ggplot(T90.df.host.a)+
   facet_wrap(~species, ncol=4, scales="free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
+host.model.fig
 ```
 
-```{r symb phys model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+```{r symb phys model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE, include=FALSE}
 
 # subsetting
 T90.df.symb <- subset(T90.df, param=="symb")
@@ -732,17 +733,17 @@ completeFun <- function(data, desiredCols) {
   completeVec <- complete.cases(data[, desiredCols])
   return(data[completeVec, ])
 }
-T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values from "rate"
-
-# mixed effect model run using
-T90.symb.model <- lmer(value ~ species * ftemp + reef + fpco2  + (1 | colony), REML=T, data = T90.df.symb)
-
-
+#T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values from "rate"
+#
+## mixed effect model run using
+#T90.symb.model <- lmer(value ~ species * ftemp + reef + fpco2  + (1 | colony), REML=T, data = T90.df.symb)
+#
+#
 #out <- simulate(T90.symb.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + reef + fpco2  +(1 | colony), #REML=T, data = T90.df.symb),re.form=NA))
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + reef + fpco2  +(1 | colony), REML=T, data = T90.df.symb),re.form=NA))
 #
 #boots <- cbind(predict(T90.symb.model,re.form=NA), boots)
-#T90.df.symb.a <- (cbind(T90.df.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
+#T90.df.symb.a <- (cbind(T90.df.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
 #colnames(T90.df.symb.a)[16:18] <- c("mean", "lowerci", "upperci")
 #
 #
@@ -750,7 +751,7 @@ T90.symb.model <- lmer(value ~ species * ftemp + reef + fpco2  + (1 | colony), R
 #symb.df <- paste(symb.df, ".csv", sep="") 
 #write.csv(T90.df.symb.a, file=symb.df)  
 
-T90.df.symb.a <- read.csv("symb_model_T90_2019-10-21.csv", head=T)
+T90.df.symb.a <- read.csv("symb_model_T90_2019-10-28.csv", head=T)
 T90.df.symb.a$ftemp <- as.factor(T90.df.symb.a$ftemp)
 T90.df.symb.a$fpco2 <- as.factor(T90.df.symb.a$fpco2)
 T90.df.symb.a$species <- factor(T90.df.symb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
@@ -771,20 +772,22 @@ T90.df.symb.a$treat <- as.numeric(T90.df.symb.a$treat)
 symb.model.fig <- ggplot(T90.df.symb.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
-  geom_point(data=df.comp.symb, aes(x=treat, y=(value*10000000), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
-  geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value*10000000)-(ci*10000000), ymax=(value*10000000)+(ci*10000000)), size = 1, colour = "#009E73")+
+  geom_point(data=df.comp.symb, aes(x=treat, y=(value), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value)-(ci), ymax=(value)+(ci)), size = 1, colour = "#009E73")+ 
+  #geom_point(data=df.comp.symb, aes(x=treat, y=(value*1000000), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  #geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value*10000000)-(ci*10000000), ymax=(value*10000000)+(ci*10000000)), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
   ylab("symb")+
   xlab("")+
   geom_point( aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  #geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
   facet_wrap(~species, ncol=4, scales="free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
 ```
 
-```{r figure 3 plot, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center", results = 'hide'}
+```{r figure 3 plot, echo=FALSE, fig.height = 5, fig.width = 10, fig.align = "center", results = 'hide', include=FALSE}
 # host and symbiont T90 plot
 
 host.symb.T90.model.fig <- plot_grid(host.model.fig, symb.model.fig, labels = c("a", "b", "c", "d"), ncol = 1, align = "v", axis = 'lb')
@@ -792,7 +795,7 @@ host.symb.T90.model.fig <- plot_grid(host.model.fig, symb.model.fig, labels = c(
 host.symb.T90.model.fig
 
 ```
-**Figure 3.** Modelled 95% confidence interval of *(a) S. siderea*, *(b) P. strigosa*, *(c) P. astreoides*, and *(d) U. tenuifolia* total host (top) or symbiont (bottom) physiology with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+**Figure 3.** Modelled 95% confidence interval of *(a) S. siderea*, *(b) P. strigosa*, *(c) P. astreoides*, and *(d) U. tenuifolia* total host (lipid, carbohydrate, protein) physiology with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
 <br/>
 <br/>
 
