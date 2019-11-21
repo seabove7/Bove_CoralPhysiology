@@ -1,0 +1,641 @@
+---
+title: "Chapter 3: Physiology results"
+author: "CBB"
+output: 
+  html_document:
+    theme: cerulean
+editor_options: 
+  chunk_output_type: console
+---
+<br/>
+<br/>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(warn = -1)
+library("knitr")
+```
+
+```{r packages, include=FALSE}
+#Packages to load
+library("readr")
+library("ggplot2")
+library("dplyr")
+library("tidyr")
+library("tidyverse")
+library("Rmisc")
+library("cowplot")
+library("ggfortify")
+library("kableExtra")
+library("readr")
+library("lme4")
+library("magick")
+```
+
+```{r labels, include=FALSE}
+#Set some standards and units
+#dodge width
+dodge=position_dodge(width=0.3)
+dodge2=position_dodge(width = 0.6)
+jitter=position_jitter(width=0.1)
+
+theme_set(theme_classic())
+
+# set parameter labels
+Tlab<-"Temperature (°C)"
+alab<-expression(paste(italic("p"),"CO" [2]~ "("*mu,'atm)'))
+dlab<-expression(paste("Cell density (10"^6,"cells cm"^-2,")"))
+plab<-expression(paste("Total protein (mg cm"^-2,")"))
+calab<-expression(paste("Carbohydrate (mg cm"^-2,")"))
+clab<-expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")"))
+rlab<-expression(paste("Calcification rate (mg cm"^-2~"day"^-1,")"))
+llab<-expression(paste("Total Lipid (mg cm"^-2,")"))
+date <- Sys.Date() 
+```
+
+```{r add phys params, include=FALSE}
+# Set up the dataframes
+#phys <- read_csv("phys_all_13Aug19.csv")
+#
+#lipid <- read_csv("~/Dropbox/Boston_Experiment/Physiology/Lipids/Calculated Lipid #Spreadsheets/Lipid_final_21Oct19.csv")
+#
+#lipid <- lipid[,c(2,22)]
+#
+#df<-phys %>% 
+# left_join(lipid, by=c("coral" = "coral"))
+
+ #write.csv(df, file="phys_all_21Oct19.csv")
+```
+
+```{r initial dataframe, include=FALSE}
+
+df <- read_csv("phys_all_21Oct19.csv")
+
+df$X1 <- NULL
+df$X1_1 <- NULL
+names(df)[38]<-"carb"
+names(df)[39]<-"lipid"
+df$ftemp <- as.factor(df$ftemp)
+df$fpco2 <- as.factor(df$fpco2)
+df$colony <- as.factor(df$colony)
+df$species <- factor(df$species, levels = c("S", "P", "A", "T"))
+df$fpco2 <- factor(df$fpco2, c("280", "400", "700", "2800"))
+df$den <- df$den / 1000000
+df$symb <- (df$chla) / (df$den)
+df$host <- df$pro + df$carb + df$lipid
+df$treat[df$T0_T90 == "T0"] <- "T0"
+df$treat <- factor(df$treat, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+# add a new treat column for plotting
+df$treat2 <- df$treat
+df$treat <- gsub("T0", 2, df$treat)
+df$treat <- gsub("288_28", 4, df$treat)
+df$treat <- gsub("311_31", 4.5, df$treat)
+df$treat <- gsub("447_28", 6, df$treat)
+df$treat <- gsub("405_31", 6.5, df$treat)
+df$treat <- gsub("673_28", 8, df$treat)
+df$treat <- gsub("701_31", 8.5, df$treat)
+df$treat <- gsub("3285_28", 10, df$treat)
+df$treat <- gsub("3309_31", 10.5, df$treat)
+
+df$treat <- as.numeric(df$treat) #convert 'treat' column to numerics
+
+df2 <- df[,c(1:16,38:42)] #subset dataframe for selected columns
+df2 <- gather(df2, param, value, den:host) # make column of parameter and value
+df2$param <- factor(df2$param, levels = c("pro", "carb", "lipid", "den", "chla", "host", "symb")) #relevel physiology parameters
+df2$species <- revalue(x = df2$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")) #relevel species
+
+```
+
+```{r T90 and T0 SE plot, include=FALSE, echo=FALSE, fig.height = 16, fig.width = 10, fig.align = "center", results = 'hide'}
+# I THINK THIS CAN BE DELETED
+
+#df2 <- df[,c(1:16,38:41)] #subset dataframe for selected columns
+#df.comp <- gather(df2, param, value, den:host) # make column of parameter and value
+#df.comp$param <- factor(df.comp$param, levels = c("pro", "carb", "lipid", "den", "chla", "host", "symb")) #relevel physiology parameters
+#df.comp$species <- revalue(x = df.comp$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")) #relevel species
+
+```
+
+```{r T0 model setup, echo=FALSE}
+
+T0.df <- subset(df2, T0_T90=="T0") # subset for only T0 values
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T0.df <- completeFun(T0.df, "value") # run function to remove any missing values from "rate"
+
+# create 2 dataframes to run two different modesl
+T0.df.1 <- subset(T0.df, subset = param %in% c("chla", "symb")) # chlorophyll a and total symbiont only
+T0.df.2 <- subset(T0.df, subset = param %in% c("pro", "lipid", "carb", "host", "den")) # all host and density here
+
+### Performing the parametric bootstrapping of the model:
+bootnum = 2000 # set number of iterations (we used 2000) between 999 and 9999
+seed = 7 #seed to make results replicatable (our seed was 7)
+
+```
+
+```{r T0 model 1, echo=FALSE}
+
+# mixed effects model and boostrapping
+#T0.model1 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1)
+#out <- simulate(T0.model1, nsim=bootnum, seed=seed, re.form=NULL)
+#boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1), re.form=NA))
+#boots <- cbind(predict(T0.model1,re.form=NA), boots)
+#T0.df1.a <- (cbind(T0.df.1, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+#colnames(T0.df1.a)[17:19] <- c("mean", "lowerci", "upperci")
+#
+#T0.df1.nam <- paste("T0_model1", date, sep="_") 
+#T0.df1.nam <- paste(T0.df1.nam, ".csv", sep="") 
+#write.csv(T0.df1.a, file=T0.df1.nam)  
+
+```
+
+```{r T0 model 2, echo=FALSE}
+
+# mixed effects model and boostrapping
+#T0.model2 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2)
+#out <- simulate(T0.model2, nsim=bootnum, seed=seed, re.form=NULL)
+#boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2), re.form=NA))
+#boots <- cbind(predict(T0.model2,re.form=NA), boots)
+#T0.df2.a <- (cbind(T0.df.2, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+#colnames(T0.df2.a)[17:19] <- c("mean", "lowerci", "upperci")
+#
+#T0.df2.nam <- paste("T0_model2", date, sep="_") 
+#T0.df2.nam <- paste(T0.df2.nam, ".csv", sep="") 
+#write.csv(T0.df2.a, file=T0.df2.nam)  
+
+```
+
+```{r T0 compiled model, echo=FALSE}
+
+# read in the dataframes from the two to create one compiled
+T0.df1.a <- read.csv("T0_model1_2019-11-20.csv", head=T)
+T0.df2.a <- read.csv("T0_model2_2019-11-20.csv", head=T)
+T0.df.a <- rbind(T0.df1.a, T0.df2.a)
+
+T0.df.a$species <- factor(T0.df.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.a$param <- factor(T0.df.a$param, levels = c("carb", "lipid", "pro",  "chla", "den","host", "symb"))
+
+T0.model2.fig <- ggplot(T0.df.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(),  panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  geom_point(data=T0.df, aes(x=species, y=value), colour="grey", alpha = 0.3, size = 2, position = dodge)+
+  ylab("Value")+
+  xlab("Physiology Parameter")+
+  facet_wrap(~param, scales="free_y", ncol=4)+
+  geom_linerange(aes(x=species, ymin=lowerci, ymax=upperci, colour=species), position = dodge, size = 1.2)
+#theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))  
+
+```
+
+
+
+### Figure 2
+
+```{r coral images, echo=FALSE}
+
+# make cowplot of all coral images
+s <- cowplot::ggdraw() + cowplot::draw_image("SSID.png", scale = 0.9) 
+p <- cowplot::ggdraw() + cowplot::draw_image("PSTR.png", scale = 0.9)
+a <- cowplot::ggdraw() + cowplot::draw_image("PAST.png", scale = 0.9)
+u <- cowplot::ggdraw() + cowplot::draw_image("UTEN.png", scale = 0.9)
+corals <- cowplot::plot_grid(s, p, a, u, ncol = 4, scale=0.7)
+
+```
+
+```{r T90 df, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+#modify dataframe for T90 samples
+T90.df <- df[,c(1:17,38:42)]
+T90.df <- subset(T90.df, T0_T90=="T90")
+T90.df <- gather(T90.df, param, value, den:host) # make column of parameter and value
+T90.df$param <- factor(T90.df$param, levels = c("pro", "carb", "lipid", "den", "chla", "sum_bw5", "host", "symb"))
+T90.df$fpco2 <- factor(T90.df$fpco2, c("280", "400", "700", "2800"))
+T90.df$species <- revalue(x = T90.df$species, c("S" = "SSID", "P" = "PSTR", 
+  "A" = "PAST", "T" = "UTEN"))
+
+```
+
+```{r protein model, echo=FALSE}
+
+# subsetting
+T90.df.pro <- subset(T90.df, param=="pro")
+T0.df.pro <- subset(T0.df.a, param=="pro")
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+#T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.pro)
+#out <- simulate(T90.pro.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.pro),re.form=NA))
+#boots <- cbind(predict(T90.pro.model,re.form=NA), boots)
+#T90.df.pro.a <- (cbind(T90.df.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.pro.a)[17:19] <- c("mean", "lowerci", "upperci")
+#
+#pro.df <- paste("Protein_model_T90", date, sep="_") 
+#pro.df <- paste(pro.df, ".csv", sep="") 
+#write.csv(T90.df.pro.a, file=pro.df)  
+
+```
+
+```{r protein figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+T90.df.pro.a <- read.csv("Protein_model_T90_2019-11-20.csv", head=T)
+T90.df.pro.a$ftemp <- as.factor(T90.df.pro.a$ftemp)
+T90.df.pro.a$fpco2 <- as.factor(T90.df.pro.a$fpco2)
+T90.df.pro.a$species <- factor(T90.df.pro.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+pro.model.fig <- ggplot(T90.df.pro.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  geom_point(data=T0.df.pro, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=T0.df.pro, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
+  geom_vline(xintercept = 3)+
+  ylab(plab)+
+  xlab("")+
+  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  facet_wrap(~species, ncol=4, scales="free_y")
+  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))  
+
+```
+
+```{r carb model, echo=FALSE}
+
+# subsetting
+T90.df.carb <- subset(T90.df, param=="carb")
+T0.df.carb <- subset(T0.df.a, param=="carb")
+
+# this function remove rows with any missing values
+#completeFun <- function(data, desiredCols) {
+#  completeVec <- complete.cases(data[, desiredCols])
+#  return(data[completeVec, ])
+#}
+#T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values from "rate"
+#
+## mixed effect model run using lmer()
+#T90.carb.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.carb)
+#out <- simulate(T90.carb.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.carb),re.form=NA))
+#boots <- cbind(predict(T90.carb.model,re.form=NA), boots)
+#T90.df.carb.a <- (cbind(T90.df.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.carb.a)[17:19] <- c("mean", "lowerci", "upperci")
+#
+#
+#carb.df <- paste("carbohydrate_model_T90", date, sep="_") 
+#carb.df <- paste(carb.df, ".csv", sep="") 
+#write.csv(T90.df.carb.a, file=carb.df)  
+
+```
+
+```{r carb figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+T90.df.carb.a <- read.csv("carbohydrate_model_T90_2019-11-20.csv", head=T)
+T90.df.carb.a$ftemp <- as.factor(T90.df.carb.a$ftemp)
+T90.df.carb.a$fpco2 <- as.factor(T90.df.carb.a$fpco2)
+T90.df.carb.a$species <- factor(T90.df.carb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+carb.model.fig <- ggplot(T90.df.carb.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  geom_point(data=T0.df.carb, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=T0.df.carb, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
+  geom_vline(xintercept = 3)+
+  ylab(calab)+
+  xlab("")+
+  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  facet_wrap(~species, ncol=4, scales="free_y")
+  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+```
+
+```{r lipid model, echo=FALSE}
+
+# subsetting
+T90.df.lipid <- subset(T90.df, param=="lipid")
+T0.df.lipid <- subset(T0.df.a, param=="lipid")
+
+
+# this function remove rows with any missing values
+#completeFun <- function(data, desiredCols) {
+#  completeVec <- complete.cases(data[, desiredCols])
+#  return(data[completeVec, ])
+#}
+#T90.df.lipid <- completeFun(T90.df.lipid, "value") # run function to remove any missing values from "rate"
+#
+## mixed effect model run using lmer()
+#T90.lipid.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.lipid)
+#out <- simulate(T90.lipid.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.lipid),re.form=NA))
+#boots <- cbind(predict(T90.lipid.model,re.form=NA), boots)
+#T90.df.lipid.a <- (cbind(T90.df.lipid, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.lipid.a)[17:19] <- c("mean", "lowerci", "upperci")
+#
+#
+#lipid.df <- paste("lipid_model_T90", date, sep="_") 
+#lipid.df <- paste(lipid.df, ".csv", sep="") 
+#write.csv(T90.df.lipid.a, file=lipid.df)  
+
+```
+
+```{r lipid figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+T90.df.lipid.a <- read.csv("lipid_model_T90_2019-11-20.csv", head=T)
+T90.df.lipid.a$ftemp <- as.factor(T90.df.lipid.a$ftemp)
+T90.df.lipid.a$fpco2 <- as.factor(T90.df.lipid.a$fpco2)
+T90.df.lipid.a$species <- factor(T90.df.lipid.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+lipid.model.fig <- ggplot(T90.df.lipid.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  geom_point(data=T0.df.lipid, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=T0.df.lipid, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
+  geom_vline(xintercept = 3)+
+  ylab(llab)+
+  xlab("")+
+  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  facet_wrap(~species, ncol=4, scales="free_y")
+  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+```
+ Here is where I stopped editing on 20 Nov 19
+```{r denisty model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+# subsetting
+T90.df.den <- subset(T90.df, param=="den")
+T0.df.den <- subset(T0.df, param=="den")
+
+
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.den.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.den)
+
+#out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = #T90.df.den),re.form=NA))
+#
+#boots <- cbind(predict(T90.den.model,re.form=NA), boots)
+#T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, #0.975))))))))
+#colnames(T90.df.den.a)[17:19] <- c("mean", "lowerci", "upperci")
+#
+#
+#den.df <- paste("dentein_model_T90", date, sep="_") 
+#den.df <- paste(den.df, ".csv", sep="") 
+#write.csv(T90.df.den.a, file=den.df)  
+
+T90.df.den.a <- read.csv("dentein_model_T90_2019-10-21.csv", head=T)
+T90.df.den.a$ftemp <- as.factor(T90.df.den.a$ftemp)
+T90.df.den.a$fpco2 <- as.factor(T90.df.den.a$fpco2)
+T90.df.den.a$species <- factor(T90.df.den.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+den.model.fig <- ggplot(T90.df.den.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(),  panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  geom_point(data=T0.df.den, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=T0.df.den, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
+  geom_vline(xintercept = 3)+
+  ylab(dlab)+
+  xlab("")+
+  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  facet_wrap(~species, ncol=4, scales="free_y")
+  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+```
+
+```{r chlorophyll model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+# subsetting
+T90.df.chla <- subset(T90.df, param=="chla")
+T0.df.chla <- subset(T0.df, param=="chla")
+
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.chla.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.chla)
+
+
+#out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = #T90.df.chla),re.form=NA))
+#
+#boots <- cbind(predict(T90.chla.model,re.form=NA), boots)
+#T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, #0.975))))))))
+#colnames(T90.df.chla.a)[17:19] <- c("mean", "lowerci", "upperci")
+#
+#chla.df <- paste("chlatein_model_T90", date, sep="_") 
+#chla.df <- paste(chla.df, ".csv", sep="") 
+#write.csv(T90.df.chla.a, file=chla.df)  
+
+T90.df.chla.a <- read.csv("chlatein_model_T90_2019-10-21.csv", head=T)
+T90.df.chla.a$ftemp <- as.factor(T90.df.chla.a$ftemp)
+T90.df.chla.a$fpco2 <- as.factor(T90.df.chla.a$fpco2)
+T90.df.chla.a$species <- factor(T90.df.chla.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+chla.model.fig <- ggplot(T90.df.chla.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  geom_point(data=T0.df.chla, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=T0.df.chla, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
+  geom_vline(xintercept = 3)+
+  ylab(clab)+
+  xlab("")+
+  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  facet_wrap(~species, ncol=4, scales="free_y")
+  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+```
+
+```{r figure 2, echo=FALSE, fig.height = 14, fig.width = 10, fig.align = "center", results = 'hide'}
+# full T90 plot with coral images
+
+full.T90.model.fig <- plot_grid(corals, pro.model.fig, lipid.model.fig, carb.model.fig, den.model.fig, chla.model.fig, labels=c("", "A", "B", "C", "D", "E"), ncol = 1, align = "v", axis = 'lb', rel_heights = c(1,1,1,1,1,1))
+
+full.T90.model.fig
+
+```
+**Figure 1.** Modelled 95% confidence interval of (A) total protein (mg/cm2), (B) total lipid (mg/cm2), (C) total carbohydrate (mg/cm2), (D) cell density (10^6 cells/cm2), and (E) Chlorophyll a (ug/cm2) for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+<br/>
+<br/>
+
+### Figure 2
+
+```{r host phys model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+# subsetting
+T90.df.host <- subset(T90.df, param=="host")
+T0.df.host <- subset(T0.df, param=="host")
+
+
+# this function remove rows with any missing values
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+T90.df.host <- completeFun(T90.df.host, "value") # run function to remove any missing values from "rate"
+
+# mixed effect model run using lmer()
+T90.host.model <- lmer(value ~ species * ftemp + fpco2 + (1 | colony), REML=T, data = T90.df.host)
+
+
+#out <- simulate(T90.host.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + fpco2 + (1 | colony), REML=T, #data = T90.df.host),re.form=NA))
+#
+#boots <- cbind(predict(T90.host.model,re.form=NA), boots)
+#T90.df.host.a <- (cbind(T90.df.host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.host.a)[16:18] <- c("mean", "lowerci", "upperci")
+#
+#
+#host.df <- paste("host_model_T90", date, sep="_") 
+#host.df <- paste(host.df, ".csv", sep="") 
+#write.csv(T90.df.host.a, file=host.df)  
+
+T90.df.host.a <- read.csv("host_model_T90_2019-10-21.csv", head=T)
+T90.df.host.a$ftemp <- as.factor(T90.df.host.a$ftemp)
+T90.df.host.a$fpco2 <- as.factor(T90.df.host.a$fpco2)
+T90.df.host.a$species <- factor(T90.df.host.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+T90.df.host.a$treat2 <- T90.df.host.a$treat
+T90.df.host.a$treat <- gsub("T0", 2, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("288_28", 4, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("311_31", 4.5, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("447_28", 6, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("405_31", 6.5, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("673_28", 8, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("701_31", 8.5, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("3285_28", 10, T90.df.host.a$treat)
+T90.df.host.a$treat <- gsub("3309_31", 10.5, T90.df.host.a$treat)
+
+T90.df.host.a$treat <- as.numeric(T90.df.host.a$treat)
+
+host.model.fig <- ggplot(T90.df.host.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  geom_point(data=T0.df.host, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=T0.df.host, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
+  geom_vline(xintercept = 3)+
+  ylab("Total host energy \n reserves (mg cm )")+
+  xlab("")+
+  geom_point( aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  facet_wrap(~species, ncol=4, scales="free_y")
+  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+```
+
+```{r symb phys model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE, include=FALSE}
+
+# subsetting
+T90.df.symb <- subset(T90.df, param=="symb")
+#T90.df.symb <- subset(T90.df.symb, species!="UTEN")
+T0.df.symb <- subset(T0.df, param=="symb")
+
+
+T90.df.symb$value[T90.df.symb$value > 4000] <- NA
+
+ggplot(data=T90.df.symb, aes(x=treat, y=value))+
+  geom_point()+
+  #geom_hline(yintercept=4000)+
+  facet_wrap(~species, scales="free_y")
+
+# this function remove rows with any missing values
+#completeFun <- function(data, desiredCols) {
+#  completeVec <- complete.cases(data[, desiredCols])
+#  return(data[completeVec, ])
+#}
+#T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values from "rate"
+#
+## mixed effect model run using
+#T90.symb.model <- lmer(value ~ species * ftemp * fpco2 + reef + (1 | colony), REML=T, data = T90.df.symb)
+#
+#out <- simulate(T90.symb.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp * fpco2 + reef + (1 | colony), REML=T, data = T90.df.symb), re.form=NA))
+#
+#boots <- cbind(predict(T90.symb.model,re.form=NA), boots)
+#T90.df.symb.a <- (cbind(T90.df.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.symb.a)[17:19] <- c("mean", "lowerci", "upperci")
+#head(T90.df.symb.a)
+#
+#symb.df <- paste("symb_model_T90", date, sep="_") 
+#symb.df <- paste(symb.df, ".csv", sep="") 
+#write.csv(T90.df.symb.a, file=symb.df)  
+
+T90.df.symb.a <- read.csv("symb_model_T90_2019-11-20.csv", head=T)
+T90.df.symb.a$ftemp <- as.factor(T90.df.symb.a$ftemp)
+T90.df.symb.a$fpco2 <- as.factor(T90.df.symb.a$fpco2)
+T90.df.symb.a$species <- factor(T90.df.symb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+
+T90.df.symb.a$treat2 <- T90.df.symb.a$treat
+T90.df.symb.a$treat <- gsub("T0", 2, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("288_28", 4, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("311_31", 4.5, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("447_28", 6, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("405_31", 6.5, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("673_28", 8, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("701_31", 8.5, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("3285_28", 10, T90.df.symb.a$treat)
+T90.df.symb.a$treat <- gsub("3309_31", 10.5, T90.df.symb.a$treat)
+
+T90.df.symb.a$treat <- as.numeric(T90.df.symb.a$treat)
+
+symb.model.fig <- ggplot(T90.df.symb.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  geom_point(data=df.comp.symb, aes(x=treat, y=(value), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value)-(ci), ymax=(value)+(ci)), size = 1, colour = "#009E73")+ 
+  #geom_point(data=df.comp.symb, aes(x=treat, y=(value*1000000), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  #geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value*10000000)-(ci*10000000), ymax=(value*10000000)+(ci*10000000)), size = 1, colour = "#009E73")+
+  geom_vline(xintercept = 3)+
+  ylab("Chlorophyll a \n per symbiont cell")+
+  xlab("")+
+  geom_point( aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  #geom_point(aes(x=treat, y=mean), position = dodge, size = 3, colour="black")+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  facet_grid(~species,  scales="free_y")
+  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+symb.model.fig
+
+```
+
+```{r figure 3, echo=FALSE, fig.height = 4.6, fig.width = 10, fig.align = "center", results = 'hide'}
+
+host.symb.T90.model.fig <- plot_grid(host.model.fig, symb.model.fig, labels = c("A", "B"), ncol = 1, align = "v", axis = 'lb')
+
+host.symb.T90.model.fig
+
+```
+**Figure 2.** Modelled 95% confidence interval of total host energy reserves (mg/cm2) for (A) *S. siderea*, (B) *P. strigosa*, (C) *P. astreoides*, and (D) *U. tenuifolia* for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+<br/>
+<br/>
+
+
+
+
