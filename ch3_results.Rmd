@@ -1,27 +1,47 @@
 ---
-title: "Chapter 3: Physiology results"
+title: "Chapter 3: Physiology"
 author: "CBB"
+runtime: shiny
 output: 
   html_document:
-    theme: cerulean
-editor_options: 
-  chunk_output_type: console
+    theme: spacelab
 ---
-<br/>
-<br/>
+# Results
+
+#### (A) Individual coral host and algal endosymbiont physiology
+> Protein: .  
+Lipids: .  
+Carbs: .  
+Density: .  
+Chla: .  
+
+
+#### (B) Total coral host energy reserves
+> Coral host total energy reserves (mg/cm2) was calculated as the sum of each protein, lipid, and carbohydrate value per fragment. 
+
+(**Figure 2A**). 
+
+#### (C) Total algal endosymbiont physiology
+> Calculated chlorophyll a content per algal endosymbiont cell (ug/10^6 cells) represents total algal endosymbiont physiology and is a measure of the efficiency of the endosymbionts within each coral fragment. Total endosymbiont physiology of *S. siderea* and *P. astreoides* did not change from the start (T0) to finish (T90) of the experimental period, nor did *p*CO2 or temperature have a statistically clear impact after 93 days at treatment. Conversely, *P. strigosa* total endosymbiont physiology increased in the 400 uatm 28C treatment at T90 compared to T0, however, there was no statistically clear difference from the other 28C *p*CO2 treatments at T90. Additionally, T90 total endosymbiont physiology was clearly greater at 31C than measured values at T0 and under all *p*CO2 treatments at 28C, except the extreme where they converge (**Figure 2B**). 
+
 ```{r setup, include=FALSE}
+
 knitr::opts_chunk$set(echo = TRUE)
 options(warn = -1)
 library("knitr")
+
 ```
 
 ```{r packages, include=FALSE}
+
 #Packages to load
 library("readr")
 library("ggplot2")
 library("dplyr")
 library("tidyr")
+library("plotly")
 library("tidyverse")
+library("shiny")
 library("Rmisc")
 library("cowplot")
 library("ggfortify")
@@ -29,9 +49,11 @@ library("kableExtra")
 library("readr")
 library("lme4")
 library("magick")
+
 ```
 
 ```{r labels, include=FALSE}
+
 #Set some standards and units
 #dodge width
 dodge=position_dodge(width=0.3)
@@ -50,9 +72,11 @@ clab<-expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")"))
 rlab<-expression(paste("Calcification rate (mg cm"^-2~"day"^-1,")"))
 llab<-expression(paste("Total Lipid (mg cm"^-2,")"))
 date <- Sys.Date() 
+
 ```
 
 ```{r add phys params, include=FALSE}
+
 # Set up the dataframes
 #phys <- read_csv("phys_all_13Aug19.csv")
 #
@@ -64,6 +88,7 @@ date <- Sys.Date()
 # left_join(lipid, by=c("coral" = "coral"))
 
  #write.csv(df, file="phys_all_21Oct19.csv")
+
 ```
 
 ```{r initial dataframe, include=FALSE}
@@ -106,15 +131,7 @@ df2$species <- revalue(x = df2$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAS
 
 ```
 
-```{r T90 and T0 SE plot, include=FALSE, echo=FALSE, fig.height = 16, fig.width = 10, fig.align = "center", results = 'hide'}
-# I THINK THIS CAN BE DELETED
 
-#df2 <- df[,c(1:16,38:41)] #subset dataframe for selected columns
-#df.comp <- gather(df2, param, value, den:host) # make column of parameter and value
-#df.comp$param <- factor(df.comp$param, levels = c("pro", "carb", "lipid", "den", "chla", "host", "symb")) #relevel physiology parameters
-#df.comp$species <- revalue(x = df.comp$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")) #relevel species
-
-```
 
 ```{r T0 model setup, echo=FALSE}
 
@@ -190,10 +207,6 @@ T0.model2.fig <- ggplot(T0.df.a)+
 
 ```
 
-
-
-### Figure 2
-
 ```{r coral images, echo=FALSE}
 
 # make cowplot of all coral images
@@ -218,17 +231,13 @@ T90.df$species <- revalue(x = T90.df$species, c("S" = "SSID", "P" = "PSTR",
 
 ```
 
+
+
 ```{r protein model, echo=FALSE}
 
 # subsetting
 T90.df.pro <- subset(T90.df, param=="pro")
 T0.df.pro <- subset(T0.df.a, param=="pro")
-
-# this function remove rows with any missing values
-completeFun <- function(data, desiredCols) {
-  completeVec <- complete.cases(data[, desiredCols])
-  return(data[completeVec, ])
-}
 T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any missing values from "rate"
 
 # mixed effect model run using lmer()
@@ -245,7 +254,7 @@ T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any miss
 
 ```
 
-```{r protein figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+```{r protein figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
 T90.df.pro.a <- read.csv("Protein_model_T90_2019-11-20.csv", head=T)
 T90.df.pro.a$ftemp <- as.factor(T90.df.pro.a$ftemp)
@@ -273,13 +282,7 @@ pro.model.fig <- ggplot(T90.df.pro.a)+
 # subsetting
 T90.df.carb <- subset(T90.df, param=="carb")
 T0.df.carb <- subset(T0.df.a, param=="carb")
-
-# this function remove rows with any missing values
-#completeFun <- function(data, desiredCols) {
-#  completeVec <- complete.cases(data[, desiredCols])
-#  return(data[completeVec, ])
-#}
-#T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values from "rate"
+T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values from "rate"
 #
 ## mixed effect model run using lmer()
 #T90.carb.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.carb)
@@ -296,7 +299,7 @@ T0.df.carb <- subset(T0.df.a, param=="carb")
 
 ```
 
-```{r carb figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+```{r carb figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
 T90.df.carb.a <- read.csv("carbohydrate_model_T90_2019-11-20.csv", head=T)
 T90.df.carb.a$ftemp <- as.factor(T90.df.carb.a$ftemp)
@@ -324,14 +327,7 @@ carb.model.fig <- ggplot(T90.df.carb.a)+
 # subsetting
 T90.df.lipid <- subset(T90.df, param=="lipid")
 T0.df.lipid <- subset(T0.df.a, param=="lipid")
-
-
-# this function remove rows with any missing values
-#completeFun <- function(data, desiredCols) {
-#  completeVec <- complete.cases(data[, desiredCols])
-#  return(data[completeVec, ])
-#}
-#T90.df.lipid <- completeFun(T90.df.lipid, "value") # run function to remove any missing values from "rate"
+T90.df.lipid <- completeFun(T90.df.lipid, "value") # run function to remove any missing values from "rate"
 #
 ## mixed effect model run using lmer()
 #T90.lipid.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.lipid)
@@ -348,7 +344,7 @@ T0.df.lipid <- subset(T0.df.a, param=="lipid")
 
 ```
 
-```{r lipid figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+```{r lipid figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
 T90.df.lipid.a <- read.csv("lipid_model_T90_2019-11-20.csv", head=T)
 T90.df.lipid.a$ftemp <- as.factor(T90.df.lipid.a$ftemp)
@@ -370,38 +366,31 @@ lipid.model.fig <- ggplot(T90.df.lipid.a)+
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
 ```
- Here is where I stopped editing on 20 Nov 19
-```{r denisty model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+```{r denisty model, echo=FALSE, message=FALSE}
 
 # subsetting
 T90.df.den <- subset(T90.df, param=="den")
-T0.df.den <- subset(T0.df, param=="den")
-
-
-
-# this function remove rows with any missing values
-completeFun <- function(data, desiredCols) {
-  completeVec <- complete.cases(data[, desiredCols])
-  return(data[completeVec, ])
-}
+T0.df.den <- subset(T0.df.a, param=="den")
 T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any missing values from "rate"
-
-# mixed effect model run using lmer()
-T90.den.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.den)
-
-#out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = #T90.df.den),re.form=NA))
 #
+## mixed effect model run using lmer()
+#T90.den.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.den)
+#out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.den),re.form=NA))
 #boots <- cbind(predict(T90.den.model,re.form=NA), boots)
-#T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, #0.975))))))))
+#T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
 #colnames(T90.df.den.a)[17:19] <- c("mean", "lowerci", "upperci")
 #
-#
-#den.df <- paste("dentein_model_T90", date, sep="_") 
+#den.df <- paste("density_model_T90", date, sep="_") 
 #den.df <- paste(den.df, ".csv", sep="") 
 #write.csv(T90.df.den.a, file=den.df)  
 
-T90.df.den.a <- read.csv("dentein_model_T90_2019-10-21.csv", head=T)
+```
+
+```{r denisty figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+T90.df.den.a <- read.csv("density_model_T90_2019-11-21.csv", head=T)
 T90.df.den.a$ftemp <- as.factor(T90.df.den.a$ftemp)
 T90.df.den.a$fpco2 <- as.factor(T90.df.den.a$fpco2)
 T90.df.den.a$species <- factor(T90.df.den.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
@@ -422,36 +411,29 @@ den.model.fig <- ggplot(T90.df.den.a)+
 
 ```
 
-```{r chlorophyll model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+```{r chlorophyll model, echo=FALSE, message=FALSE}
 
 # subsetting
 T90.df.chla <- subset(T90.df, param=="chla")
-T0.df.chla <- subset(T0.df, param=="chla")
-
-
-# this function remove rows with any missing values
-completeFun <- function(data, desiredCols) {
-  completeVec <- complete.cases(data[, desiredCols])
-  return(data[completeVec, ])
-}
+T0.df.chla <- subset(T0.df.a, param=="chla")
 T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any missing values from "rate"
-
-# mixed effect model run using lmer()
-T90.chla.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.chla)
-
-
-#out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = #T90.df.chla),re.form=NA))
 #
+## mixed effect model run using lmer()
+#T90.chla.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.chla)
+#out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL)
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.chla),re.form=NA))
 #boots <- cbind(predict(T90.chla.model,re.form=NA), boots)
-#T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, #0.975))))))))
+#T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
 #colnames(T90.df.chla.a)[17:19] <- c("mean", "lowerci", "upperci")
 #
-#chla.df <- paste("chlatein_model_T90", date, sep="_") 
+#chla.df <- paste("chlorophyll_model_T90", date, sep="_") 
 #chla.df <- paste(chla.df, ".csv", sep="") 
 #write.csv(T90.df.chla.a, file=chla.df)  
 
-T90.df.chla.a <- read.csv("chlatein_model_T90_2019-10-21.csv", head=T)
+```
+
+```{r chlorophyll figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+T90.df.chla.a <- read.csv("chlorophyll_model_T90_2019-11-21.csv", head=T)
 T90.df.chla.a$ftemp <- as.factor(T90.df.chla.a$ftemp)
 T90.df.chla.a$fpco2 <- as.factor(T90.df.chla.a$fpco2)
 T90.df.chla.a$species <- factor(T90.df.chla.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
@@ -472,69 +454,59 @@ chla.model.fig <- ggplot(T90.df.chla.a)+
 
 ```
 
+## Figures:
+
+### Figure 1
+
 ```{r figure 2, echo=FALSE, fig.height = 14, fig.width = 10, fig.align = "center", results = 'hide'}
+
 # full T90 plot with coral images
 
-full.T90.model.fig <- plot_grid(corals, pro.model.fig, lipid.model.fig, carb.model.fig, den.model.fig, chla.model.fig, labels=c("", "A", "B", "C", "D", "E"), ncol = 1, align = "v", axis = 'lb', rel_heights = c(1,1,1,1,1,1))
+full.T90.model.fig <- plot_grid(corals, pro.model.fig, lipid.model.fig, carb.model.fig, den.model.fig, chla.model.fig, labels=c("", "A", "B", "C", "D", "E"), ncol = 1, align = "v", axis = 'lb', rel_heights = c(1,1,1,1,1,1), scale = 0.9)
+#full.T90.model.fig
 
-full.T90.model.fig
+# make interactive Rmarkdown version
+full.T90.fig.interactive <- subplot(corals, pro.model.fig, lipid.model.fig, carb.model.fig, den.model.fig, chla.model.fig, nrows = 6)
+
+full.T90.fig.interactive
 
 ```
-**Figure 1.** Modelled 95% confidence interval of (A) total protein (mg/cm2), (B) total lipid (mg/cm2), (C) total carbohydrate (mg/cm2), (D) cell density (10^6 cells/cm2), and (E) Chlorophyll a (ug/cm2) for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+
+Modelled 95% confidence interval of (A) total protein (mg/cm2), (B) total lipid (mg/cm2), (C) total carbohydrate (mg/cm2), (D) cell density (10^6 cells/cm2), and (E) Chlorophyll a (ug/cm2) for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+
 <br/>
 <br/>
 
 ### Figure 2
 
-```{r host phys model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+```{r host phys model, echo=FALSE, message=FALSE}
 
 # subsetting
 T90.df.host <- subset(T90.df, param=="host")
-T0.df.host <- subset(T0.df, param=="host")
-
-
-# this function remove rows with any missing values
-completeFun <- function(data, desiredCols) {
-  completeVec <- complete.cases(data[, desiredCols])
-  return(data[completeVec, ])
-}
+T0.df.host <- subset(T0.df.a, param=="host")
 T90.df.host <- completeFun(T90.df.host, "value") # run function to remove any missing values from "rate"
-
-# mixed effect model run using lmer()
-T90.host.model <- lmer(value ~ species * ftemp + fpco2 + (1 | colony), REML=T, data = T90.df.host)
-
-
+#
+## mixed effect model run using lmer()
+#T90.host.model <- lmer(value ~ species * ftemp + fpco2 + (1 | colony), REML=T, data = T90.df.host)
 #out <- simulate(T90.host.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + fpco2 + (1 | colony), REML=T, #data = T90.df.host),re.form=NA))
-#
+#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + fpco2 + (1 | colony), REML=T, data = T90.df.host),re.form=NA))
 #boots <- cbind(predict(T90.host.model,re.form=NA), boots)
-#T90.df.host.a <- (cbind(T90.df.host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), #quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.host.a)[16:18] <- c("mean", "lowerci", "upperci")
-#
+#T90.df.host.a <- (cbind(T90.df.host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+#colnames(T90.df.host.a)[17:19] <- c("mean", "lowerci", "upperci")
 #
 #host.df <- paste("host_model_T90", date, sep="_") 
 #host.df <- paste(host.df, ".csv", sep="") 
 #write.csv(T90.df.host.a, file=host.df)  
 
-T90.df.host.a <- read.csv("host_model_T90_2019-10-21.csv", head=T)
+```
+
+```{r host phys figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
+
+T90.df.host.a <- read.csv("host_model_T90_2019-11-21.csv", head=T)
 T90.df.host.a$ftemp <- as.factor(T90.df.host.a$ftemp)
-T90.df.host.a$fpco2 <- as.factor(T90.df.host.a$fpco2)
 T90.df.host.a$species <- factor(T90.df.host.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 
-T90.df.host.a$treat2 <- T90.df.host.a$treat
-T90.df.host.a$treat <- gsub("T0", 2, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("288_28", 4, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("311_31", 4.5, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("447_28", 6, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("405_31", 6.5, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("673_28", 8, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("701_31", 8.5, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("3285_28", 10, T90.df.host.a$treat)
-T90.df.host.a$treat <- gsub("3309_31", 10.5, T90.df.host.a$treat)
-
-T90.df.host.a$treat <- as.numeric(T90.df.host.a$treat)
-
-host.model.fig <- ggplot(T90.df.host.a)+
+host.model.fig <- ggplot(data=T90.df.host.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
   geom_point(data=T0.df.host, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
@@ -550,66 +522,39 @@ host.model.fig <- ggplot(T90.df.host.a)+
 
 ```
 
-```{r symb phys model, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE, include=FALSE}
+```{r symb phys model, echo=FALSE, message=FALSE}
 
 # subsetting
 T90.df.symb <- subset(T90.df, param=="symb")
-#T90.df.symb <- subset(T90.df.symb, species!="UTEN")
-T0.df.symb <- subset(T0.df, param=="symb")
-
-
+T0.df.symb <- subset(T0.df.a, param=="symb")
 T90.df.symb$value[T90.df.symb$value > 4000] <- NA
+T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values from "rate"
 
-ggplot(data=T90.df.symb, aes(x=treat, y=value))+
-  geom_point()+
-  #geom_hline(yintercept=4000)+
-  facet_wrap(~species, scales="free_y")
-
-# this function remove rows with any missing values
-#completeFun <- function(data, desiredCols) {
-#  completeVec <- complete.cases(data[, desiredCols])
-#  return(data[completeVec, ])
-#}
-#T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values from "rate"
-#
 ## mixed effect model run using
-#T90.symb.model <- lmer(value ~ species * ftemp * fpco2 + reef + (1 | colony), REML=T, data = T90.df.symb)
-#
+#T90.symb.model <- lmer(value ~ species * ftemp * fpco2 + reef + (1 | colony), REML=TRUE, data = T90.df.symb)
 #out <- simulate(T90.symb.model,nsim=bootnum,seed=seed,re.form=NULL)
 #boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp * fpco2 + reef + (1 | colony), REML=T, data = T90.df.symb), re.form=NA))
-#
 #boots <- cbind(predict(T90.symb.model,re.form=NA), boots)
 #T90.df.symb.a <- (cbind(T90.df.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
 #colnames(T90.df.symb.a)[17:19] <- c("mean", "lowerci", "upperci")
-#head(T90.df.symb.a)
 #
 #symb.df <- paste("symb_model_T90", date, sep="_") 
 #symb.df <- paste(symb.df, ".csv", sep="") 
 #write.csv(T90.df.symb.a, file=symb.df)  
 
-T90.df.symb.a <- read.csv("symb_model_T90_2019-11-20.csv", head=T)
+```
+
+```{r symb phys figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE, include=FALSE}
+
+T90.df.symb.a <- read.csv("symb_model_T90_2019-11-21.csv", head=T)
 T90.df.symb.a$ftemp <- as.factor(T90.df.symb.a$ftemp)
-T90.df.symb.a$fpco2 <- as.factor(T90.df.symb.a$fpco2)
 T90.df.symb.a$species <- factor(T90.df.symb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 
-T90.df.symb.a$treat2 <- T90.df.symb.a$treat
-T90.df.symb.a$treat <- gsub("T0", 2, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("288_28", 4, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("311_31", 4.5, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("447_28", 6, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("405_31", 6.5, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("673_28", 8, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("701_31", 8.5, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("3285_28", 10, T90.df.symb.a$treat)
-T90.df.symb.a$treat <- gsub("3309_31", 10.5, T90.df.symb.a$treat)
-
-T90.df.symb.a$treat <- as.numeric(T90.df.symb.a$treat)
-
-symb.model.fig <- ggplot(T90.df.symb.a)+
+symb.model.fig <- ggplot(data=T90.df.symb.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
-  geom_point(data=df.comp.symb, aes(x=treat, y=(value), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
-  geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value)-(ci), ymax=(value)+(ci)), size = 1, colour = "#009E73")+ 
+  geom_point(data=T0.df.symb, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  geom_linerange(data=T0.df.symb, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+ 
   #geom_point(data=df.comp.symb, aes(x=treat, y=(value*1000000), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   #geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value*10000000)-(ci*10000000), ymax=(value*10000000)+(ci*10000000)), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
@@ -619,9 +564,8 @@ symb.model.fig <- ggplot(T90.df.symb.a)+
   geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
   #geom_point(aes(x=treat, y=mean), position = dodge, size = 3, colour="black")+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
-  facet_grid(~species,  scales="free_y")
+  facet_wrap(~species,  ncol=4, scales="free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
-symb.model.fig
 
 ```
 
@@ -632,10 +576,251 @@ host.symb.T90.model.fig <- plot_grid(host.model.fig, symb.model.fig, labels = c(
 host.symb.T90.model.fig
 
 ```
-**Figure 2.** Modelled 95% confidence interval of total host energy reserves (mg/cm2) for (A) *S. siderea*, (B) *P. strigosa*, (C) *P. astreoides*, and (D) *U. tenuifolia* for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+Modelled 95% confidence interval of (A) total host energy reserves (mg/cm2) and (B) chlorophyll a per symbiont cell (ug/10^6 cells) for *S. siderea*, *P. strigosa*, *P. astreoides*, and *U. tenuifolia* for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+
+
+
+
+
+
+
+## Tables:
+
+```{r T0 table, echo=FALSE}
+
+T0.tab <- T0.df.a[,c(9,16,18:20)]
+T0.tab$binder <- paste(T0.tab$species, T0.tab$param, sep = "_")
+
+T0.mean <- summarySE(data=T0.tab, measurevar = "mean", groupvars = c("species", "param", "binder"))
+T0.low <- summarySE(data=T0.tab, measurevar = "lowerci", groupvars = c("species", "param", "binder"))
+T0.up <- summarySE(data=T0.tab, measurevar = "upperci", groupvars = c("species", "param", "binder"))
+
+T0.tab <- cbind(T0.mean, T0.low, T0.up)[, -c(1,3,6:12, 14:20, 22:24)]
+T0.tab$mean <- round(T0.tab$mean, 2)
+T0.tab$lowerci <- round(T0.tab$lowerci, 2)
+T0.tab$upperci <- round(T0.tab$upperci, 2)
+
+colnames(T0.tab)[colnames(T0.tab)=="param"] <- "parameter"
+colnames(T0.tab)[colnames(T0.tab)=="lowerci"] <- "lower 95%"
+colnames(T0.tab)[colnames(T0.tab)=="upperci"] <- "upper 95%"
+
+table1 <- kable(T0.tab, booktabs = T, caption = "Table 1. T0 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
+  kable_styling(font_size = 10, full_width = F, position="center") %>% 
+  pack_rows("(a) SSID", 1, 7) %>%
+  pack_rows("(b) PSTR", 8, 14) %>%
+  pack_rows("(c) PAST", 15, 21) %>%
+  pack_rows("(d) UTEN", 22, 28)
+table1
+
+```
+
+```{r protein table, echo=FALSE}
+
+T90.pro.tab <- T90.df.pro.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.pro.tab$binder <- paste(T90.pro.tab$species, T90.pro.tab$treat2, sep = "_")
+
+T90.pro.mean <- summarySE(data=T90.pro.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90.pro.low <- summarySE(data=T90.pro.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90.pro.up <- summarySE(data=T90.pro.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+
+T90.pro.tab <- cbind(T90.pro.mean, T90.pro.low, T90.pro.up)[, c(2,4,5,13,21)]
+T90.pro.tab$mean <- round(T90.pro.tab$mean, 2)
+T90.pro.tab$lowerci <- round(T90.pro.tab$lowerci, 2)
+T90.pro.tab$upperci <- round(T90.pro.tab$upperci, 2)
+
+colnames(T90.pro.tab)[colnames(T90.pro.tab)=="treat2"] <- "treatment"
+colnames(T90.pro.tab)[colnames(T90.pro.tab)=="lowerci"] <- "lower 95%"
+colnames(T90.pro.tab)[colnames(T90.pro.tab)=="upperci"] <- "upper 95%"
+T90.pro.tab$treatment <- factor(T90.pro.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table2 <- kable(T90.pro.tab, booktabs = T, caption = "Table 2. T90 modelled mean coral host protein content and 95% confidence intervals for each  species") %>%
+  kable_styling(font_size = 10, full_width = F) %>% 
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24) %>%
+  pack_rows("(d) UTEN", 25, 30)
+table2
+
+```
+
+```{r lipid table, echo=FALSE}
+
+T90.lipid.tab <- T90.df.lipid.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.lipid.tab$binder <- paste(T90.lipid.tab$species, T90.lipid.tab$treat2, sep = "_")
+
+T90.lipid.mean <- summarySE(data=T90.lipid.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90.lipid.low <- summarySE(data=T90.lipid.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90.lipid.up <- summarySE(data=T90.lipid.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+
+T90.lipid.tab <- cbind(T90.lipid.mean, T90.lipid.low, T90.lipid.up)[, c(2,4,5,13,21)]
+T90.lipid.tab$mean <- round(T90.lipid.tab$mean, 2)
+T90.lipid.tab$lowerci <- round(T90.lipid.tab$lowerci, 2)
+T90.lipid.tab$upperci <- round(T90.lipid.tab$upperci, 2)
+
+colnames(T90.lipid.tab)[colnames(T90.lipid.tab)=="treat2"] <- "treatment"
+colnames(T90.lipid.tab)[colnames(T90.lipid.tab)=="lowerci"] <- "lower 95%"
+colnames(T90.lipid.tab)[colnames(T90.lipid.tab)=="upperci"] <- "upper 95%"
+T90.lipid.tab$treatment <- factor(T90.lipid.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table3 <- kable(T90.lipid.tab, booktabs = T, caption = "Table 3. T90 modelled mean coral host lipid content and 95% confidence intervals for each  species") %>%
+  kable_styling(font_size = 10, full_width = F) %>% 
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24) %>%
+  pack_rows("(d) UTEN", 25, 30)
+table3
+
+```
+
+```{r carbohydrate table, echo=FALSE}
+
+T90.carb.tab <- T90.df.carb.a[,c(10,18,19:21)] #subset for species, treatment, and model values
+T90.carb.tab$binder <- paste(T90.carb.tab$species, T90.carb.tab$treat2, sep = "_")
+
+T90.carb.mean <- summarySE(data=T90.carb.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90.carb.low <- summarySE(data=T90.carb.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90.carb.up <- summarySE(data=T90.carb.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+
+T90.carb.tab <- cbind(T90.carb.mean, T90.carb.low, T90.carb.up)[, c(2,4,5,13,21)]
+T90.carb.tab$mean <- round(T90.carb.tab$mean, 2)
+T90.carb.tab$lowerci <- round(T90.carb.tab$lowerci, 2)
+T90.carb.tab$upperci <- round(T90.carb.tab$upperci, 2)
+
+colnames(T90.carb.tab)[colnames(T90.carb.tab)=="treat2"] <- "treatment"
+colnames(T90.carb.tab)[colnames(T90.carb.tab)=="lowerci"] <- "lower 95%"
+colnames(T90.carb.tab)[colnames(T90.carb.tab)=="upperci"] <- "upper 95%"
+T90.carb.tab$treatment <- factor(T90.carb.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table4 <- kable(T90.carb.tab, booktabs = T, caption = "Table 4. T90 modelled mean coral host carbohydrate content and 95% confidence intervals for each  species") %>%
+  kable_styling(font_size = 10, full_width = F) %>% 
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24) %>%
+  pack_rows("(d) UTEN", 25, 30)
+table4
+
+```
+
+```{r density table, echo=FALSE}
+
+T90.den.tab <- T90.df.den.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.den.tab$binder <- paste(T90.den.tab$species, T90.den.tab$treat2, sep = "_")
+
+T90.den.mean <- summarySE(data=T90.den.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90.den.low <- summarySE(data=T90.den.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90.den.up <- summarySE(data=T90.den.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+
+T90.den.tab <- cbind(T90.den.mean, T90.den.low, T90.den.up)[, c(2,4,5,13,21)]
+T90.den.tab$mean <- round(T90.den.tab$mean, 2)
+T90.den.tab$lowerci <- round(T90.den.tab$lowerci, 2)
+T90.den.tab$upperci <- round(T90.den.tab$upperci, 2)
+
+colnames(T90.den.tab)[colnames(T90.den.tab)=="treat2"] <- "treatment"
+colnames(T90.den.tab)[colnames(T90.den.tab)=="lowerci"] <- "lower 95%"
+colnames(T90.den.tab)[colnames(T90.den.tab)=="upperci"] <- "upper 95%"
+T90.den.tab$treatment <- factor(T90.den.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table5 <- kable(T90.den.tab, booktabs = T, caption = "Table 5. T90 modelled mean algal endosymbiont cell density and 95% confidence intervals for each  species") %>%
+  kable_styling(font_size = 10, full_width = F) %>% 
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24) %>%
+  pack_rows("(d) UTEN", 25, 30)
+table5
+
+```
+
+```{r chlorophyll table, echo=FALSE}
+
+T90.chla.tab <- T90.df.chla.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.chla.tab$binder <- paste(T90.chla.tab$species, T90.chla.tab$treat2, sep = "_")
+
+T90.chla.mean <- summarySE(data=T90.chla.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90.chla.low <- summarySE(data=T90.chla.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90.chla.up <- summarySE(data=T90.chla.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+
+T90.chla.tab <- cbind(T90.chla.mean, T90.chla.low, T90.chla.up)[, c(2,4,5,13,21)]
+T90.chla.tab$mean <- round(T90.chla.tab$mean, 2)
+T90.chla.tab$lowerci <- round(T90.chla.tab$lowerci, 2)
+T90.chla.tab$upperci <- round(T90.chla.tab$upperci, 2)
+
+colnames(T90.chla.tab)[colnames(T90.chla.tab)=="treat2"] <- "treatment"
+colnames(T90.chla.tab)[colnames(T90.chla.tab)=="lowerci"] <- "lower 95%"
+colnames(T90.chla.tab)[colnames(T90.chla.tab)=="upperci"] <- "upper 95%"
+T90.chla.tab$treatment <- factor(T90.chla.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table6 <- kable(T90.chla.tab, booktabs = T, caption = "Table 6. T90 modelled mean algal endosymbiont chlorophyll a content and 95% confichlace intervals for each  species") %>%
+  kable_styling(font_size = 10, full_width = F) %>% 
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24) %>%
+  pack_rows("(d) UTEN", 25, 30)
+table6
+
+```
+
+```{r host table, echo=FALSE}
+
+T90.host.tab <- T90.df.host.a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
+T90.host.tab$binder <- paste(T90.host.tab$species, T90.host.tab$param, T90.host.tab$treat2, sep = "_")
+
+T90.host.mean <- summarySE(data=T90.host.tab, measurevar = "mean", groupvars = c("species", "param", "treat2", "binder"))
+T90.host.low <- summarySE(data=T90.host.tab, measurevar = "lowerci", groupvars = c("species", "param", "treat2", "binder"))
+T90.host.up <- summarySE(data=T90.host.tab, measurevar = "upperci", groupvars = c("species", "param", "treat2", "binder"))
+
+T90.host.tab <- cbind(T90.host.mean, T90.host.low, T90.host.up)[, c(3,5,6,15,24)]
+T90.host.tab$mean <- round(T90.host.tab$mean, 2)
+T90.host.tab$lowerci <- round(T90.host.tab$lowerci, 2)
+T90.host.tab$upperci <- round(T90.host.tab$upperci, 2)
+
+colnames(T90.host.tab)[colnames(T90.host.tab)=="treat2"] <- "treatment"
+colnames(T90.host.tab)[colnames(T90.host.tab)=="lowerci"] <- "lower 95%"
+colnames(T90.host.tab)[colnames(T90.host.tab)=="upperci"] <- "upper 95%"
+T90.host.tab$treatment <- factor(T90.host.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table8 <- kable(T90.host.tab, booktabs = T, caption = "Table 8. Total coral host physiology at T90 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
+  kable_styling(font_size = 10, full_width = F) %>% 
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24) %>%
+  pack_rows("(d) UTEN", 25, 30)
+table8
+
+```
+
+```{r symbiont table, echo=FALSE}
+
+T90.symb.tab <- T90.df.symb.a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
+T90.symb.tab$binder <- paste(T90.symb.tab$species, T90.symb.tab$param, T90.symb.tab$treat2, sep = "_")
+
+T90.symb.mean <- summarySE(data=T90.symb.tab, measurevar = "mean", groupvars = c("species", "param", "treat2", "binder"))
+T90.symb.low <- summarySE(data=T90.symb.tab, measurevar = "lowerci", groupvars = c("species", "param", "treat2", "binder"))
+T90.symb.up <- summarySE(data=T90.symb.tab, measurevar = "upperci", groupvars = c("species", "param", "treat2", "binder"))
+
+T90.symb.tab <- cbind(T90.symb.mean, T90.symb.low, T90.symb.up)[, c(3,5,6,15,24)]
+T90.symb.tab$mean <- round(T90.symb.tab$mean, 2)
+T90.symb.tab$lowerci <- round(T90.symb.tab$lowerci, 2)
+T90.symb.tab$upperci <- round(T90.symb.tab$upperci, 2)
+
+colnames(T90.symb.tab)[colnames(T90.symb.tab)=="treat2"] <- "treatment"
+colnames(T90.symb.tab)[colnames(T90.symb.tab)=="lowerci"] <- "lower 95%"
+colnames(T90.symb.tab)[colnames(T90.symb.tab)=="upperci"] <- "upper 95%"
+T90.symb.tab$treatment <- factor(T90.symb.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table9 <- kable(T90.symb.tab, booktabs = T, caption = "Table 9. Total algal endosymbiont physiology at T90 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
+  kable_styling(font_size = 10, full_width = F) %>% 
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24) %>%
+  pack_rows("(d) UTEN", 25, 30)
+table9
+
+```
+
 <br/>
 <br/>
 
-
-
+```{r}
+sessionInfo()
+```
 
