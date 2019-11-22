@@ -465,10 +465,10 @@ chla.model.fig <- ggplot(T90.df.chla.a)+
 full.T90.model.fig <- plot_grid(corals, pro.model.fig, lipid.model.fig, carb.model.fig, den.model.fig, chla.model.fig, labels=c("", "A", "B", "C", "D", "E"), ncol = 1, align = "v", axis = 'lb', rel_heights = c(1,1,1,1,1,1), scale = 0.9)
 #full.T90.model.fig
 
-# make interactive Rmarkdown version
-full.T90.fig.interactive <- subplot(corals, pro.model.fig, lipid.model.fig, carb.model.fig, den.model.fig, chla.model.fig, nrows = 6)
-
-full.T90.fig.interactive
+## make interactive Rmarkdown version
+#full.T90.fig.interactive <- subplot(pro.model.fig, lipid.model.fig, carb.model.fig, #den.model.fig, chla.model.fig, nrows = 6)
+#
+#full.T90.fig.interactive
 
 ```
 
