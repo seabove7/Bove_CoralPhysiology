@@ -1,6 +1,5 @@
 ---
 title: "Chapter 3: Physiology"
-author: "CBB"
 runtime: shiny
 output: 
   html_document:
@@ -8,21 +7,24 @@ output:
 ---
 # Results
 
-#### (A) Individual coral host and algal endosymbiont physiology
-> Protein: .  
-Lipids: .  
-Carbs: .  
-Density: .  
-Chla: .  
+#### (A) Coral host and algal endosymbiont physiology by parameter
+> Protein content (mg/cm2) measured in coral host tissue at the start of the experiment (T0) was not clearly different than the that in coral hosts maintained in the control treatments (400 uatm at 28C) for the 93 day experiment (T90) in any coral species. Coral host tissue of *P. strigosa* reared at 31C exhibited consistently lower protein content than coral hosts reared at 28C in the same pCO2 treatments, however there was no statistically clear difference between pCO2 treatments at either temperature (**Figure 1A**). Coral host protein content did not clearly differ between treatments in *S. siderea, P.astreoides,* or *U. tenuifolia*. Lipid content (mg/cm2) measured in *S. siderea* coral host tissue taken at T0 was lower than in coral hosts reared in the control treatment at T90 (**Figure 1B**). There was no clear difference in coral host lipid content from T0 to T90 in the control treatments for *P. strigosa, P. astreoides,* and *U. tenuifolia*. No statistically clear temperature or pCO2 effect on coral host lipid content was observed at T90 in the four coral species (**Figure 1B**). Coral host carbohydrate content (mg/cm2) of *P. astreoides* and *U. tenuifolia* at T0 was higher than in coral hosts reared under the control treatment at T90 (**Figure 1C**), however, there was no difference between T0 and T90 control coral hosts in *S. siderea* or *P. strigosa*. There was no overall effect of pCO2 or temperature on coral host carbohydrate content in any of the four species examined (**Figure 1C**).
+
+> Algal endosymbiont cell density (10^6 cells/cm2) in *S. siderea* fragments at T0 was lower than densities measured in fragments under the control treatment at T90, while *P. astreoides* T0 densities were clearly lower than those measured under the control treatment at T90 (**Figure 1D**). Algal endosymbiont cell densities did not exhibit a statistically clear difference between T0 fragments and T90 fragments maintained at the control treatment in either *P. strigosa* or *U. tenuifolia*. Neither pCO2 nor temperature exhibited a statistically clear overall effect on algal endosymbiont cell densities quantified at T90 in any of the four coral species (**Figure 1D**). Algal endosymbiont chlorophyll a content (ug/cm2) of *S. siderea* and *P. strigosa* at T0 was lower than the measured chlorophyll a in fragments maintained in the control treatment at T90 (**Figure 1E**). Conversely, chlorophyll a measured at T0 was not clearly different than in fragments reared in the control treatment at T90 for both *P. astreoides* and *U. tenuifolia*. All species with the exception of *U. tenuifolia* have algal endosymbionts with statistically clear reductions in chlorophyll a content with increasing pCO2, while elevated temperature (31C) only clearly reduces chlorophyll a in the algal endosymbionts associated with *P. strigosa* (**Figure 1E**).
+
 
 
 #### (B) Total coral host energy reserves
-> Coral host total energy reserves (mg/cm2) was calculated as the sum of each protein, lipid, and carbohydrate value per fragment. 
+> Coral host total tissue energy reserves (mg/cm2) was calculated as the sum of each protein, lipid, and carbohydrate value per coral host. Total host energy reserves of *P. astreoides* and *U. tenuifolia* at T0 were clearly greater than the total energy reserves quantified in coral hosts maintained under at control treatment at T90 (**Figure 2A**). There was not statistically clear difference in total energy reserves between T0 and T90 control coral hosts in both *S. siderea* and *P. strigosa*. Elevated temperature (31C) resulted in a statistically clear reduction in total coral host energy reserves in only *P. strigosa* across all pCO2 treatments (**Figure 2A**). No overall effect of pCO2 was quantified in any of the four species examined. 
 
-(**Figure 2A**). 
+
 
 #### (C) Total algal endosymbiont physiology
-> Calculated chlorophyll a content per algal endosymbiont cell (ug/10^6 cells) represents total algal endosymbiont physiology and is a measure of the efficiency of the endosymbionts within each coral fragment. Total endosymbiont physiology of *S. siderea* and *P. astreoides* did not change from the start (T0) to finish (T90) of the experimental period, nor did *p*CO2 or temperature have a statistically clear impact after 93 days at treatment. Conversely, *P. strigosa* total endosymbiont physiology increased in the 400 uatm 28C treatment at T90 compared to T0, however, there was no statistically clear difference from the other 28C *p*CO2 treatments at T90. Additionally, T90 total endosymbiont physiology was clearly greater at 31C than measured values at T0 and under all *p*CO2 treatments at 28C, except the extreme where they converge (**Figure 2B**). 
+> Calculated chlorophyll a content per algal endosymbiont cell (ug/10^6 cells) represents total algal endosymbiont physiology and is a measure of the efficiency of the endosymbionts associated with each coral fragment. Total algal endosymbiont physiology of *P. strigosa* was lower at T0 than in the control treatment fragments at T90 (**Figure 2B**). Conversely, *S. siderea, P.astreoides,* and *U. tenuifolia* total algal endosymbiont physiology did not exhibit a statistically clear difference between T0 and fragments maintained under the control teratment at T90. Algal endosymbionts associated with *P. strigosa* fragments maintained at 31C exhibited greater total endosymbiont physiology than those reared at 28C across all pCO2 treatment (**Figure 2B**), while temerature did not alter the total endosymbiont physiology associated with the other species examined. No statstically clear effect of pCO2 on the total algal endosymbiont was observed on any of the four species. 
+
+
+
+## Figures:
 
 ```{r setup, include=FALSE}
 
@@ -39,6 +41,7 @@ library("readr")
 library("ggplot2")
 library("dplyr")
 library("tidyr")
+library("openxlsx")
 library("plotly")
 library("tidyverse")
 library("shiny")
@@ -75,7 +78,7 @@ date <- Sys.Date()
 
 ```
 
-```{r add phys params, include=FALSE}
+```{r add phys params, eval=FALSE, include=FALSE}
 
 # Set up the dataframes
 #phys <- read_csv("phys_all_13Aug19.csv")
@@ -142,7 +145,7 @@ completeFun <- function(data, desiredCols) {
   completeVec <- complete.cases(data[, desiredCols])
   return(data[completeVec, ])
 }
-T0.df <- completeFun(T0.df, "value") # run function to remove any missing values from "rate"
+T0.df <- completeFun(T0.df, "value") # run function to remove any missing values
 
 # create 2 dataframes to run two different modesl
 T0.df.1 <- subset(T0.df, subset = param %in% c("chla", "symb")) # chlorophyll a and total symbiont only
@@ -154,35 +157,35 @@ seed = 7 #seed to make results replicatable (our seed was 7)
 
 ```
 
-```{r T0 model 1, echo=FALSE}
+```{r T0 model 1, eval=FALSE, include=FALSE}
 
-# mixed effects model and boostrapping
-#T0.model1 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1)
-#out <- simulate(T0.model1, nsim=bootnum, seed=seed, re.form=NULL)
-#boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1), re.form=NA))
-#boots <- cbind(predict(T0.model1,re.form=NA), boots)
-#T0.df1.a <- (cbind(T0.df.1, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T0.df1.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#T0.df1.nam <- paste("T0_model1", date, sep="_") 
-#T0.df1.nam <- paste(T0.df1.nam, ".csv", sep="") 
-#write.csv(T0.df1.a, file=T0.df1.nam)  
+## mixed effects model and boostrapping
+T0.model1 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1)
+out <- simulate(T0.model1, nsim=bootnum, seed=seed, re.form=NULL)
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1), re.form=NA))
+boots <- cbind(predict(T0.model1,re.form=NA), boots)
+T0.df1.a <- (cbind(T0.df.1, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T0.df1.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+T0.df1.nam <- paste("T0_model1", date, sep="_") 
+T0.df1.nam <- paste(T0.df1.nam, ".csv", sep="") 
+write.csv(T0.df1.a, file=T0.df1.nam)  
 
 ```
 
-```{r T0 model 2, echo=FALSE}
+```{r T0 model 2, eval=FALSE, include=FALSE}
 
-# mixed effects model and boostrapping
-#T0.model2 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2)
-#out <- simulate(T0.model2, nsim=bootnum, seed=seed, re.form=NULL)
-#boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2), re.form=NA))
-#boots <- cbind(predict(T0.model2,re.form=NA), boots)
-#T0.df2.a <- (cbind(T0.df.2, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T0.df2.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#T0.df2.nam <- paste("T0_model2", date, sep="_") 
-#T0.df2.nam <- paste(T0.df2.nam, ".csv", sep="") 
-#write.csv(T0.df2.a, file=T0.df2.nam)  
+## mixed effects model and boostrapping
+T0.model2 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2)
+out <- simulate(T0.model2, nsim=bootnum, seed=seed, re.form=NULL)
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2), re.form=NA))
+boots <- cbind(predict(T0.model2,re.form=NA), boots)
+T0.df2.a <- (cbind(T0.df.2, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T0.df2.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+T0.df2.nam <- paste("T0_model2", date, sep="_") 
+T0.df2.nam <- paste(T0.df2.nam, ".csv", sep="") 
+write.csv(T0.df2.a, file=T0.df2.nam)  
 
 ```
 
@@ -233,24 +236,23 @@ T90.df$species <- revalue(x = T90.df$species, c("S" = "SSID", "P" = "PSTR",
 
 
 
-```{r protein model, echo=FALSE}
+```{r protein model, eval=FALSE, include=FALSE}
 
 # subsetting
 T90.df.pro <- subset(T90.df, param=="pro")
-T0.df.pro <- subset(T0.df.a, param=="pro")
-T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any missing values from "rate"
+T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any missing values
 
-# mixed effect model run using lmer()
-#T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.pro)
-#out <- simulate(T90.pro.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.pro),re.form=NA))
-#boots <- cbind(predict(T90.pro.model,re.form=NA), boots)
-#T90.df.pro.a <- (cbind(T90.df.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.pro.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#pro.df <- paste("Protein_model_T90", date, sep="_") 
-#pro.df <- paste(pro.df, ".csv", sep="") 
-#write.csv(T90.df.pro.a, file=pro.df)  
+## mixed effect model run using lmer()
+T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.pro)
+out <- simulate(T90.pro.model,nsim=bootnum,seed=seed,re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.pro),re.form=NA))
+boots <- cbind(predict(T90.pro.model,re.form=NA), boots)
+T90.df.pro.a <- (cbind(T90.df.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T90.df.pro.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+pro.df <- paste("Protein_model_T90", date, sep="_") 
+pro.df <- paste(pro.df, ".csv", sep="") 
+write.csv(T90.df.pro.a, file=pro.df)  
 
 ```
 
@@ -260,6 +262,7 @@ T90.df.pro.a <- read.csv("Protein_model_T90_2019-11-20.csv", head=T)
 T90.df.pro.a$ftemp <- as.factor(T90.df.pro.a$ftemp)
 T90.df.pro.a$fpco2 <- as.factor(T90.df.pro.a$fpco2)
 T90.df.pro.a$species <- factor(T90.df.pro.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.pro <- subset(T0.df.a, param=="pro") # subset the T0 protein values
 
 pro.model.fig <- ggplot(T90.df.pro.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -277,25 +280,23 @@ pro.model.fig <- ggplot(T90.df.pro.a)+
 
 ```
 
-```{r carb model, echo=FALSE}
+```{r carb model, eval=FALSE, include=FALSE}
 
 # subsetting
 T90.df.carb <- subset(T90.df, param=="carb")
-T0.df.carb <- subset(T0.df.a, param=="carb")
-T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values from "rate"
-#
+T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values
+
 ## mixed effect model run using lmer()
-#T90.carb.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.carb)
-#out <- simulate(T90.carb.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.carb),re.form=NA))
-#boots <- cbind(predict(T90.carb.model,re.form=NA), boots)
-#T90.df.carb.a <- (cbind(T90.df.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.carb.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#
-#carb.df <- paste("carbohydrate_model_T90", date, sep="_") 
-#carb.df <- paste(carb.df, ".csv", sep="") 
-#write.csv(T90.df.carb.a, file=carb.df)  
+T90.carb.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.carb)
+out <- simulate(T90.carb.model,nsim=bootnum,seed=seed,re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.carb),re.form=NA))
+boots <- cbind(predict(T90.carb.model,re.form=NA), boots)
+T90.df.carb.a <- (cbind(T90.df.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T90.df.carb.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+carb.df <- paste("carbohydrate_model_T90", date, sep="_") 
+carb.df <- paste(carb.df, ".csv", sep="") 
+write.csv(T90.df.carb.a, file=carb.df)  
 
 ```
 
@@ -305,6 +306,7 @@ T90.df.carb.a <- read.csv("carbohydrate_model_T90_2019-11-20.csv", head=T)
 T90.df.carb.a$ftemp <- as.factor(T90.df.carb.a$ftemp)
 T90.df.carb.a$fpco2 <- as.factor(T90.df.carb.a$fpco2)
 T90.df.carb.a$species <- factor(T90.df.carb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.carb <- subset(T0.df.a, param=="carb") # subset the T0 carb values
 
 carb.model.fig <- ggplot(T90.df.carb.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -322,25 +324,23 @@ carb.model.fig <- ggplot(T90.df.carb.a)+
 
 ```
 
-```{r lipid model, echo=FALSE}
+```{r lipid model, eval=FALSE, include=FALSE}
 
 # subsetting
 T90.df.lipid <- subset(T90.df, param=="lipid")
-T0.df.lipid <- subset(T0.df.a, param=="lipid")
-T90.df.lipid <- completeFun(T90.df.lipid, "value") # run function to remove any missing values from "rate"
-#
+T90.df.lipid <- completeFun(T90.df.lipid, "value") # run function to remove any missing values
+
 ## mixed effect model run using lmer()
-#T90.lipid.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.lipid)
-#out <- simulate(T90.lipid.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.lipid),re.form=NA))
-#boots <- cbind(predict(T90.lipid.model,re.form=NA), boots)
-#T90.df.lipid.a <- (cbind(T90.df.lipid, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.lipid.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#
-#lipid.df <- paste("lipid_model_T90", date, sep="_") 
-#lipid.df <- paste(lipid.df, ".csv", sep="") 
-#write.csv(T90.df.lipid.a, file=lipid.df)  
+T90.lipid.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.lipid)
+out <- simulate(T90.lipid.model,nsim=bootnum,seed=seed,re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.lipid),re.form=NA))
+boots <- cbind(predict(T90.lipid.model,re.form=NA), boots)
+T90.df.lipid.a <- (cbind(T90.df.lipid, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T90.df.lipid.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+lipid.df <- paste("lipid_model_T90", date, sep="_") 
+lipid.df <- paste(lipid.df, ".csv", sep="") 
+write.csv(T90.df.lipid.a, file=lipid.df)  
 
 ```
 
@@ -350,6 +350,7 @@ T90.df.lipid.a <- read.csv("lipid_model_T90_2019-11-20.csv", head=T)
 T90.df.lipid.a$ftemp <- as.factor(T90.df.lipid.a$ftemp)
 T90.df.lipid.a$fpco2 <- as.factor(T90.df.lipid.a$fpco2)
 T90.df.lipid.a$species <- factor(T90.df.lipid.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.lipid <- subset(T0.df.a, param=="lipid") # subset the T0 lipid values
 
 lipid.model.fig <- ggplot(T90.df.lipid.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -367,24 +368,23 @@ lipid.model.fig <- ggplot(T90.df.lipid.a)+
 
 ```
 
-```{r denisty model, echo=FALSE, message=FALSE}
+```{r denisty model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
 T90.df.den <- subset(T90.df, param=="den")
-T0.df.den <- subset(T0.df.a, param=="den")
-T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any missing values from "rate"
-#
+T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any missing values
+
 ## mixed effect model run using lmer()
-#T90.den.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.den)
-#out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.den),re.form=NA))
-#boots <- cbind(predict(T90.den.model,re.form=NA), boots)
-#T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.den.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#den.df <- paste("density_model_T90", date, sep="_") 
-#den.df <- paste(den.df, ".csv", sep="") 
-#write.csv(T90.df.den.a, file=den.df)  
+T90.den.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.den)
+out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.den),re.form=NA))
+boots <- cbind(predict(T90.den.model,re.form=NA), boots)
+T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T90.df.den.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+den.df <- paste("density_model_T90", date, sep="_") 
+den.df <- paste(den.df, ".csv", sep="") 
+write.csv(T90.df.den.a, file=den.df)  
 
 ```
 
@@ -394,6 +394,7 @@ T90.df.den.a <- read.csv("density_model_T90_2019-11-21.csv", head=T)
 T90.df.den.a$ftemp <- as.factor(T90.df.den.a$ftemp)
 T90.df.den.a$fpco2 <- as.factor(T90.df.den.a$fpco2)
 T90.df.den.a$species <- factor(T90.df.den.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.den <- subset(T0.df.a, param=="den") # subset the T0 density values
 
 den.model.fig <- ggplot(T90.df.den.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(),  panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -411,24 +412,23 @@ den.model.fig <- ggplot(T90.df.den.a)+
 
 ```
 
-```{r chlorophyll model, echo=FALSE, message=FALSE}
+```{r chlorophyll model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
 T90.df.chla <- subset(T90.df, param=="chla")
-T0.df.chla <- subset(T0.df.a, param=="chla")
-T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any missing values from "rate"
-#
+T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any missing values
+
 ## mixed effect model run using lmer()
-#T90.chla.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.chla)
-#out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=T, data = T90.df.chla),re.form=NA))
-#boots <- cbind(predict(T90.chla.model,re.form=NA), boots)
-#T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.chla.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#chla.df <- paste("chlorophyll_model_T90", date, sep="_") 
-#chla.df <- paste(chla.df, ".csv", sep="") 
-#write.csv(T90.df.chla.a, file=chla.df)  
+T90.chla.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.chla)
+out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.chla),re.form=NA))
+boots <- cbind(predict(T90.chla.model,re.form=NA), boots)
+T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T90.df.chla.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+chla.df <- paste("chlorophyll_model_T90", date, sep="_") 
+chla.df <- paste(chla.df, ".csv", sep="") 
+write.csv(T90.df.chla.a, file=chla.df)  
 
 ```
 
@@ -437,6 +437,7 @@ T90.df.chla.a <- read.csv("chlorophyll_model_T90_2019-11-21.csv", head=T)
 T90.df.chla.a$ftemp <- as.factor(T90.df.chla.a$ftemp)
 T90.df.chla.a$fpco2 <- as.factor(T90.df.chla.a$fpco2)
 T90.df.chla.a$species <- factor(T90.df.chla.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.chla <- subset(T0.df.a, param=="chla") # subset the T0 chlorophyll values
 
 chla.model.fig <- ggplot(T90.df.chla.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -454,8 +455,6 @@ chla.model.fig <- ggplot(T90.df.chla.a)+
 
 ```
 
-## Figures:
-
 ### Figure 1
 
 ```{r figure 2, echo=FALSE, fig.height = 14, fig.width = 10, fig.align = "center", results = 'hide'}
@@ -463,48 +462,43 @@ chla.model.fig <- ggplot(T90.df.chla.a)+
 # full T90 plot with coral images
 
 full.T90.model.fig <- plot_grid(corals, pro.model.fig, lipid.model.fig, carb.model.fig, den.model.fig, chla.model.fig, labels=c("", "A", "B", "C", "D", "E"), ncol = 1, align = "v", axis = 'lb', rel_heights = c(1,1,1,1,1,1), scale = 0.9)
-#full.T90.model.fig
-
-## make interactive Rmarkdown version
-#full.T90.fig.interactive <- subplot(pro.model.fig, lipid.model.fig, carb.model.fig, #den.model.fig, chla.model.fig, nrows = 6)
-#
-#full.T90.fig.interactive
+full.T90.model.fig
 
 ```
 
-Modelled 95% confidence interval of (A) total protein (mg/cm2), (B) total lipid (mg/cm2), (C) total carbohydrate (mg/cm2), (D) cell density (10^6 cells/cm2), and (E) Chlorophyll a (ug/cm2) for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+Modeled 95% confidence interval of (A) total protein (mg/cm2), (B) total lipid (mg/cm2), (C) total carbohydrate (mg/cm2), (D) cell density (10^6 cells/cm2), and (E) Chlorophyll a (ug/cm2) for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
 
 <br/>
 <br/>
 
 ### Figure 2
 
-```{r host phys model, echo=FALSE, message=FALSE}
+```{r host phys model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
 T90.df.host <- subset(T90.df, param=="host")
-T0.df.host <- subset(T0.df.a, param=="host")
-T90.df.host <- completeFun(T90.df.host, "value") # run function to remove any missing values from "rate"
-#
+T90.df.host <- completeFun(T90.df.host, "value") # run function to remove any missing values
+
 ## mixed effect model run using lmer()
-#T90.host.model <- lmer(value ~ species * ftemp + fpco2 + (1 | colony), REML=T, data = T90.df.host)
-#out <- simulate(T90.host.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + fpco2 + (1 | colony), REML=T, data = T90.df.host),re.form=NA))
-#boots <- cbind(predict(T90.host.model,re.form=NA), boots)
-#T90.df.host.a <- (cbind(T90.df.host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.host.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#host.df <- paste("host_model_T90", date, sep="_") 
-#host.df <- paste(host.df, ".csv", sep="") 
-#write.csv(T90.df.host.a, file=host.df)  
+T90.host.model <- lmer(value ~ species * (ftemp + fpco2) + (1 | colony), REML=TRUE, data = T90.df.host)
+out <- simulate(T90.host.model,nsim=bootnum,seed=seed,re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + fpco2 + (1 | colony), REML=TRUE, data = T90.df.host),re.form=NA))
+boots <- cbind(predict(T90.host.model,re.form=NA), boots)
+T90.df.host.a <- (cbind(T90.df.host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T90.df.host.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+host.df <- paste("host_model_T90", date, sep="_") 
+host.df <- paste(host.df, ".csv", sep="") 
+write.csv(T90.df.host.a, file=host.df)  
 
 ```
 
 ```{r host phys figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-T90.df.host.a <- read.csv("host_model_T90_2019-11-21.csv", head=T)
+T90.df.host.a <- read.csv("host_model_T90_2019-11-27.csv", head=T)
 T90.df.host.a$ftemp <- as.factor(T90.df.host.a$ftemp)
 T90.df.host.a$species <- factor(T90.df.host.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.host <- subset(T0.df.a, param=="host") # subset the T0 host values
 
 host.model.fig <- ggplot(data=T90.df.host.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -522,33 +516,33 @@ host.model.fig <- ggplot(data=T90.df.host.a)+
 
 ```
 
-```{r symb phys model, echo=FALSE, message=FALSE}
+```{r symb phys model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
 T90.df.symb <- subset(T90.df, param=="symb")
-T0.df.symb <- subset(T0.df.a, param=="symb")
 T90.df.symb$value[T90.df.symb$value > 4000] <- NA
-T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values from "rate"
+T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values
 
 ## mixed effect model run using
-#T90.symb.model <- lmer(value ~ species * ftemp * fpco2 + reef + (1 | colony), REML=TRUE, data = T90.df.symb)
-#out <- simulate(T90.symb.model,nsim=bootnum,seed=seed,re.form=NULL)
-#boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp * fpco2 + reef + (1 | colony), REML=T, data = T90.df.symb), re.form=NA))
-#boots <- cbind(predict(T90.symb.model,re.form=NA), boots)
-#T90.df.symb.a <- (cbind(T90.df.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-#colnames(T90.df.symb.a)[17:19] <- c("mean", "lowerci", "upperci")
-#
-#symb.df <- paste("symb_model_T90", date, sep="_") 
-#symb.df <- paste(symb.df, ".csv", sep="") 
-#write.csv(T90.df.symb.a, file=symb.df)  
+T90.symb.model <- lmer(value ~ species * (ftemp + fpco2) + (1 | colony), REML=TRUE, data = T90.df.symb)
+out <- simulate(T90.symb.model,nsim=bootnum,seed=seed,re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp * fpco2 + reef + (1 | colony), REML=TRUE, data = T90.df.symb), re.form=NA))
+boots <- cbind(predict(T90.symb.model,re.form=NA), boots)
+T90.df.symb.a <- (cbind(T90.df.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(T90.df.symb.a)[17:19] <- c("mean", "lowerci", "upperci")
+
+symb.df <- paste("symb_model_T90", date, sep="_") 
+symb.df <- paste(symb.df, ".csv", sep="") 
+write.csv(T90.df.symb.a, file=symb.df)  
 
 ```
 
 ```{r symb phys figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE, include=FALSE}
 
-T90.df.symb.a <- read.csv("symb_model_T90_2019-11-21.csv", head=T)
+T90.df.symb.a <- read.csv("symb_model_T90_2019-11-27.csv", head=T)
 T90.df.symb.a$ftemp <- as.factor(T90.df.symb.a$ftemp)
 T90.df.symb.a$species <- factor(T90.df.symb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+T0.df.symb <- subset(T0.df.a, param=="symb") # subset the T0 symbiont values
 
 symb.model.fig <- ggplot(data=T90.df.symb.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
@@ -572,11 +566,11 @@ symb.model.fig <- ggplot(data=T90.df.symb.a)+
 ```{r figure 3, echo=FALSE, fig.height = 4.6, fig.width = 10, fig.align = "center", results = 'hide'}
 
 host.symb.T90.model.fig <- plot_grid(host.model.fig, symb.model.fig, labels = c("A", "B"), ncol = 1, align = "v", axis = 'lb')
-
 host.symb.T90.model.fig
 
+
 ```
-Modelled 95% confidence interval of (A) total host energy reserves (mg/cm2) and (B) chlorophyll a per symbiont cell (ug/10^6 cells) for *S. siderea*, *P. strigosa*, *P. astreoides*, and *U. tenuifolia* for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+Modeled 95% confidence interval of (A) total host energy reserves (mg/cm2) and (B) chlorophyll a per symbiont cell (ug/10^6 cells) for *S. siderea*, *P. strigosa*, *P. astreoides*, and *U. tenuifolia* for each coral species, with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
 
 
 
@@ -595,7 +589,7 @@ T0.mean <- summarySE(data=T0.tab, measurevar = "mean", groupvars = c("species", 
 T0.low <- summarySE(data=T0.tab, measurevar = "lowerci", groupvars = c("species", "param", "binder"))
 T0.up <- summarySE(data=T0.tab, measurevar = "upperci", groupvars = c("species", "param", "binder"))
 
-T0.tab <- cbind(T0.mean, T0.low, T0.up)[, -c(1,3,6:12, 14:20, 22:24)]
+T0.tab <- cbind(T0.mean, T0.low, T0.up)[, -c(3,6:12, 14:20, 22:24)]
 T0.tab$mean <- round(T0.tab$mean, 2)
 T0.tab$lowerci <- round(T0.tab$lowerci, 2)
 T0.tab$upperci <- round(T0.tab$upperci, 2)
@@ -604,7 +598,7 @@ colnames(T0.tab)[colnames(T0.tab)=="param"] <- "parameter"
 colnames(T0.tab)[colnames(T0.tab)=="lowerci"] <- "lower 95%"
 colnames(T0.tab)[colnames(T0.tab)=="upperci"] <- "upper 95%"
 
-table1 <- kable(T0.tab, booktabs = T, caption = "Table 1. T0 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
+table1 <- kable(T0.tab[, -c(1)], booktabs = T, caption = "Table 1. T0 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
   kable_styling(font_size = 10, full_width = F, position="center") %>% 
   pack_rows("(a) SSID", 1, 7) %>%
   pack_rows("(b) PSTR", 8, 14) %>%
@@ -623,7 +617,7 @@ T90.pro.mean <- summarySE(data=T90.pro.tab, measurevar = "mean", groupvars = c("
 T90.pro.low <- summarySE(data=T90.pro.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
 T90.pro.up <- summarySE(data=T90.pro.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-T90.pro.tab <- cbind(T90.pro.mean, T90.pro.low, T90.pro.up)[, c(2,4,5,13,21)]
+T90.pro.tab <- cbind(T90.pro.mean, T90.pro.low, T90.pro.up)[, c(1,2,4,5,13,21)]
 T90.pro.tab$mean <- round(T90.pro.tab$mean, 2)
 T90.pro.tab$lowerci <- round(T90.pro.tab$lowerci, 2)
 T90.pro.tab$upperci <- round(T90.pro.tab$upperci, 2)
@@ -633,7 +627,7 @@ colnames(T90.pro.tab)[colnames(T90.pro.tab)=="lowerci"] <- "lower 95%"
 colnames(T90.pro.tab)[colnames(T90.pro.tab)=="upperci"] <- "upper 95%"
 T90.pro.tab$treatment <- factor(T90.pro.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table2 <- kable(T90.pro.tab, booktabs = T, caption = "Table 2. T90 modelled mean coral host protein content and 95% confidence intervals for each  species") %>%
+table2 <- kable(T90.pro.tab[,-c(1)], booktabs = T, caption = "Table 2. T90 modelled mean coral host protein content and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
   pack_rows("(a) SSID", 1, 8) %>%
   pack_rows("(b) PSTR", 9, 16) %>%
@@ -652,7 +646,7 @@ T90.lipid.mean <- summarySE(data=T90.lipid.tab, measurevar = "mean", groupvars =
 T90.lipid.low <- summarySE(data=T90.lipid.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
 T90.lipid.up <- summarySE(data=T90.lipid.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-T90.lipid.tab <- cbind(T90.lipid.mean, T90.lipid.low, T90.lipid.up)[, c(2,4,5,13,21)]
+T90.lipid.tab <- cbind(T90.lipid.mean, T90.lipid.low, T90.lipid.up)[, c(1,2,4,5,13,21)]
 T90.lipid.tab$mean <- round(T90.lipid.tab$mean, 2)
 T90.lipid.tab$lowerci <- round(T90.lipid.tab$lowerci, 2)
 T90.lipid.tab$upperci <- round(T90.lipid.tab$upperci, 2)
@@ -662,7 +656,7 @@ colnames(T90.lipid.tab)[colnames(T90.lipid.tab)=="lowerci"] <- "lower 95%"
 colnames(T90.lipid.tab)[colnames(T90.lipid.tab)=="upperci"] <- "upper 95%"
 T90.lipid.tab$treatment <- factor(T90.lipid.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table3 <- kable(T90.lipid.tab, booktabs = T, caption = "Table 3. T90 modelled mean coral host lipid content and 95% confidence intervals for each  species") %>%
+table3 <- kable(T90.lipid.tab[,-c(1)], booktabs = T, caption = "Table 3. T90 modelled mean coral host lipid content and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
   pack_rows("(a) SSID", 1, 8) %>%
   pack_rows("(b) PSTR", 9, 16) %>%
@@ -681,7 +675,7 @@ T90.carb.mean <- summarySE(data=T90.carb.tab, measurevar = "mean", groupvars = c
 T90.carb.low <- summarySE(data=T90.carb.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
 T90.carb.up <- summarySE(data=T90.carb.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-T90.carb.tab <- cbind(T90.carb.mean, T90.carb.low, T90.carb.up)[, c(2,4,5,13,21)]
+T90.carb.tab <- cbind(T90.carb.mean, T90.carb.low, T90.carb.up)[, c(1,2,4,5,13,21)]
 T90.carb.tab$mean <- round(T90.carb.tab$mean, 2)
 T90.carb.tab$lowerci <- round(T90.carb.tab$lowerci, 2)
 T90.carb.tab$upperci <- round(T90.carb.tab$upperci, 2)
@@ -691,7 +685,7 @@ colnames(T90.carb.tab)[colnames(T90.carb.tab)=="lowerci"] <- "lower 95%"
 colnames(T90.carb.tab)[colnames(T90.carb.tab)=="upperci"] <- "upper 95%"
 T90.carb.tab$treatment <- factor(T90.carb.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table4 <- kable(T90.carb.tab, booktabs = T, caption = "Table 4. T90 modelled mean coral host carbohydrate content and 95% confidence intervals for each  species") %>%
+table4 <- kable(T90.carb.tab[,-c(1)], booktabs = T, caption = "Table 4. T90 modelled mean coral host carbohydrate content and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
   pack_rows("(a) SSID", 1, 8) %>%
   pack_rows("(b) PSTR", 9, 16) %>%
@@ -710,7 +704,7 @@ T90.den.mean <- summarySE(data=T90.den.tab, measurevar = "mean", groupvars = c("
 T90.den.low <- summarySE(data=T90.den.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
 T90.den.up <- summarySE(data=T90.den.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-T90.den.tab <- cbind(T90.den.mean, T90.den.low, T90.den.up)[, c(2,4,5,13,21)]
+T90.den.tab <- cbind(T90.den.mean, T90.den.low, T90.den.up)[, c(1,2,4,5,13,21)]
 T90.den.tab$mean <- round(T90.den.tab$mean, 2)
 T90.den.tab$lowerci <- round(T90.den.tab$lowerci, 2)
 T90.den.tab$upperci <- round(T90.den.tab$upperci, 2)
@@ -720,7 +714,7 @@ colnames(T90.den.tab)[colnames(T90.den.tab)=="lowerci"] <- "lower 95%"
 colnames(T90.den.tab)[colnames(T90.den.tab)=="upperci"] <- "upper 95%"
 T90.den.tab$treatment <- factor(T90.den.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table5 <- kable(T90.den.tab, booktabs = T, caption = "Table 5. T90 modelled mean algal endosymbiont cell density and 95% confidence intervals for each  species") %>%
+table5 <- kable(T90.den.tab[,-c(1)], booktabs = T, caption = "Table 5. T90 modelled mean algal endosymbiont cell density and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
   pack_rows("(a) SSID", 1, 8) %>%
   pack_rows("(b) PSTR", 9, 16) %>%
@@ -739,7 +733,7 @@ T90.chla.mean <- summarySE(data=T90.chla.tab, measurevar = "mean", groupvars = c
 T90.chla.low <- summarySE(data=T90.chla.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
 T90.chla.up <- summarySE(data=T90.chla.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-T90.chla.tab <- cbind(T90.chla.mean, T90.chla.low, T90.chla.up)[, c(2,4,5,13,21)]
+T90.chla.tab <- cbind(T90.chla.mean, T90.chla.low, T90.chla.up)[, c(1,2,4,5,13,21)]
 T90.chla.tab$mean <- round(T90.chla.tab$mean, 2)
 T90.chla.tab$lowerci <- round(T90.chla.tab$lowerci, 2)
 T90.chla.tab$upperci <- round(T90.chla.tab$upperci, 2)
@@ -749,7 +743,7 @@ colnames(T90.chla.tab)[colnames(T90.chla.tab)=="lowerci"] <- "lower 95%"
 colnames(T90.chla.tab)[colnames(T90.chla.tab)=="upperci"] <- "upper 95%"
 T90.chla.tab$treatment <- factor(T90.chla.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table6 <- kable(T90.chla.tab, booktabs = T, caption = "Table 6. T90 modelled mean algal endosymbiont chlorophyll a content and 95% confichlace intervals for each  species") %>%
+table6 <- kable(T90.chla.tab[,-c(1)], booktabs = T, caption = "Table 6. T90 modelled mean algal endosymbiont chlorophyll a content and 95% confichlace intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
   pack_rows("(a) SSID", 1, 8) %>%
   pack_rows("(b) PSTR", 9, 16) %>%
@@ -768,7 +762,7 @@ T90.host.mean <- summarySE(data=T90.host.tab, measurevar = "mean", groupvars = c
 T90.host.low <- summarySE(data=T90.host.tab, measurevar = "lowerci", groupvars = c("species", "param", "treat2", "binder"))
 T90.host.up <- summarySE(data=T90.host.tab, measurevar = "upperci", groupvars = c("species", "param", "treat2", "binder"))
 
-T90.host.tab <- cbind(T90.host.mean, T90.host.low, T90.host.up)[, c(3,5,6,15,24)]
+T90.host.tab <- cbind(T90.host.mean, T90.host.low, T90.host.up)[, c(1,3,5,6,15,24)]
 T90.host.tab$mean <- round(T90.host.tab$mean, 2)
 T90.host.tab$lowerci <- round(T90.host.tab$lowerci, 2)
 T90.host.tab$upperci <- round(T90.host.tab$upperci, 2)
@@ -778,13 +772,13 @@ colnames(T90.host.tab)[colnames(T90.host.tab)=="lowerci"] <- "lower 95%"
 colnames(T90.host.tab)[colnames(T90.host.tab)=="upperci"] <- "upper 95%"
 T90.host.tab$treatment <- factor(T90.host.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table8 <- kable(T90.host.tab, booktabs = T, caption = "Table 8. Total coral host physiology at T90 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
+table7 <- kable(T90.host.tab[,-c(1)], booktabs = T, caption = "Table 7. Total coral host physiology at T90 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
   pack_rows("(a) SSID", 1, 8) %>%
   pack_rows("(b) PSTR", 9, 16) %>%
   pack_rows("(c) PAST", 17, 24) %>%
   pack_rows("(d) UTEN", 25, 30)
-table8
+table7
 
 ```
 
@@ -797,7 +791,7 @@ T90.symb.mean <- summarySE(data=T90.symb.tab, measurevar = "mean", groupvars = c
 T90.symb.low <- summarySE(data=T90.symb.tab, measurevar = "lowerci", groupvars = c("species", "param", "treat2", "binder"))
 T90.symb.up <- summarySE(data=T90.symb.tab, measurevar = "upperci", groupvars = c("species", "param", "treat2", "binder"))
 
-T90.symb.tab <- cbind(T90.symb.mean, T90.symb.low, T90.symb.up)[, c(3,5,6,15,24)]
+T90.symb.tab <- cbind(T90.symb.mean, T90.symb.low, T90.symb.up)[, c(1,3,5,6,15,24)]
 T90.symb.tab$mean <- round(T90.symb.tab$mean, 2)
 T90.symb.tab$lowerci <- round(T90.symb.tab$lowerci, 2)
 T90.symb.tab$upperci <- round(T90.symb.tab$upperci, 2)
@@ -807,13 +801,65 @@ colnames(T90.symb.tab)[colnames(T90.symb.tab)=="lowerci"] <- "lower 95%"
 colnames(T90.symb.tab)[colnames(T90.symb.tab)=="upperci"] <- "upper 95%"
 T90.symb.tab$treatment <- factor(T90.symb.tab$treatment, c("288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table9 <- kable(T90.symb.tab, booktabs = T, caption = "Table 9. Total algal endosymbiont physiology at T90 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
+table8 <- kable(T90.symb.tab[,-c(1)], booktabs = T, caption = "Table 8. Total algal endosymbiont physiology at T90 modelled mean and 95% confidence intervals for each physiological parameter per species ") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
   pack_rows("(a) SSID", 1, 8) %>%
   pack_rows("(b) PSTR", 9, 16) %>%
   pack_rows("(c) PAST", 17, 24) %>%
   pack_rows("(d) UTEN", 25, 30)
-table9
+table8
+
+```
+
+
+```{r excel WB, eval=FALSE, include=FALSE}
+
+### Create workbook
+wb <- createWorkbook()
+
+# add 'Table 1' worksheet
+addWorksheet(wb, "Table 1 - T0") 
+writeData(wb, sheet = 1, x = T0.tab)
+setColWidths(wb, sheet = 1, cols = 1:5, widths = "auto")
+
+# add 'Table 2' worksheet
+addWorksheet(wb, "Table 2 - protein") 
+writeData(wb, sheet = 2, x = T90.pro.tab)
+setColWidths(wb, sheet = 2, cols = 1:5, widths = "auto")
+
+# add 'Table 3' worksheet
+addWorksheet(wb, "Table 3 - lipid") 
+writeData(wb, sheet = 3, x = T90.lipid.tab)
+setColWidths(wb, sheet = 3, cols = 1:5, widths = "auto")
+
+# add 'Table 4' worksheet
+addWorksheet(wb, "Table 4 - carbohydrate") 
+writeData(wb, sheet = 4, x = T90.carb.tab)
+setColWidths(wb, sheet = 4, cols = 1:5, widths = "auto")
+
+# add 'Table 5' worksheet
+addWorksheet(wb, "Table 5 - density") 
+writeData(wb, sheet = 5, x = T90.den.tab)
+setColWidths(wb, sheet = 5, cols = 1:5, widths = "auto")
+
+# add 'Table 6' worksheet
+addWorksheet(wb, "Table 6 - chlorophyll") 
+writeData(wb, sheet = 6, x = T90.chla.tab)
+setColWidths(wb, sheet = 6, cols = 1:5, widths = "auto")
+
+# add 'Table 7' worksheet
+addWorksheet(wb, "Table 7 - total host") 
+writeData(wb, sheet = 7, x = T90.host.tab)
+setColWidths(wb, sheet = 7, cols = 1:5, widths = "auto")
+
+# add 'Table 8' worksheet
+addWorksheet(wb, "Table 8 - total symbiont") 
+writeData(wb, sheet = 8, x = T90.symb.tab)
+setColWidths(wb, sheet = 8, cols = 1:5, widths = "auto")
+
+# save workbook
+saveWorkbook(wb, file="Ch3_Phys_tables.xlsx", overwrite = TRUE)
+
 
 ```
 
