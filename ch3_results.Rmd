@@ -103,9 +103,9 @@ df$ftemp <- as.factor(df$ftemp)
 df$fpco2 <- as.factor(df$fpco2)
 df$colony <- as.factor(df$colony)
 df$species <- factor(df$species, levels = c("S", "P", "A", "T"))
-df$fpco2 <- factor(df$fpco2, c("280", "400", "700", "2800"))
+df$fpco2 <- factor(df$fpco2, c("400", "con", "280", "700", "2800"))
+df$ftemp <- factor(df$ftmep, c("28", "con", "31"))
 df$den <- df$den / 1000000
-df$symb <- (df$chla) / (df$den)
 df$host <- df$pro + df$carb + df$lipid
 df$treat[df$T0_T90 == "T0"] <- "T0"
 df$treat <- factor(df$treat, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
@@ -124,86 +124,20 @@ df$treat <- gsub("3309_31", 10.5, df$treat)
 
 df$treat <- as.numeric(df$treat) #convert 'treat' column to numerics
 
-df2 <- df[,c(1:16,38:42)] #subset dataframe for selected columns
-df2 <- gather(df2, param, value, den:host) # make column of parameter and value
-df2$param <- factor(df2$param, levels = c("pro", "carb", "lipid", "den", "chla", "host", "symb")) #relevel physiology parameters
-df2$species <- revalue(x = df2$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")) #relevel species
-
 ```
 
 
-
-```{r T0 model setup, echo=FALSE}
-
-T0.df <- subset(df2, T0_T90=="T0") # subset for only T0 values
+```{r bootstrap model setup, echo=FALSE}
 
 # this function remove rows with any missing values
 completeFun <- function(data, desiredCols) {
   completeVec <- complete.cases(data[, desiredCols])
   return(data[completeVec, ])
 }
-T0.df <- completeFun(T0.df, "value") # run function to remove any missing values
-
-# create 2 dataframes to run two different modesl
-T0.df.1 <- subset(T0.df, subset = param %in% c("chla", "symb")) # chlorophyll a and total symbiont only
-T0.df.2 <- subset(T0.df, subset = param %in% c("pro", "lipid", "carb", "host", "den")) # all host and density here
 
 ### Performing the parametric bootstrapping of the model:
 bootnum = 2000 # set number of iterations (we used 2000) between 999 and 9999
 seed = 7 #seed to make results replicatable (our seed was 7)
-
-```
-
-```{r T0 model 1, eval=FALSE, include=FALSE}
-
-## mixed effects model and boostrapping
-T0.model1 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1)
-out <- simulate(T0.model1, nsim=bootnum, seed=seed, re.form=NULL)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.1), re.form=NA))
-boots <- cbind(predict(T0.model1,re.form=NA), boots)
-T0.df1.a <- (cbind(T0.df.1, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T0.df1.a)[17:19] <- c("mean", "lowerci", "upperci")
-
-T0.df1.nam <- paste("T0_model1", date, sep="_") 
-T0.df1.nam <- paste(T0.df1.nam, ".csv", sep="") 
-write.csv(T0.df1.a, file=T0.df1.nam)  
-
-```
-
-```{r T0 model 2, eval=FALSE, include=FALSE}
-
-## mixed effects model and boostrapping
-T0.model2 <- lmer(value ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2)
-out <- simulate(T0.model2, nsim=bootnum, seed=seed, re.form=NULL)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species * param + (1 | colony), REML=TRUE, data = T0.df.2), re.form=NA))
-boots <- cbind(predict(T0.model2,re.form=NA), boots)
-T0.df2.a <- (cbind(T0.df.2, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T0.df2.a)[17:19] <- c("mean", "lowerci", "upperci")
-
-T0.df2.nam <- paste("T0_model2", date, sep="_") 
-T0.df2.nam <- paste(T0.df2.nam, ".csv", sep="") 
-write.csv(T0.df2.a, file=T0.df2.nam)  
-
-```
-
-```{r T0 compiled model, echo=FALSE}
-
-# read in the dataframes from the two to create one compiled
-T0.df1.a <- read.csv("T0_model1_2019-11-20.csv", head=T)
-T0.df2.a <- read.csv("T0_model2_2019-11-20.csv", head=T)
-T0.df.a <- rbind(T0.df1.a, T0.df2.a)
-
-T0.df.a$species <- factor(T0.df.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
-T0.df.a$param <- factor(T0.df.a$param, levels = c("carb", "lipid", "pro",  "chla", "den","host", "symb"))
-
-T0.model2.fig <- ggplot(T0.df.a)+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(),  panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  geom_point(data=T0.df, aes(x=species, y=value), colour="grey", alpha = 0.3, size = 2, position = dodge)+
-  ylab("Value")+
-  xlab("Physiology Parameter")+
-  facet_wrap(~param, scales="free_y", ncol=4)+
-  geom_linerange(aes(x=species, ymin=lowerci, ymax=upperci, colour=species), position = dodge, size = 1.2)
-#theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))  
 
 ```
 
@@ -213,21 +147,18 @@ T0.model2.fig <- ggplot(T0.df.a)+
 s <- cowplot::ggdraw() + cowplot::draw_image("SSID.png", scale = 0.9) 
 p <- cowplot::ggdraw() + cowplot::draw_image("PSTR.png", scale = 0.9)
 a <- cowplot::ggdraw() + cowplot::draw_image("PAST.png", scale = 0.9)
-u <- cowplot::ggdraw() + cowplot::draw_image("UTEN.png", scale = 0.9)
-corals <- cowplot::plot_grid(s, p, a, u, ncol = 4, scale=0.7)
+#u <- cowplot::ggdraw() + cowplot::draw_image("UTEN.png", scale = 0.9)
+corals <- cowplot::plot_grid(s, p, a, ncol = 3, scale=0.7)
 
 ```
 
 ```{r T90 df, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
 #modify dataframe for T90 samples
-T90.df <- df[,c(1:17,38:42)]
-T90.df <- subset(T90.df, T0_T90=="T90")
-T90.df <- gather(T90.df, param, value, den:host) # make column of parameter and value
-T90.df$param <- factor(T90.df$param, levels = c("pro", "carb", "lipid", "den", "chla", "sum_bw5", "host", "symb"))
-T90.df$fpco2 <- factor(T90.df$fpco2, c("280", "400", "700", "2800"))
-T90.df$species <- revalue(x = T90.df$species, c("S" = "SSID", "P" = "PSTR", 
-  "A" = "PAST", "T" = "UTEN"))
+df2 <- df[,c(1:16,38:41)]
+df2 <- gather(df2, param, value, den:host) # make column of parameter and value
+df2$param <- factor(df2$param, levels = c("pro", "carb", "lipid", "den", "chla", "host"))
+df2$species <- revalue(x = df2$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN"))
 
 ```
 
@@ -236,42 +167,41 @@ T90.df$species <- revalue(x = T90.df$species, c("S" = "SSID", "P" = "PSTR",
 ```{r protein model, eval=FALSE, include=FALSE}
 
 # subsetting
-T90.df.pro <- subset(T90.df, param=="pro")
-T90.df.pro <- completeFun(T90.df.pro, "value") # run function to remove any missing values
+df2.pro <- subset(df2, param=="pro")
+df2.pro <- completeFun(df2.pro, "value") # run function to remove any missing values
 
 ## mixed effect model run using lmer()
-T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.pro)
-out <- simulate(T90.pro.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.pro),re.form=NA))
+T90.pro.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.pro)
+out <- simulate(T90.pro.model, nsim=bootnum, seed=seed, re.form=NULL)
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.pro),re.form=NA))
 boots <- cbind(predict(T90.pro.model,re.form=NA), boots)
-T90.df.pro.a <- (cbind(T90.df.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T90.df.pro.a)[17:19] <- c("mean", "lowerci", "upperci")
+df2.pro.a <- (cbind(df2.pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(df2.pro.a)[17:19] <- c("mean", "lowerci", "upperci")
 
-pro.df <- paste("Protein_model_T90", date, sep="_") 
+pro.df <- paste("Protein_model", date, sep="_") 
 pro.df <- paste(pro.df, ".csv", sep="") 
-write.csv(T90.df.pro.a, file=pro.df)  
+write.csv(df2.pro.a, file=pro.df)  
 
 ```
 
 ```{r protein figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-T90.df.pro.a <- read.csv("Protein_model_T90_2019-11-20.csv", head=T)
-T90.df.pro.a$ftemp <- as.factor(T90.df.pro.a$ftemp)
-T90.df.pro.a$fpco2 <- as.factor(T90.df.pro.a$fpco2)
-T90.df.pro.a$species <- factor(T90.df.pro.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
-T0.df.pro <- subset(T0.df.a, param=="pro") # subset the T0 protein values
+df2.pro.a <- read.csv("Protein_model_2019-12-17.csv", head=T)
+df2.pro.a$ftemp <- as.factor(df2.pro.a$ftemp)
+df2.pro.a$fpco2 <- as.factor(df2.pro.a$fpco2)
+df2.pro.a$species <- factor(df2.pro.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 
-pro.model.fig <- ggplot(T90.df.pro.a)+
+pro.model.fig <- ggplot(df2.pro.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
-  geom_point(data=T0.df.pro, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
-  geom_linerange(data=T0.df.pro, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
+  #geom_point(data=T0.df.pro, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
+  #geom_linerange(data=T0.df.pro, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
   ylab(plab)+
   xlab("")+
   geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
   geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
-  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
+  scale_color_manual("Temperature", values = c("#D55E00", "#0072B2", "#009E73"))+
   facet_wrap(~species, ncol=4, scales="free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))  
 
@@ -280,32 +210,32 @@ pro.model.fig <- ggplot(T90.df.pro.a)+
 ```{r carb model, eval=FALSE, include=FALSE}
 
 # subsetting
-T90.df.carb <- subset(T90.df, param=="carb")
-T90.df.carb <- completeFun(T90.df.carb, "value") # run function to remove any missing values
+df2.carb <- subset(df2, param=="carb")
+df2.carb <- completeFun(df2.carb, "value") # run function to remove any missing values
 
 ## mixed effect model run using lmer()
-T90.carb.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.carb)
+T90.carb.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.carb)
 out <- simulate(T90.carb.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.carb),re.form=NA))
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.carb),re.form=NA))
 boots <- cbind(predict(T90.carb.model,re.form=NA), boots)
-T90.df.carb.a <- (cbind(T90.df.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T90.df.carb.a)[17:19] <- c("mean", "lowerci", "upperci")
+df2.carb.a <- (cbind(df2.carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(df2.carb.a)[17:19] <- c("mean", "lowerci", "upperci")
 
 carb.df <- paste("carbohydrate_model_T90", date, sep="_") 
 carb.df <- paste(carb.df, ".csv", sep="") 
-write.csv(T90.df.carb.a, file=carb.df)  
+write.csv(df2.carb.a, file=carb.df)  
 
 ```
 
 ```{r carb figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-T90.df.carb.a <- read.csv("carbohydrate_model_T90_2019-11-20.csv", head=T)
-T90.df.carb.a$ftemp <- as.factor(T90.df.carb.a$ftemp)
-T90.df.carb.a$fpco2 <- as.factor(T90.df.carb.a$fpco2)
-T90.df.carb.a$species <- factor(T90.df.carb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+df2.carb.a <- read.csv("carbohydrate_model_T90_2019-11-20.csv", head=T)
+df2.carb.a$ftemp <- as.factor(df2.carb.a$ftemp)
+df2.carb.a$fpco2 <- as.factor(df2.carb.a$fpco2)
+df2.carb.a$species <- factor(df2.carb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 T0.df.carb <- subset(T0.df.a, param=="carb") # subset the T0 carb values
 
-carb.model.fig <- ggplot(T90.df.carb.a)+
+carb.model.fig <- ggplot(df2.carb.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
   geom_point(data=T0.df.carb, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
@@ -324,32 +254,32 @@ carb.model.fig <- ggplot(T90.df.carb.a)+
 ```{r lipid model, eval=FALSE, include=FALSE}
 
 # subsetting
-T90.df.lipid <- subset(T90.df, param=="lipid")
-T90.df.lipid <- completeFun(T90.df.lipid, "value") # run function to remove any missing values
+df2.lipid <- subset(df2, param=="lipid")
+df2.lipid <- completeFun(df2.lipid, "value") # run function to remove any missing values
 
 ## mixed effect model run using lmer()
-T90.lipid.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.lipid)
+T90.lipid.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.lipid)
 out <- simulate(T90.lipid.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.lipid),re.form=NA))
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.lipid),re.form=NA))
 boots <- cbind(predict(T90.lipid.model,re.form=NA), boots)
-T90.df.lipid.a <- (cbind(T90.df.lipid, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T90.df.lipid.a)[17:19] <- c("mean", "lowerci", "upperci")
+df2.lipid.a <- (cbind(df2.lipid, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(df2.lipid.a)[17:19] <- c("mean", "lowerci", "upperci")
 
 lipid.df <- paste("lipid_model_T90", date, sep="_") 
 lipid.df <- paste(lipid.df, ".csv", sep="") 
-write.csv(T90.df.lipid.a, file=lipid.df)  
+write.csv(df2.lipid.a, file=lipid.df)  
 
 ```
 
 ```{r lipid figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-T90.df.lipid.a <- read.csv("lipid_model_T90_2019-11-20.csv", head=T)
-T90.df.lipid.a$ftemp <- as.factor(T90.df.lipid.a$ftemp)
-T90.df.lipid.a$fpco2 <- as.factor(T90.df.lipid.a$fpco2)
-T90.df.lipid.a$species <- factor(T90.df.lipid.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+df2.lipid.a <- read.csv("lipid_model_T90_2019-11-20.csv", head=T)
+df2.lipid.a$ftemp <- as.factor(df2.lipid.a$ftemp)
+df2.lipid.a$fpco2 <- as.factor(df2.lipid.a$fpco2)
+df2.lipid.a$species <- factor(df2.lipid.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 T0.df.lipid <- subset(T0.df.a, param=="lipid") # subset the T0 lipid values
 
-lipid.model.fig <- ggplot(T90.df.lipid.a)+
+lipid.model.fig <- ggplot(df2.lipid.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
   geom_point(data=T0.df.lipid, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
@@ -368,32 +298,32 @@ lipid.model.fig <- ggplot(T90.df.lipid.a)+
 ```{r denisty model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
-T90.df.den <- subset(T90.df, param=="den")
-T90.df.den <- completeFun(T90.df.den, "value") # run function to remove any missing values
+df2.den <- subset(df2, param=="den")
+df2.den <- completeFun(df2.den, "value") # run function to remove any missing values
 
 ## mixed effect model run using lmer()
-T90.den.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.den)
+T90.den.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.den)
 out <- simulate(T90.den.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.den),re.form=NA))
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.den),re.form=NA))
 boots <- cbind(predict(T90.den.model,re.form=NA), boots)
-T90.df.den.a <- (cbind(T90.df.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T90.df.den.a)[17:19] <- c("mean", "lowerci", "upperci")
+df2.den.a <- (cbind(df2.den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(df2.den.a)[17:19] <- c("mean", "lowerci", "upperci")
 
 den.df <- paste("density_model_T90", date, sep="_") 
 den.df <- paste(den.df, ".csv", sep="") 
-write.csv(T90.df.den.a, file=den.df)  
+write.csv(df2.den.a, file=den.df)  
 
 ```
 
 ```{r denisty figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-T90.df.den.a <- read.csv("density_model_T90_2019-11-21.csv", head=T)
-T90.df.den.a$ftemp <- as.factor(T90.df.den.a$ftemp)
-T90.df.den.a$fpco2 <- as.factor(T90.df.den.a$fpco2)
-T90.df.den.a$species <- factor(T90.df.den.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+df2.den.a <- read.csv("density_model_T90_2019-11-21.csv", head=T)
+df2.den.a$ftemp <- as.factor(df2.den.a$ftemp)
+df2.den.a$fpco2 <- as.factor(df2.den.a$fpco2)
+df2.den.a$species <- factor(df2.den.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 T0.df.den <- subset(T0.df.a, param=="den") # subset the T0 density values
 
-den.model.fig <- ggplot(T90.df.den.a)+
+den.model.fig <- ggplot(df2.den.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(),  panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
   geom_point(data=T0.df.den, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
@@ -412,31 +342,31 @@ den.model.fig <- ggplot(T90.df.den.a)+
 ```{r chlorophyll model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
-T90.df.chla <- subset(T90.df, param=="chla")
-T90.df.chla <- completeFun(T90.df.chla, "value") # run function to remove any missing values
+df2.chla <- subset(df2, param=="chla")
+df2.chla <- completeFun(df2.chla, "value") # run function to remove any missing values
 
 ## mixed effect model run using lmer()
-T90.chla.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.chla)
+T90.chla.model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.chla)
 out <- simulate(T90.chla.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = T90.df.chla),re.form=NA))
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML=TRUE, data = df2.chla),re.form=NA))
 boots <- cbind(predict(T90.chla.model,re.form=NA), boots)
-T90.df.chla.a <- (cbind(T90.df.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T90.df.chla.a)[17:19] <- c("mean", "lowerci", "upperci")
+df2.chla.a <- (cbind(df2.chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(df2.chla.a)[17:19] <- c("mean", "lowerci", "upperci")
 
 chla.df <- paste("chlorophyll_model_T90", date, sep="_") 
 chla.df <- paste(chla.df, ".csv", sep="") 
-write.csv(T90.df.chla.a, file=chla.df)  
+write.csv(df2.chla.a, file=chla.df)  
 
 ```
 
 ```{r chlorophyll figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
-T90.df.chla.a <- read.csv("chlorophyll_model_T90_2019-11-21.csv", head=T)
-T90.df.chla.a$ftemp <- as.factor(T90.df.chla.a$ftemp)
-T90.df.chla.a$fpco2 <- as.factor(T90.df.chla.a$fpco2)
-T90.df.chla.a$species <- factor(T90.df.chla.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+df2.chla.a <- read.csv("chlorophyll_model_T90_2019-11-21.csv", head=T)
+df2.chla.a$ftemp <- as.factor(df2.chla.a$ftemp)
+df2.chla.a$fpco2 <- as.factor(df2.chla.a$fpco2)
+df2.chla.a$species <- factor(df2.chla.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 T0.df.chla <- subset(T0.df.a, param=="chla") # subset the T0 chlorophyll values
 
-chla.model.fig <- ggplot(T90.df.chla.a)+
+chla.model.fig <- ggplot(df2.chla.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
   geom_point(data=T0.df.chla, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
@@ -473,31 +403,31 @@ Modeled 95% confidence interval of (A) total protein (mg/cm2), (B) total lipid (
 ```{r host phys model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
-T90.df.host <- subset(T90.df, param=="host")
-T90.df.host <- completeFun(T90.df.host, "value") # run function to remove any missing values
+df2.host <- subset(df2, param=="host")
+df2.host <- completeFun(df2.host, "value") # run function to remove any missing values
 
 ## mixed effect model run using lmer()
-T90.host.model <- lmer(value ~ species * (ftemp + fpco2) + (1 | colony), REML=TRUE, data = T90.df.host)
+T90.host.model <- lmer(value ~ species * (ftemp + fpco2) + (1 | colony), REML=TRUE, data = df2.host)
 out <- simulate(T90.host.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + fpco2 + (1 | colony), REML=TRUE, data = T90.df.host),re.form=NA))
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp + fpco2 + (1 | colony), REML=TRUE, data = df2.host),re.form=NA))
 boots <- cbind(predict(T90.host.model,re.form=NA), boots)
-T90.df.host.a <- (cbind(T90.df.host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T90.df.host.a)[17:19] <- c("mean", "lowerci", "upperci")
+df2.host.a <- (cbind(df2.host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(df2.host.a)[17:19] <- c("mean", "lowerci", "upperci")
 
 host.df <- paste("host_model_T90", date, sep="_") 
 host.df <- paste(host.df, ".csv", sep="") 
-write.csv(T90.df.host.a, file=host.df)  
+write.csv(df2.host.a, file=host.df)  
 
 ```
 
 ```{r host phys figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-T90.df.host.a <- read.csv("host_model_T90_2019-11-27.csv", head=T)
-T90.df.host.a$ftemp <- as.factor(T90.df.host.a$ftemp)
-T90.df.host.a$species <- factor(T90.df.host.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+df2.host.a <- read.csv("host_model_T90_2019-11-27.csv", head=T)
+df2.host.a$ftemp <- as.factor(df2.host.a$ftemp)
+df2.host.a$species <- factor(df2.host.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 T0.df.host <- subset(T0.df.a, param=="host") # subset the T0 host values
 
-host.model.fig <- ggplot(data=T90.df.host.a)+
+host.model.fig <- ggplot(data=df2.host.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
   geom_point(data=T0.df.host, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
@@ -516,32 +446,32 @@ host.model.fig <- ggplot(data=T90.df.host.a)+
 ```{r symb phys model, eval=FALSE, message=FALSE, include=FALSE}
 
 # subsetting
-T90.df.symb <- subset(T90.df, param=="symb")
-T90.df.symb$value[T90.df.symb$value > 4000] <- NA
-T90.df.symb <- completeFun(T90.df.symb, "value") # run function to remove any missing values
+df2.symb <- subset(df2, param=="symb")
+df2.symb$value[df2.symb$value > 4000] <- NA
+df2.symb <- completeFun(df2.symb, "value") # run function to remove any missing values
 
 ## mixed effect model run using
-T90.symb.model <- lmer(value ~ species * (ftemp + fpco2) + (1 | colony), REML=TRUE, data = T90.df.symb)
+T90.symb.model <- lmer(value ~ species * (ftemp + fpco2) + (1 | colony), REML=TRUE, data = df2.symb)
 out <- simulate(T90.symb.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp * fpco2 + reef + (1 | colony), REML=TRUE, data = T90.df.symb), re.form=NA))
+boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp * fpco2 + reef + (1 | colony), REML=TRUE, data = df2.symb), re.form=NA))
 boots <- cbind(predict(T90.symb.model,re.form=NA), boots)
-T90.df.symb.a <- (cbind(T90.df.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(T90.df.symb.a)[17:19] <- c("mean", "lowerci", "upperci")
+df2.symb.a <- (cbind(df2.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
+colnames(df2.symb.a)[17:19] <- c("mean", "lowerci", "upperci")
 
 symb.df <- paste("symb_model_T90", date, sep="_") 
 symb.df <- paste(symb.df, ".csv", sep="") 
-write.csv(T90.df.symb.a, file=symb.df)  
+write.csv(df2.symb.a, file=symb.df)  
 
 ```
 
 ```{r symb phys figure, echo=FALSE, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE, include=FALSE}
 
-T90.df.symb.a <- read.csv("symb_model_T90_2019-11-27.csv", head=T)
-T90.df.symb.a$ftemp <- as.factor(T90.df.symb.a$ftemp)
-T90.df.symb.a$species <- factor(T90.df.symb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
+df2.symb.a <- read.csv("symb_model_T90_2019-11-27.csv", head=T)
+df2.symb.a$ftemp <- as.factor(df2.symb.a$ftemp)
+df2.symb.a$species <- factor(df2.symb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 T0.df.symb <- subset(T0.df.a, param=="symb") # subset the T0 symbiont values
 
-symb.model.fig <- ggplot(data=T90.df.symb.a)+
+symb.model.fig <- ggplot(data=df2.symb.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
   scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
   geom_point(data=T0.df.symb, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
@@ -607,7 +537,7 @@ table1
 
 ```{r protein table, echo=FALSE}
 
-T90.pro.tab <- T90.df.pro.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.pro.tab <- df2.pro.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 T90.pro.tab$binder <- paste(T90.pro.tab$species, T90.pro.tab$treat2, sep = "_")
 
 T90.pro.mean <- summarySE(data=T90.pro.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
@@ -636,7 +566,7 @@ table2
 
 ```{r lipid table, echo=FALSE}
 
-T90.lipid.tab <- T90.df.lipid.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.lipid.tab <- df2.lipid.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 T90.lipid.tab$binder <- paste(T90.lipid.tab$species, T90.lipid.tab$treat2, sep = "_")
 
 T90.lipid.mean <- summarySE(data=T90.lipid.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
@@ -665,7 +595,7 @@ table3
 
 ```{r carbohydrate table, echo=FALSE}
 
-T90.carb.tab <- T90.df.carb.a[,c(10,18,19:21)] #subset for species, treatment, and model values
+T90.carb.tab <- df2.carb.a[,c(10,18,19:21)] #subset for species, treatment, and model values
 T90.carb.tab$binder <- paste(T90.carb.tab$species, T90.carb.tab$treat2, sep = "_")
 
 T90.carb.mean <- summarySE(data=T90.carb.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
@@ -694,7 +624,7 @@ table4
 
 ```{r density table, echo=FALSE}
 
-T90.den.tab <- T90.df.den.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.den.tab <- df2.den.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 T90.den.tab$binder <- paste(T90.den.tab$species, T90.den.tab$treat2, sep = "_")
 
 T90.den.mean <- summarySE(data=T90.den.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
@@ -723,7 +653,7 @@ table5
 
 ```{r chlorophyll table, echo=FALSE}
 
-T90.chla.tab <- T90.df.chla.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+T90.chla.tab <- df2.chla.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 T90.chla.tab$binder <- paste(T90.chla.tab$species, T90.chla.tab$treat2, sep = "_")
 
 T90.chla.mean <- summarySE(data=T90.chla.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
@@ -752,7 +682,7 @@ table6
 
 ```{r host table, echo=FALSE}
 
-T90.host.tab <- T90.df.host.a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
+T90.host.tab <- df2.host.a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
 T90.host.tab$binder <- paste(T90.host.tab$species, T90.host.tab$param, T90.host.tab$treat2, sep = "_")
 
 T90.host.mean <- summarySE(data=T90.host.tab, measurevar = "mean", groupvars = c("species", "param", "treat2", "binder"))
@@ -781,7 +711,7 @@ table7
 
 ```{r symbiont table, echo=FALSE}
 
-T90.symb.tab <- T90.df.symb.a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
+T90.symb.tab <- df2.symb.a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
 T90.symb.tab$binder <- paste(T90.symb.tab$species, T90.symb.tab$param, T90.symb.tab$treat2, sep = "_")
 
 T90.symb.mean <- summarySE(data=T90.symb.tab, measurevar = "mean", groupvars = c("species", "param", "treat2", "binder"))
