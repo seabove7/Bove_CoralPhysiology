@@ -1,9 +1,6 @@
 ---
 title: "Chapter 3: Physiology"
-runtime: shiny
-output: 
-  html_document:
-    theme: spacelab
+output: rmdformats::readthedown
 ---
 # Results
 
@@ -24,7 +21,7 @@ output:
 
 
 
-## Figures:
+# Figures:
 
 ```{r setup, include=FALSE}
 
@@ -578,7 +575,7 @@ Modeled 95% confidence interval of (A) total host energy reserves (mg/cm2) and (
 
 
 
-## Tables:
+# Tables:
 
 ```{r T0 table, echo=FALSE}
 
