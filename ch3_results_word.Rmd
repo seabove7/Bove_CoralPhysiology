@@ -1,39 +1,43 @@
 ---
 title: "Chapter 3: Physiology"
-output: rmdformats::readthedown
+author: "Colleen Bove"
+date: "17 December 2019"
+output: 
+  word_document:
+    reference_docx: word_syles_reference_1.docx
+always_allow_html: true
 ---
 # Results
 
-#### (A) Coral host and algal endosymbiont physiology by parameter
-> Protein content (mg/cm2) measured in coral host tissue at the start of the experiment (T0) was not clearly different than the that in coral hosts maintained in the control treatments (400 uatm at 28C) for the 93 day experiment (T90) in any coral species. Coral host tissue of *P. strigosa* reared at 31C exhibited consistently lower protein content than coral hosts reared at 28C in the same pCO2 treatments, however there was no statistically clear difference between pCO2 treatments at either temperature (**Figure 1A**). Coral host protein content did not clearly differ between treatments in *S. siderea, P.astreoides,* or *U. tenuifolia*. Lipid content (mg/cm2) measured in *S. siderea* coral host tissue taken at T0 was lower than in coral hosts reared in the control treatment at T90 (**Figure 1B**). There was no clear difference in coral host lipid content from T0 to T90 in the control treatments for *P. strigosa, P. astreoides,* and *U. tenuifolia*. No statistically clear temperature or pCO2 effect on coral host lipid content was observed at T90 in the four coral species (**Figure 1B**). Coral host carbohydrate content (mg/cm2) of *P. astreoides* and *U. tenuifolia* at T0 was higher than in coral hosts reared under the control treatment at T90 (**Figure 1C**), however, there was no difference between T0 and T90 control coral hosts in *S. siderea* or *P. strigosa*. There was no overall effect of pCO2 or temperature on coral host carbohydrate content in any of the four species examined (**Figure 1C**).
+#### (A) Coral host and algal endosymbiont physiology
+> Coral host total tissue energy reserves (mg cm^-2^) was calculated as the sum of each protein, lipid, and carbohydrate value per coral host. Total host energy reserves of *P. astreoides* at T0 were clearly greater than the total energy reserves quantified in coral hosts maintained under at control treatment at T90 (**Figure 1A**). There was not statistically clear difference in total energy reserves between T0 and T90 control coral hosts in both *S. siderea* and *P. strigosa*. Elevated temperature (31&deg;C) resulted in a statistically clear reduction in total coral host energy reserves in only *P. strigosa* across all pCO2 treatments (**Figure 1A**). No overall effect of *p*CO~2~ was quantified in any of the four species examined. 
 
-> Algal endosymbiont cell density (10^6 cells/cm2) in *S. siderea* fragments at T0 was lower than densities measured in fragments under the control treatment at T90, while *P. astreoides* T0 densities were clearly lower than those measured under the control treatment at T90 (**Figure 1D**). Algal endosymbiont cell densities did not exhibit a statistically clear difference between T0 fragments and T90 fragments maintained at the control treatment in either *P. strigosa* or *U. tenuifolia*. Neither pCO2 nor temperature exhibited a statistically clear overall effect on algal endosymbiont cell densities quantified at T90 in any of the four coral species (**Figure 1D**). Algal endosymbiont chlorophyll a content (ug/cm2) of *S. siderea* and *P. strigosa* at T0 was lower than the measured chlorophyll a in fragments maintained in the control treatment at T90 (**Figure 1E**). Conversely, chlorophyll a measured at T0 was not clearly different than in fragments reared in the control treatment at T90 for both *P. astreoides* and *U. tenuifolia*. All species with the exception of *U. tenuifolia* have algal endosymbionts with statistically clear reductions in chlorophyll a content with increasing pCO2, while elevated temperature (31C) only clearly reduces chlorophyll a in the algal endosymbionts associated with *P. strigosa* (**Figure 1E**).
-
-
-
-#### (B) Total coral host energy reserves
-> Coral host total tissue energy reserves (mg/cm2) was calculated as the sum of each protein, lipid, and carbohydrate value per coral host. Total host energy reserves of *P. astreoides* and *U. tenuifolia* at T0 were clearly greater than the total energy reserves quantified in coral hosts maintained under at control treatment at T90 (**Figure 2A**). There was not statistically clear difference in total energy reserves between T0 and T90 control coral hosts in both *S. siderea* and *P. strigosa*. Elevated temperature (31C) resulted in a statistically clear reduction in total coral host energy reserves in only *P. strigosa* across all pCO2 treatments (**Figure 2A**). No overall effect of pCO2 was quantified in any of the four species examined. 
+> Algal endosymbiont cell density (10^6^ cells cm^-2^) in *S. siderea* fragments at T0 was lower than densities measured in fragments under the control treatment at T90, while *P. astreoides* T0 densities were clearly lower than those measured under the control treatment at T90 (**Figure 1B**). Algal endosymbiont cell densities did not exhibit a statistically clear difference between T0 fragments and T90 fragments maintained at the control treatment in *P. strigosa*. Neither *p*CO~2~ nor temperature exhibited a statistically clear overall effect on algal endosymbiont cell densities quantified at T90 in any of the four coral species (**Figure 1B**). Algal endosymbiont chlorophyll a content (ug cm^-2^) of *S. siderea* and *P. strigosa* at T0 was lower than the measured chlorophyll a in fragments maintained in the control treatment at T90 (**Figure 1C**). Conversely, chlorophyll a measured at T0 was not clearly different than in fragments reared in the control treatment at T90 for *P. astreoides*. All species have algal endosymbionts with statistically clear reductions in chlorophyll a content with increasing *p*CO~2~, while elevated temperature (31&deg;C) only clearly reduces chlorophyll a in the algal endosymbionts associated with *P. strigosa* (**Figure 1C**).
 
 
-
-#### (C) Total algal endosymbiont physiology
-> Calculated chlorophyll a content per algal endosymbiont cell (ug/10^6 cells) represents total algal endosymbiont physiology and is a measure of the efficiency of the endosymbionts associated with each coral fragment. Total algal endosymbiont physiology of *P. strigosa* was lower at T0 than in the control treatment fragments at T90 (**Figure 2B**). Conversely, *S. siderea, P.astreoides,* and *U. tenuifolia* total algal endosymbiont physiology did not exhibit a statistically clear difference between T0 and fragments maintained under the control teratment at T90. Algal endosymbionts associated with *P. strigosa* fragments maintained at 31C exhibited greater total endosymbiont physiology than those reared at 28C across all pCO2 treatment (**Figure 2B**), while temerature did not alter the total endosymbiont physiology associated with the other species examined. No statstically clear effect of pCO2 on the total algal endosymbiont was observed on any of the four species. 
-
+#### (B) Host transcriptomic responses
+> I will talk about HOST trends/findings about gene expression here.
 
 
-# Figures:
+#### (C) Algal endosymbiont transcriptomic responses
+> I will talk about symbiont trends/findings about gene expression here.
+
+
+#### (D) Overall physiological response
+> This will discuss overall responses and the WGCNA here.
+
 
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = TRUE)
 options(warn = -1)
-library("knitr")
 
 ```
 
 ```{r packages, include=FALSE}
 
 #Packages to load
+library("knitr")
 library("readr")
 library("ggplot2")
 library("dplyr")
@@ -75,22 +79,6 @@ date <- Sys.Date()
 
 ```
 
-```{r add phys params, eval=FALSE, include=FALSE}
-
-# Set up the dataframes
-#phys <- read_csv("phys_all_13Aug19.csv")
-#
-#lipid <- read_csv("~/Dropbox/Boston_Experiment/Physiology/Lipids/Calculated Lipid #Spreadsheets/Lipid_final_21Oct19.csv")
-#
-#lipid <- lipid[,c(2,22)]
-#
-#df<-phys %>% 
-# left_join(lipid, by=c("coral" = "coral"))
-
- #write.csv(df, file="phys_all_21Oct19.csv")
-
-```
-
 ```{r initial dataframe, include=FALSE}
 
 df <- read_csv("phys_all_21Oct19.csv")
@@ -103,8 +91,12 @@ df$ftemp <- as.factor(df$ftemp)
 df$fpco2 <- as.factor(df$fpco2)
 df$colony <- as.factor(df$colony)
 df$species <- factor(df$species, levels = c("S", "P", "A", "T"))
-df$fpco2 <- factor(df$fpco2, c("400", "con", "280", "700", "2800"))
-df$ftemp <- factor(df$ftemp, c("28", "con", "31"))
+df$fpco2 <- gsub("2800", "3300", df$fpco2)
+df$fpco2 <- gsub("280", "300", df$fpco2)
+df$fpco2 <- gsub("400", "420", df$fpco2)
+df$fpco2 <- gsub("700", "680", df$fpco2)
+df$fpco2 <- factor(df$fpco2, c("420", "T0", "300", "680", "3300"))
+df$ftemp <- factor(df$ftemp, c("28", "T0", "31"))
 df$den <- df$den / 1000000
 df$host <- df$pro + df$carb + df$lipid
 df$treat[df$T0_T90 == "T0"] <- "T0"
@@ -114,13 +106,13 @@ df$treat <- factor(df$treat, c("T0", "288_28", "311_31", "447_28", "405_31", "67
 df$treat2 <- df$treat
 df$treat <- gsub("T0", 2, df$treat)
 df$treat <- gsub("288_28", 4, df$treat)
-df$treat <- gsub("311_31", 4.5, df$treat)
+df$treat <- gsub("311_31", 4, df$treat)
 df$treat <- gsub("447_28", 6, df$treat)
-df$treat <- gsub("405_31", 6.5, df$treat)
+df$treat <- gsub("405_31", 6, df$treat)
 df$treat <- gsub("673_28", 8, df$treat)
-df$treat <- gsub("701_31", 8.5, df$treat)
+df$treat <- gsub("701_31", 8, df$treat)
 df$treat <- gsub("3285_28", 10, df$treat)
-df$treat <- gsub("3309_31", 10.5, df$treat)
+df$treat <- gsub("3309_31", 10, df$treat)
 
 df$treat <- as.numeric(df$treat) #convert 'treat' column to numerics
 
@@ -194,16 +186,17 @@ df2.pro.a$species <- factor(df2.pro.a$species, levels = c("SSID", "PSTR", "PAST"
 
 pro.model.fig <- ggplot(df2.pro.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  #scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  scale_x_continuous(breaks = df2.pro.a$treat, labels = df2.pro.a$fpco2)+
   #geom_point(data=T0.df.pro, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   #geom_linerange(data=T0.df.pro, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
   ylab(plab)+
   xlab("")+
-  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
-  scale_color_manual("Temperature", values = c("#D55E00", "#0072B2", "#009E73"))+
-  facet_wrap(~species, ncol=3)
+  geom_point(aes(x = treat, y = value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
+  facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))  
 
 ```
@@ -237,16 +230,17 @@ df2.carb.a$species <- factor(df2.carb.a$species, levels = c("SSID", "PSTR", "PAS
 
 carb.model.fig <- ggplot(df2.carb.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  #scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  scale_x_continuous(breaks = df2.carb.a$treat, labels = df2.carb.a$fpco2)+
   #geom_point(data=T0.df.carb, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   #geom_linerange(data=T0.df.carb, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
   ylab(calab)+
   xlab("")+
-  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  geom_point(aes(x = treat, y = value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
-  facet_wrap(~species, ncol=3)
+  facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
 ```
@@ -280,16 +274,17 @@ df2.lipid.a$species <- factor(df2.lipid.a$species, levels = c("SSID", "PSTR", "P
 
 lipid.model.fig <- ggplot(df2.lipid.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  #scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  scale_x_continuous(breaks = df2.lipid.a$treat, labels = df2.lipid.a$fpco2)+
   #geom_point(data=T0.df.lipid, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   #geom_linerange(data=T0.df.lipid, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
   ylab(llab)+
   xlab("")+
-  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  geom_point(aes(x = treat, y = value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
-  facet_wrap(~species, ncol=3)
+  facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
 ```
@@ -322,17 +317,20 @@ df2.den.a$fpco2 <- as.factor(df2.den.a$fpco2)
 df2.den.a$species <- factor(df2.den.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 
 den.model.fig <- ggplot(df2.den.a)+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(),  panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  #scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  scale_x_continuous(breaks = df2.den.a$treat, labels = df2.den.a$fpco2)+
   #geom_point(data=T0.df.den, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   #geom_linerange(data=T0.df.den, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
   ylab(dlab)+
   xlab("")+
-  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  geom_point(aes(x = treat, y = value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
-  facet_wrap(~species, ncol=3)
+  facet_wrap(~species, ncol = 3, scales = "free_y")
+
+
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
 ```
@@ -365,16 +363,16 @@ df2.chla.a$species <- factor(df2.chla.a$species, levels = c("SSID", "PSTR", "PAS
 
 chla.model.fig <- ggplot(df2.chla.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  scale_x_continuous(breaks = df2.chla.a$treat, labels = df2.chla.a$fpco2)+
   #geom_point(data=T0.df.chla, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   #geom_linerange(data=T0.df.chla, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
   ylab(clab)+
   xlab("")+
-  geom_point(aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  geom_point(aes(x = treat, y = value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
-  facet_wrap(~species, ncol=3)
+  facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
 ```
@@ -407,70 +405,23 @@ df2.host.a <- read.csv("host_model_2019-12-17.csv", head=T)
 df2.host.a$ftemp <- as.factor(df2.host.a$ftemp)
 df2.host.a$species <- factor(df2.host.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
 
-host.model.fig <- ggplot(data=df2.host.a)+
+host.model.fig <-ggplot(df2.host.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  #scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
+  scale_x_continuous(breaks = df2.host.a$treat, labels = df2.host.a$fpco2)+
   #geom_point(data=T0.df.host, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
   #geom_linerange(data=T0.df.host, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+
   geom_vline(xintercept = 3)+
-  ylab("Total host energy \n reserves (mg cm )")+
+  ylab("Total host energy \n reserves (mg cm-2)")+
   xlab("")+
-  geom_point( aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
+  geom_point(aes(x = treat, y = value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
-  facet_wrap(~species, ncol=3)
+  facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
 ```
 
-```{r symb phys model, eval=FALSE, message=FALSE, include=FALSE}
-
-# subsetting
-df2.symb <- subset(df2, param=="symb")
-df2.symb$value[df2.symb$value > 4000] <- NA
-df2.symb <- completeFun(df2.symb, "value") # run function to remove any missing values
-
-## mixed effect model run using
-T90.symb.model <- lmer(value ~ species * (ftemp + fpco2) + (1 | colony), REML=TRUE, data = df2.symb)
-out <- simulate(T90.symb.model,nsim=bootnum,seed=seed,re.form=NULL)
-boots <- apply(out,2,function(x) predict(lmer(x ~ species * ftemp * fpco2 + reef + (1 | colony), REML=TRUE, data = df2.symb), re.form=NA))
-boots <- cbind(predict(T90.symb.model,re.form=NA), boots)
-df2.symb.a <- (cbind(df2.symb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975))))))))
-colnames(df2.symb.a)[17:19] <- c("mean", "lowerci", "upperci")
-
-symb.df <- paste("symb_model_T90", date, sep="_") 
-symb.df <- paste(symb.df, ".csv", sep="") 
-write.csv(df2.symb.a, file=symb.df)  
-
-```
-
-```{r symb phys figure, eval=FALSE, fig.align="center", fig.height=2, fig.width=10, message=FALSE, include=FALSE, results='hide'}
-
-df2.symb.a <- read.csv("symb_model_T90_2019-11-27.csv", head=T)
-df2.symb.a$ftemp <- as.factor(df2.symb.a$ftemp)
-df2.symb.a$species <- factor(df2.symb.a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
-T0.df.symb <- subset(T0.df.a, param=="symb") # subset the T0 symbiont values
-
-symb.model.fig <- ggplot(data=df2.symb.a)+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  scale_x_discrete(limits=c(2, 4, 6, 8, 10))+
-  geom_point(data=T0.df.symb, aes(x=treat, y=value, group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
-  geom_linerange(data=T0.df.symb, aes(x=treat, ymin=lowerci, ymax=upperci), size = 1, colour = "#009E73")+ 
-  #geom_point(data=df.comp.symb, aes(x=treat, y=(value*1000000), group = species), alpha = 0.3, size = 2, shape = 8, colour = "#009E73")+
-  #geom_linerange(data=comp.sum.symb, aes(x=treat, ymin=(value*10000000)-(ci*10000000), ymax=(value*10000000)+(ci*10000000)), size = 1, colour = "#009E73")+
-  geom_vline(xintercept = 3)+
-  ylab("Chlorophyll a \n per symbiont cell")+
-  xlab("")+
-  geom_point( aes(treat, value, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
-  geom_linerange(aes(x=treat, ymin=lowerci, ymax=upperci, colour=ftemp), position = dodge, size = 1)+
-  #geom_point(aes(x=treat, y=mean), position = dodge, size = 3, colour="black")+
-  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00"))+
-  facet_wrap(~species,  ncol=4, scales="free_y")
-  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
-
-```
-
-### Figure 1
 
 ```{r figure 3, echo=FALSE, fig.height = 10, fig.width = 10, fig.align = "center", results = 'hide'}
 
@@ -478,13 +429,12 @@ fig1 <- plot_grid(corals, host.model.fig, den.model.fig, chla.model.fig, labels 
 fig1
 
 ```
-Modeled 95% confidence interval of (A) total host energy reserves (mg/cm2), (B) cell density (10^6 cells/cm2), and (C) Chlorophyll a (ug/cm2) for *S. siderea*, *P. strigosa*, and *P. astreoides* at T0 (green) or T90 (red/blue), with individual coral fragment physiology denoted by points. Blue denotes 28C and red denotes 31C, with *p*CO2 treatment along the x axis.
+<br/>
+**Figure 1.** Modeled 95% confidence interval of (**A**) total host energy reserves (mg cm^-2^), (**B**) cell density (10^6^ cells cm^-2^), and (**C**) Chlorophyll a (ug cm^-2^) for *S. siderea*, *P. strigosa*, and *P. astreoides* at T0 (green) or T90 (red/blue), with individual coral fragment physiology denoted by points. Blue denotes 28&deg;C and red denotes 31&deg;C, with *p*CO~2~ treatment along the x axis.
 
 
 
-# Tables:
-
-```{r protein table, echo=FALSE}
+```{r protein table, include=FALSE}
 
 pro.tab <- df2.pro.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 pro.tab$binder <- paste(pro.tab$species, pro.tab$treat2, sep = "_")
@@ -512,7 +462,7 @@ table1
 
 ```
 
-```{r lipid table, echo=FALSE}
+```{r lipid table, include=FALSE}
 
 lipid.tab <- df2.lipid.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 lipid.tab$binder <- paste(lipid.tab$species, lipid.tab$treat2, sep = "_")
@@ -540,7 +490,7 @@ table2
 
 ```
 
-```{r carbohydrate table, echo=FALSE}
+```{r carbohydrate table, include=FALSE}
 
 carb.tab <- df2.carb.a[,c(9,15,18:20)] #subset for species, treatment, and model values
 carb.tab$binder <- paste(carb.tab$species, carb.tab$treat2, sep = "_")
@@ -568,7 +518,7 @@ table3
 
 ```
 
-```{r density table, echo=FALSE}
+```{r density table, include=FALSE}
 
 den.tab <- df2.den.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 den.tab$binder <- paste(den.tab$species, den.tab$treat2, sep = "_")
@@ -596,7 +546,7 @@ table4
 
 ```
 
-```{r chlorophyll table, echo=FALSE}
+```{r chlorophyll table, include=FALSE}
 
 chla.tab <- df2.chla.a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
 chla.tab$binder <- paste(chla.tab$species, chla.tab$treat2, sep = "_")
@@ -624,7 +574,7 @@ table5
 
 ```
 
-```{r host table, echo=FALSE}
+```{r host table, include=FALSE}
 
 host.tab <- df2.host.a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
 host.tab$binder <- paste(host.tab$species, host.tab$param, host.tab$treat2, sep = "_")
@@ -653,7 +603,7 @@ table6
 ```
 
 
-```{r excel WB, eval=FALSE, include=FALSE}
+```{r excel WB, include=FALSE}
 
 ### Create workbook
 wb <- createWorkbook()
