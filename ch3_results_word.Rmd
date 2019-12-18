@@ -10,9 +10,9 @@ always_allow_html: true
 # Results
 
 #### (A) Coral host and algal endosymbiont physiology
-> Coral host total tissue energy reserves (mg cm^-2^) was calculated as the sum of each protein, lipid, and carbohydrate value per coral host. Total host energy reserves of *P. astreoides* at T0 were clearly greater than the total energy reserves quantified in coral hosts maintained under at control treatment at T90 (**Figure 1A**). There was not statistically clear difference in total energy reserves between T0 and T90 control coral hosts in both *S. siderea* and *P. strigosa*. Elevated temperature (31&deg;C) resulted in a statistically clear reduction in total coral host energy reserves in only *P. strigosa* across all pCO2 treatments (**Figure 1A**). No overall effect of *p*CO~2~ was quantified in any of the four species examined. 
+> Coral host total tissue energy reserves (mg cm^-2^) was calculated as the sum of each protein, lipid, and carbohydrate value per coral host. Total host energy reserves of *P. astreoides* at T0 were clearly greater than the total energy reserves quantified in coral hosts maintained under at control treatment at T90 (**Figure 1A**). There was no difference in total energy reserves between T0 and T90 control coral hosts in either *S. siderea* or *P. strigosa*. Elevated temperature (31&deg;C) resulted in a clear reduction in total coral host energy reserves in only *P. strigosa* across all pCO2 treatments (**Figure 1A**). No overall effect of *p*CO~2~ was quantified in any of the four species examined. 
 
-> Algal endosymbiont cell density (10^6^ cells cm^-2^) in *S. siderea* fragments at T0 was lower than densities measured in fragments under the control treatment at T90, while *P. astreoides* T0 densities were clearly lower than those measured under the control treatment at T90 (**Figure 1B**). Algal endosymbiont cell densities did not exhibit a statistically clear difference between T0 fragments and T90 fragments maintained at the control treatment in *P. strigosa*. Neither *p*CO~2~ nor temperature exhibited a statistically clear overall effect on algal endosymbiont cell densities quantified at T90 in any of the four coral species (**Figure 1B**). Algal endosymbiont chlorophyll a content (ug cm^-2^) of *S. siderea* and *P. strigosa* at T0 was lower than the measured chlorophyll a in fragments maintained in the control treatment at T90 (**Figure 1C**). Conversely, chlorophyll a measured at T0 was not clearly different than in fragments reared in the control treatment at T90 for *P. astreoides*. All species have algal endosymbionts with statistically clear reductions in chlorophyll a content with increasing *p*CO~2~, while elevated temperature (31&deg;C) only clearly reduces chlorophyll a in the algal endosymbionts associated with *P. strigosa* (**Figure 1C**).
+> Algal endosymbiont cell density (10^6^ cells cm^-2^) in *P. astreoides* T0 densities were clearly lower than those measured under all treatments at T90 (**Figure 1B**). Algal endosymbiont cell densities did not exhibit a statistically clear difference between T0 fragments and T90 fragments maintained at the control treatment in *S. siderea* or *P. strigosa*. Neither *p*CO~2~ nor temperature exhibited a statistically clear overall effect on algal endosymbiont cell densities quantified at T90 in any of the three coral species (**Figure 1B**). Algal endosymbiont chlorophyll a content (ug cm^-2^) of *S. siderea* and *P. strigosa* at T0 was lower than the measured chlorophyll a in fragments maintained in the control treatment at T90 (**Figure 1C**). Conversely, chlorophyll a measured at T0 was not clearly different than in fragments reared in the control treatment at T90 for *P. astreoides*. All species exhibited reduced algal endosymbiont chlorophyll a in the highest *p*CO~2~ treatment, while elevated temperature (31&deg;C) only clearly reduces chlorophyll a in the algal endosymbionts associated with *P. strigosa* (**Figure 1C**).
 
 
 #### (B) Host transcriptomic responses
@@ -423,10 +423,12 @@ host.model.fig <-ggplot(df2.host.a)+
 ```
 
 
-```{r figure 3, echo=FALSE, fig.height = 10, fig.width = 10, fig.align = "center", results = 'hide'}
+```{r figure 3, echo=FALSE, fig.height = 10, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
 fig1 <- plot_grid(corals, host.model.fig, den.model.fig, chla.model.fig, labels = c("", "A", "B", "C"), ncol = 1, align = "v", axis = 'lb')
 fig1
+
+ggsave("Fig1_physiology_18Dec19.pdf")
 
 ```
 <br/>
