@@ -331,7 +331,7 @@ den.model.fig <- ggplot(df2.den.a)+
   facet_wrap(~species, ncol = 3, scales = "free_y")
 
 
-  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+#ggsave("Density_SICB_03Jan20.pdf", width = 8.5, height = 2.5, units = "in")
 
 ```
 
@@ -373,7 +373,8 @@ chla.model.fig <- ggplot(df2.chla.a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y")
-  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+#ggsave("Chlorophyll_SICB_03Jan20.pdf", width = 8.5, height = 2.5, units = "in")
 
 ```
 
@@ -418,7 +419,31 @@ host.model.fig <-ggplot(df2.host.a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y")
-  #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+#ggsave("Host_SICB_03Jan20.pdf", width = 8.5, height = 2.5, units = "in")
+
+```
+
+
+```{r}
+
+ncalc.a<-read.csv("/Users/Colleen/Dropbox/Boston_Experiment/Manuscript1_calcification/R_Code/Paper_code_13Feb19/net_calc.csv")
+#ncalc.a <- subset(ncalc.a, species != "T")
+ncalc.a$ftemp <- as.factor(ncalc.a$ftemp)
+ncalc.a$fpco2 <- as.factor(ncalc.a$fpco2)
+ncalc.a$species <- factor(ncalc.a$species, levels = c("S", "P", "A"))
+
+calc.model.fig <- ggplot(ncalc.a)+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  #scale_x_continuous(breaks = ncalc.a$treat, labels = ncalc.a$fpco2)+
+  ylab(rlab)+
+  xlab("")+
+  geom_point(aes(x = fpco2, y = rate, colour=ftemp), position = dodge2, alpha = 0.3, shape = 17, size = 2)+
+  geom_linerange(aes(x = fpco2, ymin = lowerci, ymax = upperci, colour = ftemp), position = dodge, size = 1)+
+  scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
+  facet_wrap(~species, ncol = 4, scales = "free_y")
+
+ggsave("/Users/Colleen/ch3_phys_working/Calcification_SICB_03Jan20.pdf", width = 10, height = 2.5, units = "in")
 
 ```
 
