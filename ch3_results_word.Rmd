@@ -41,10 +41,12 @@ library("knitr")
 library("readr")
 library("ggplot2")
 library("dplyr")
+library("ggbiplot")
 library("tidyr")
 library("openxlsx")
 library("plotly")
 library("tidyverse")
+library("vegan")
 library("shiny")
 library("Rmisc")
 library("cowplot")
@@ -425,7 +427,7 @@ host.model.fig <-ggplot(df2.host.a)+
 ```
 
 
-```{r}
+```{r include=FALSE}
 
 ncalc.a<-read.csv("/Users/Colleen/Dropbox/Boston_Experiment/Manuscript1_calcification/R_Code/Paper_code_13Feb19/net_calc.csv")
 #ncalc.a <- subset(ncalc.a, species != "T")
@@ -443,9 +445,11 @@ calc.model.fig <- ggplot(ncalc.a)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 4, scales = "free_y")
 
-ggsave("/Users/Colleen/ch3_phys_working/Calcification_SICB_03Jan20.pdf", width = 10, height = 2.5, units = "in")
+#ggsave("/Users/Colleen/ch3_phys_working/Calcification_SICB_03Jan20.pdf", width = 10, height = 2.5, units = "in")
 
 ```
+
+
 
 
 ```{r figure 3, echo=FALSE, fig.height = 10, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
@@ -458,6 +462,101 @@ ggsave("Fig1_physiology_18Dec19.pdf")
 ```
 <br/>
 **Figure 1.** Modeled 95% confidence interval of (**A**) total host energy reserves (mg cm^-2^), (**B**) cell density (10^6^ cells cm^-2^), and (**C**) Chlorophyll a (ug cm^-2^) for *S. siderea*, *P. strigosa*, and *P. astreoides* at T0 (green) or T90 (red/blue), with individual coral fragment physiology denoted by points. Blue denotes 28&deg;C and red denotes 31&deg;C, with *p*CO~2~ treatment along the x axis.
+
+
+### PCAs 
+
+```{r PCAs, echo=FALSE}
+
+df.90 <- subset(df, T0_T90 == "T90") 
+df.90 <- subset(df.90, species != "T") 
+df.90 <- df.90[,-c(17:36)]
+df.90 <- completeFun(df.90, "den")
+df.90 <- completeFun(df.90, "host")
+df.90 <- completeFun(df.90, "lipid")
+df.90 <- completeFun(df.90, "carb")
+df.90.l <- gather(df.90, param, value, 14:19)
+
+
+
+
+T90.pca <- prcomp(df.90[,14:19], center = TRUE, scale= TRUE)
+summary(T90.pca)
+
+species.pca <- ggbiplot(T90.pca, ellipse = TRUE, groups = df.90$species) 
+species.pca
+
+#### S. siderea PCAs
+s.df <- subset(df.90, species == "S") 
+s.df.l <- gather(s.df, param, value, 14:19)
+
+#s.pca.mod <- adonis(value ~ reef * ftemp * fpco2 * reef * param, data = s.df.l, method='eu') # below is the model with non sig interactions removed:
+s.pca.mod <- adonis(value ~ ftemp + fpco2 + param + ftemp:fpco2 + ftemp:param + fpco2:param, data = s.df.l, method='eu')
+s.pca.mod
+s.pca <- prcomp(s.df[,14:19], center = TRUE, scale= TRUE)
+
+# reef environment
+s.reef.pca <- ggbiplot(s.pca, ellipse = TRUE, groups = s.df$reef)
+s.reef.pca
+
+# temperature
+s.temp.pca <- ggbiplot(s.pca, ellipse = TRUE, groups = s.df$ftemp) 
+s.temp.pca
+
+# pco2
+s.pco2.pca <- ggbiplot(s.pca, ellipse = TRUE, groups = s.df$fpco2) 
+s.pco2.pca
+
+
+#### P. strigosa PCAs
+p.df <- subset(df.90, species == "P") 
+p.df.l <- gather(p.df, param, value, 14:19)
+
+#adonis(value ~ reef * ftemp * fpco2 * reef * param, data = p.df.l, method='eu') # below is the model with non sig interactions removed:
+p.pca.mod <- adonis(value ~ reef + ftemp + fpco2 + param + reef:param + ftemp:param + fpco2:param, data = p.df.l, method='eu')
+p.pca.mod
+p.pca <- prcomp(p.df[,14:19], center = TRUE, scale= TRUE)
+
+# reef environment
+p.reef.pca <- ggbiplot(p.pca, ellipse = TRUE, groups = p.df$reef) 
+p.reef.pca
+
+# temperature
+p.temp.pca <- ggbiplot(p.pca, ellipse = TRUE, groups = p.df$ftemp) 
+p.temp.pca
+
+# pco2
+p.pco2.pca <- ggbiplot(p.pca, ellipse = TRUE, groups = p.df$fpco2) 
+p.pco2.pca
+
+
+
+#### P. astreoides PCAs
+a.df <- subset(df.90, species == "S") 
+a.df.l <- gather(a.df, param, value, 14:19)
+
+#adonis(value ~ reef * ftemp * fpco2 * reef * param, data = a.df.l, method='eu') # below is the model with non sig interactions removed:
+a.pca.mod <- adonis(value ~ ftemp + fpco2 + param + ftemp:param + fpco2:param, data = a.df.l, method='eu')
+a.pca.mod
+a.pca <- prcomp(a.df[,14:19], center = TRUE, scale= TRUE)
+
+# reef environment
+a.reef.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$reef) 
+a.reef.pca
+
+# temperature
+a.tema.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$ftemp) 
+a.tema.pca
+
+# pco2
+a.pco2.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$fpco2) 
+a.pco2.pca
+
+# treat
+a.treat.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$treat2) 
+a.treat.pca
+
+```
 
 
 
