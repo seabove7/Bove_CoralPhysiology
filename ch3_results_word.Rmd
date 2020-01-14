@@ -2,10 +2,11 @@
 title: "Chapter 3: Physiology"
 author: "Colleen Bove"
 date: "17 December 2019"
-output: 
-  word_document:
-    reference_docx: word_syles_reference_1.docx
-always_allow_html: true
+output: rmdformats::readthedown
+#output: 
+#  word_document:
+#    reference_docx: word_syles_reference_1.docx
+#always_allow_html: true
 ---
 # Results
 
@@ -35,6 +36,9 @@ options(warn = -1)
 ```
 
 ```{r packages, include=FALSE}
+
+#library("devtools")
+#install_github("vqv/ggbiplot") # need this to download ggbiplot if not already installed
 
 #Packages to load
 library("knitr")
@@ -479,16 +483,10 @@ df.90.l <- gather(df.90, param, value, 14:19)
 
 
 
-
-T90.pca <- prcomp(df.90[,14:19], center = TRUE, scale= TRUE)
-summary(T90.pca)
-
-species.pca <- ggbiplot(T90.pca, ellipse = TRUE, groups = df.90$species) 
-species.pca
-
 #### S. siderea PCAs
 s.df <- subset(df.90, species == "S") 
 s.df.l <- gather(s.df, param, value, 14:19)
+s.df$fpco2 <- factor(s.df$fpco2, levels = c("300", "420", "680", "3300"))
 
 #s.pca.mod <- adonis(value ~ reef * ftemp * fpco2 * reef * param, data = s.df.l, method='eu') # below is the model with non sig interactions removed:
 s.pca.mod <- adonis(value ~ ftemp + fpco2 + param + ftemp:fpco2 + ftemp:param + fpco2:param, data = s.df.l, method='eu')
@@ -496,21 +494,44 @@ s.pca.mod
 s.pca <- prcomp(s.df[,14:19], center = TRUE, scale= TRUE)
 
 # reef environment
-s.reef.pca <- ggbiplot(s.pca, ellipse = TRUE, groups = s.df$reef)
+s.reef.pca <- autoplot(s.pca, data = s.df, 
+         colour = "reef",
+         frame = TRUE, frame.type = 'norm',
+         loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+  scale_colour_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  scale_fill_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ggtitle("SSID by reef environment")
 s.reef.pca
 
+
 # temperature
-s.temp.pca <- ggbiplot(s.pca, ellipse = TRUE, groups = s.df$ftemp) 
+s.temp.pca <- autoplot(s.pca, data = s.df, 
+         colour = "ftemp",
+         frame = TRUE, frame.type = 'norm',
+         loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+    scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+    ggtitle("SSID by temperature")
 s.temp.pca
 
 # pco2
-s.pco2.pca <- ggbiplot(s.pca, ellipse = TRUE, groups = s.df$fpco2) 
+s.pco2.pca <- autoplot(s.pca, data = s.df, 
+         colour = "fpco2",
+         frame = TRUE, frame.type = 'norm',
+         loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+    scale_colour_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_fill_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+    ggtitle("SSID by pCO2")
 s.pco2.pca
 
 
 #### P. strigosa PCAs
 p.df <- subset(df.90, species == "P") 
 p.df.l <- gather(p.df, param, value, 14:19)
+p.df$fpco2 <- factor(p.df$fpco2, levels = c("300", "420", "680", "3300"))
 
 #adonis(value ~ reef * ftemp * fpco2 * reef * param, data = p.df.l, method='eu') # below is the model with non sig interactions removed:
 p.pca.mod <- adonis(value ~ reef + ftemp + fpco2 + param + reef:param + ftemp:param + fpco2:param, data = p.df.l, method='eu')
@@ -518,22 +539,46 @@ p.pca.mod
 p.pca <- prcomp(p.df[,14:19], center = TRUE, scale= TRUE)
 
 # reef environment
-p.reef.pca <- ggbiplot(p.pca, ellipse = TRUE, groups = p.df$reef) 
+p.reef.pca <- autoplot(p.pca, data = p.df, 
+                       colour = "reef",
+                       frame = TRUE, frame.type = 'norm',
+                       loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+  scale_colour_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  scale_fill_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ggtitle("SSID by reef environment")
 p.reef.pca
 
+
 # temperature
-p.temp.pca <- ggbiplot(p.pca, ellipse = TRUE, groups = p.df$ftemp) 
+p.temp.pca <- autoplot(p.pca, data = p.df, 
+                       colour = "ftemp",
+                       shape = "fpco2",
+                       frame = TRUE, frame.type = 'norm',
+                       loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_shape_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c(0,1,2,3))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ggtitle("SSID by temperature")
 p.temp.pca
 
 # pco2
-p.pco2.pca <- ggbiplot(p.pca, ellipse = TRUE, groups = p.df$fpco2) 
+p.pco2.pca <- autoplot(p.pca, data = p.df, 
+                       colour = "fpco2",
+                       frame = TRUE, frame.type = 'norm',
+                       loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+  scale_colour_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_fill_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ggtitle("SSID by pCO2")
 p.pco2.pca
 
 
-
 #### P. astreoides PCAs
-a.df <- subset(df.90, species == "S") 
+a.df <- subset(df.90, species == "A") 
 a.df.l <- gather(a.df, param, value, 14:19)
+a.df$fpco2 <- factor(a.df$fpco2, levels = c("300", "420", "680", "3300"))
 
 #adonis(value ~ reef * ftemp * fpco2 * reef * param, data = a.df.l, method='eu') # below is the model with non sig interactions removed:
 a.pca.mod <- adonis(value ~ ftemp + fpco2 + param + ftemp:param + fpco2:param, data = a.df.l, method='eu')
@@ -541,20 +586,38 @@ a.pca.mod
 a.pca <- prcomp(a.df[,14:19], center = TRUE, scale= TRUE)
 
 # reef environment
-a.reef.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$reef) 
+a.reef.pca <- autoplot(a.pca, data = a.df, 
+                       colour = "reef",
+                       frame = TRUE, frame.type = 'norm',
+                       loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+  scale_colour_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  scale_fill_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ggtitle("SSID by reef environment")
 a.reef.pca
 
+
 # temperature
-a.tema.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$ftemp) 
+a.tema.pca <- autoplot(a.pca, data = a.df, 
+                       colour = "ftemp",
+                       frame = TRUE, frame.type = 'norm',
+                       loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ggtitle("SSID by temperature")
 a.tema.pca
 
 # pco2
-a.pco2.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$fpco2) 
+a.pco2.pca <- autoplot(a.pca, data = a.df, 
+                       colour = "fpco2",
+                       frame = TRUE, frame.type = 'norm',
+                       loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
+  scale_colour_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_fill_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  ggtitle("SSID by pCO2")
 a.pco2.pca
-
-# treat
-a.treat.pca <- ggbiplot(a.pca, ellipse = TRUE, groups = a.df$treat2) 
-a.treat.pca
 
 ```
 
