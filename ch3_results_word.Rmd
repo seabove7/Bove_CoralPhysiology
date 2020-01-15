@@ -532,6 +532,7 @@ plot_grid(s.temp.pca, s.pco2.pca, ncol = 3, scale = 0.8)
 
 s.pca.mod
 
+
 ```
 
 #### **B |** *Pseudodiploria strigosa*
@@ -855,18 +856,18 @@ saveWorkbook(wb, file="Ch3_Phys_tables.xlsx", overwrite = TRUE)
 
 # Figure 3: Gene expression by reef environment
 
-![**A | ** Host gene expression by treatment](/Users/Colleen/ch3_phys_working/Host_PCA_03Jan20.png)
+![**A | ** Host gene expression by treatment](/Users/colleen/ch3_phys_working/Host_PCA_03Jan20.png)
 
 
-![**B | ** Endosymbiont gene expression by treatment](/Users/Colleen/ch3_phys_working/Symbiont_PCA_03Jan20.png)
+![**B | ** Endosymbiont gene expression by treatment](/Users/colleen/ch3_phys_working/Symbiont_PCA_03Jan20.png)
 
 <br/>
 
 # Figure 4: Differentially expressed genes by treatment
 
-![**A | ** Host significantly differentially expressed genes](/Users/Colleen/ch3_phys_working/Host_DEG_03Jan20.png)
+![**A | ** Host significantly differentially expressed genes](/Users/colleen/ch3_phys_working/Host_DEG_03Jan20.png)
 
-![**B | ** Endosymbiont significantly differentially expressed genes](/Users/Colleen/ch3_phys_working/Symbiont_DEG_03Jan20.png)
+![**B | ** Endosymbiont significantly differentially expressed genes](/Users/colleen/ch3_phys_working/Symbiont_DEG_03Jan20.png)
 
 
 <br/>
