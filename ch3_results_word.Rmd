@@ -1,31 +1,31 @@
 ---
 title: "Chapter 3: Physiology"
 author: "Colleen Bove"
-date: "17 December 2019"
-output: rmdformats::readthedown
-#output: 
-#  word_document:
-#    reference_docx: word_syles_reference_1.docx
-#always_allow_html: true
+date: "14 January 2020"
+output: 
+  word_document:
+    reference_docx: word_syles_reference_1.docx
+always_allow_html: true
 ---
 # Results
 
-#### (A) Coral host and algal endosymbiont physiology
-> Coral host total tissue energy reserves (mg cm^-2^) was calculated as the sum of each protein, lipid, and carbohydrate value per coral host. Total host energy reserves of *P. astreoides* at T0 were clearly greater than the total energy reserves quantified in coral hosts maintained under at control treatment at T90 (**Figure 1A**). There was no difference in total energy reserves between T0 and T90 control coral hosts in either *S. siderea* or *P. strigosa*. Elevated temperature (31&deg;C) resulted in a clear reduction in total coral host energy reserves in only *P. strigosa* across all pCO2 treatments (**Figure 1A**). No overall effect of *p*CO~2~ was quantified in any of the four species examined. 
+### (A) Coral host and algal endosymbiont physiology
+> Coral host total tissue energy reserves (mg cm^-2^) was calculated as the sum of each protein, lipid, and carbohydrate value per coral host. Total host energy reserves of *P. astreoides* at T0 were clearly greater than the total energy reserves quantified in coral hosts maintained under at control treatment at T90 (**Figure 1A**). There was no difference in total energy reserves between T0 and T90 control coral hosts in either *S. siderea* or *P. strigosa*. Elevated temperature (31&deg;C) resulted in a clear reduction in total coral host energy reserves in only *P. strigosa* across all *p*CO~2~ treatments (**Figure 1A**). No overall effect of *p*CO~2~ was quantified in any of the four species examined. 
 
 > Algal endosymbiont cell density (10^6^ cells cm^-2^) in *P. astreoides* T0 densities were clearly lower than those measured under all treatments at T90 (**Figure 1B**). Algal endosymbiont cell densities did not exhibit a statistically clear difference between T0 fragments and T90 fragments maintained at the control treatment in *S. siderea* or *P. strigosa*. Neither *p*CO~2~ nor temperature exhibited a statistically clear overall effect on algal endosymbiont cell densities quantified at T90 in any of the three coral species (**Figure 1B**). Algal endosymbiont chlorophyll a content (ug cm^-2^) of *S. siderea* and *P. strigosa* at T0 was lower than the measured chlorophyll a in fragments maintained in the control treatment at T90 (**Figure 1C**). Conversely, chlorophyll a measured at T0 was not clearly different than in fragments reared in the control treatment at T90 for *P. astreoides*. All species exhibited reduced algal endosymbiont chlorophyll a in the highest *p*CO~2~ treatment, while elevated temperature (31&deg;C) only clearly reduces chlorophyll a in the algal endosymbionts associated with *P. strigosa* (**Figure 1C**).
 
+> *Need a statement about PCAs* (**Figure 2**)
 
-#### (B) Host transcriptomic responses
-> I will talk about HOST trends/findings about gene expression here.
-
-
-#### (C) Algal endosymbiont transcriptomic responses
-> I will talk about symbiont trends/findings about gene expression here.
+### (B) Host transcriptomic responses
+> I will talk about HOST trends/findings about gene expression here. (**Figure 3**)
 
 
-#### (D) Overall physiological response
-> This will discuss overall responses and the WGCNA here.
+### (C) Algal endosymbiont transcriptomic responses
+> I will talk about symbiont trends/findings about gene expression here. (**Figure 4**)
+
+
+### (D) Overall physiological response
+> This will discuss overall responses and the WGCNA here. *-- This will be excluded from my dissertation, but included in the manuscript*
 
 
 ```{r setup, include=FALSE}
@@ -454,7 +454,7 @@ calc.model.fig <- ggplot(ncalc.a)+
 ```
 
 
-
+# Figure 1: Holobiont physiology 
 
 ```{r figure 3, echo=FALSE, fig.height = 10, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
@@ -468,9 +468,10 @@ ggsave("Fig1_physiology_18Dec19.pdf")
 **Figure 1.** Modeled 95% confidence interval of (**A**) total host energy reserves (mg cm^-2^), (**B**) cell density (10^6^ cells cm^-2^), and (**C**) Chlorophyll a (ug cm^-2^) for *S. siderea*, *P. strigosa*, and *P. astreoides* at T0 (green) or T90 (red/blue), with individual coral fragment physiology denoted by points. Blue denotes 28&deg;C and red denotes 31&deg;C, with *p*CO~2~ treatment along the x axis.
 
 
-### PCAs 
+# Figure 2: Holobiont PCAs
 
-```{r PCAs, echo=FALSE}
+#### **A |** *Siderastrea siderea*
+```{r SSID PCA, echo=FALSE, fig.height=4, fig.width=8}
 
 df.90 <- subset(df, T0_T90 == "T90") 
 df.90 <- subset(df.90, species != "T") 
@@ -489,8 +490,7 @@ s.df.l <- gather(s.df, param, value, 14:19)
 s.df$fpco2 <- factor(s.df$fpco2, levels = c("300", "420", "680", "3300"))
 
 #s.pca.mod <- adonis(value ~ reef * ftemp * fpco2 * reef * param, data = s.df.l, method='eu') # below is the model with non sig interactions removed:
-s.pca.mod <- adonis(value ~ ftemp + fpco2 + param + ftemp:fpco2 + ftemp:param + fpco2:param, data = s.df.l, method='eu')
-s.pca.mod
+s.pca.mod <- adonis(value ~ ftemp + fpco2 + reef, data = s.df.l, method='eu')
 s.pca <- prcomp(s.df[,14:19], center = TRUE, scale= TRUE)
 
 # reef environment
@@ -498,35 +498,44 @@ s.reef.pca <- autoplot(s.pca, data = s.df,
          colour = "reef",
          frame = TRUE, frame.type = 'norm',
          loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
-  scale_colour_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  scale_fill_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ggtitle("SSID by reef environment")
-s.reef.pca
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
 
 # temperature
 s.temp.pca <- autoplot(s.pca, data = s.df, 
          colour = "ftemp",
+         shape = "treat2",
          frame = TRUE, frame.type = 'norm',
          loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
-    scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-    scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-    ggtitle("SSID by temperature")
-s.temp.pca
+  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
+  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
 # pco2
 s.pco2.pca <- autoplot(s.pca, data = s.df, 
          colour = "fpco2",
+         shape = "treat2",
          frame = TRUE, frame.type = 'norm',
          loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
-    scale_colour_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_fill_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-    ggtitle("SSID by pCO2")
-s.pco2.pca
+    scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
+    guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
+plot_grid(s.temp.pca, s.pco2.pca, ncol = 3, scale = 0.8)
+
+s.pca.mod
+
+```
+
+#### **B |** *Pseudodiploria strigosa*
+```{r PSTR PCA, echo=FALSE, fig.height=4, fig.width=8}
 
 #### P. strigosa PCAs
 p.df <- subset(df.90, species == "P") 
@@ -534,8 +543,7 @@ p.df.l <- gather(p.df, param, value, 14:19)
 p.df$fpco2 <- factor(p.df$fpco2, levels = c("300", "420", "680", "3300"))
 
 #adonis(value ~ reef * ftemp * fpco2 * reef * param, data = p.df.l, method='eu') # below is the model with non sig interactions removed:
-p.pca.mod <- adonis(value ~ reef + ftemp + fpco2 + param + reef:param + ftemp:param + fpco2:param, data = p.df.l, method='eu')
-p.pca.mod
+p.pca.mod <- adonis(value ~ reef + ftemp + fpco2, data = p.df.l, method='eu')
 p.pca <- prcomp(p.df[,14:19], center = TRUE, scale= TRUE)
 
 # reef environment
@@ -543,37 +551,43 @@ p.reef.pca <- autoplot(p.pca, data = p.df,
                        colour = "reef",
                        frame = TRUE, frame.type = 'norm',
                        loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
-  scale_colour_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  scale_fill_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ggtitle("SSID by reef environment")
-p.reef.pca
-
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
 # temperature
 p.temp.pca <- autoplot(p.pca, data = p.df, 
                        colour = "ftemp",
-                       shape = "fpco2",
+                       shape = "treat2",
                        frame = TRUE, frame.type = 'norm',
                        loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  scale_shape_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c(0,1,2,3))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ggtitle("SSID by temperature")
-p.temp.pca
+  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
+  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
 # pco2
 p.pco2.pca <- autoplot(p.pca, data = p.df, 
                        colour = "fpco2",
+                       shape = "treat2",
                        frame = TRUE, frame.type = 'norm',
                        loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
-  scale_colour_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_fill_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ggtitle("SSID by pCO2")
-p.pco2.pca
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
+  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
+plot_grid(p.temp.pca, p.pco2.pca, ncol = 3, scale = 0.8)
+
+p.pca.mod
+
+```
+
+#### **C |** *Porites astreoides*
+```{r PAST PCA, echo=FALSE, fig.height=4, fig.width=8}
 
 #### P. astreoides PCAs
 a.df <- subset(df.90, species == "A") 
@@ -581,8 +595,7 @@ a.df.l <- gather(a.df, param, value, 14:19)
 a.df$fpco2 <- factor(a.df$fpco2, levels = c("300", "420", "680", "3300"))
 
 #adonis(value ~ reef * ftemp * fpco2 * reef * param, data = a.df.l, method='eu') # below is the model with non sig interactions removed:
-a.pca.mod <- adonis(value ~ ftemp + fpco2 + param + ftemp:param + fpco2:param, data = a.df.l, method='eu')
-a.pca.mod
+a.pca.mod <- adonis(value ~ ftemp + fpco2 + reef + ftemp:fpco2, data = a.df.l, method='eu')
 a.pca <- prcomp(a.df[,14:19], center = TRUE, scale= TRUE)
 
 # reef environment
@@ -590,34 +603,38 @@ a.reef.pca <- autoplot(a.pca, data = a.df,
                        colour = "reef",
                        frame = TRUE, frame.type = 'norm',
                        loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
-  scale_colour_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  scale_fill_manual("reef \n environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ggtitle("SSID by reef environment")
-a.reef.pca
-
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
 # temperature
 a.tema.pca <- autoplot(a.pca, data = a.df, 
                        colour = "ftemp",
+                       shape = "treat2",
                        frame = TRUE, frame.type = 'norm',
                        loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ggtitle("SSID by temperature")
-a.tema.pca
+  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+  
+  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
 
 # pco2
 a.pco2.pca <- autoplot(a.pca, data = a.df, 
                        colour = "fpco2",
+                       shape = "treat2",
                        frame = TRUE, frame.type = 'norm',
                        loadings = TRUE, loadings.colour = 'azure4', loadings.label = TRUE, loadings.label.size = 3, loadings.label.hjust = 1.5, loadings.label.vjust = 1)+
-  scale_colour_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_fill_manual("pCO2", labels = c("pre industripl", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1))+
-  ggtitle("SSID by pCO2")
-a.pco2.pca
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
+  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+
+plot_grid(a.tema.pca, a.pco2.pca, ncol = 3, scale = 0.8)
+
+a.pca.mod
 
 ```
 
@@ -834,6 +851,25 @@ saveWorkbook(wb, file="Ch3_Phys_tables.xlsx", overwrite = TRUE)
 
 ```
 
+<center>
+
+# Figure 3: Gene expression by reef environment
+
+![**A | ** Host gene expression by treatment](/Users/Colleen/ch3_phys_working/Host_PCA_03Jan20.png)
+
+
+![**B | ** Endosymbiont gene expression by treatment](/Users/Colleen/ch3_phys_working/Symbiont_PCA_03Jan20.png)
+
+<br/>
+
+# Figure 4: Differentially expressed genes by treatment
+
+![**A | ** Host significantly differentially expressed genes](/Users/Colleen/ch3_phys_working/Host_DEG_03Jan20.png)
+
+![**B | ** Endosymbiont significantly differentially expressed genes](/Users/Colleen/ch3_phys_working/Symbiont_DEG_03Jan20.png)
+
+
+<br/>
 <br/>
 <br/>
 
@@ -841,3 +877,6 @@ saveWorkbook(wb, file="Ch3_Phys_tables.xlsx", overwrite = TRUE)
 sessionInfo()
 ```
 
+
+
+<center/>
