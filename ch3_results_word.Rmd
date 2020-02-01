@@ -59,6 +59,7 @@ library("ggfortify")
 library("kableExtra")
 library("readr")
 library("lme4")
+library("ggpubr")
 library("magick")
 
 ```
@@ -658,7 +659,7 @@ ggsave("Figure2_PhysPCA_24Jan20.pdf")
 ```
 
 
-```{r SSID distance dataframe setup, include=FALSE}
+```{r SSID distance dataframe setup, eval=FALSE, include=FALSE}
 
 s.dis <- s.pca$x[-62,1:2] # grab PC1 and PC2 distances from prcomp() object
 
@@ -685,7 +686,7 @@ sid.dist$dist <- sqrt(((sid.dist$PC1 - sid.dist$con2.pc1)^2) + ((sid.dist$PC2 - 
 
 ```
 
-```{r plots of SSID distances, echo=FALSE}
+```{r plots of SSID distances, eval=FALSE, include=FALSE}
 
 # just treatment
 sid.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = sid.dist)
@@ -712,7 +713,7 @@ full.sid.plot
 
 ```
 
-```{r SSID distance analysis, echo=FALSE}
+```{r SSID distance analysis, eval=FALSE, include=FALSE}
 
 s.dis.aov <- aov(dist ~ treat2 * reef, data = sid.dist)
 summary(s.dis.aov)
@@ -726,7 +727,7 @@ sid.dis.tab$treat <- rownames(sid.dis.tab)
 
 ```
 
-```{r PAST distance dataframe setup, include=FALSE}
+```{r PAST distance dataframe setup, eval=FALSE, include=FALSE}
 
 a.dis <- a.pca$x[-22,1:2] # grab PC1 and PC2 distances from prcomp() object
 
@@ -751,7 +752,7 @@ por.dist$dist <- sqrt(((por.dist$PC1 - por.dist$con2.pc1)^2) + ((por.dist$PC2 - 
 
 ```
 
-```{r plots of PAST distances, echo=FALSE}
+```{r plots of PAST distances, eval=FALSE, include=FALSE}
 
 # just treatment
 por.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = por.dist)
@@ -778,7 +779,7 @@ full.por.plot
 
 ```
 
-```{r PAST distance analysis, echo=FALSE}
+```{r PAST distance analysis, eval=FALSE, include=FALSE}
 
 p.dis.aov <- aov(dist ~ treat2 * reef, data = por.dist)
 summary(p.dis.aov)
@@ -792,7 +793,7 @@ por.dis.tab$treat <- rownames(por.dis.tab)
 
 ```
 
-```{r full distance plot, echo=FALSE}
+```{r full distance plot, eval=FALSE, include=FALSE}
 
 plot_grid(full.sid.plot, full.por.plot, ncol = 2, labels = c("A", "B"))
 
@@ -805,57 +806,69 @@ ggsave("Figure3_PCAdistance_24Jan20.pdf")
 
 s.df90 <- subset(s.df, T0_T90 == "T90")
 
-sl.plot <- ggplot(data = s.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp)) +
+sl.plot <- ggplot(data = s.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(llab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -0.5, label.x = 0.9) +
+  stat_regline_equation(label.y = -0.7, label.x = 0.9)
 
-sp.plot <- ggplot(data = s.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp)) +
+sp.plot <- ggplot(data = s.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(plab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -0.5, label.x = 0.8) +
+  stat_regline_equation(label.y = -0.7, label.x = 0.8)  
 
-sca.plot <- ggplot(data = s.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp)) +
+sca.plot <- ggplot(data = s.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(calab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -0.5, label.x = 2) +
+  stat_regline_equation(label.y = -0.7, label.x = 2)  
 
-sh.plot <- ggplot(data = s.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp)) +
+sh.plot <- ggplot(data = s.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab("Total host energy reserves") + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -0.5, label.x = 3.4) +
+  stat_regline_equation(label.y = -0.7, label.x = 3.4)  
 
-sd.plot <- ggplot(data = s.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp)) +
+sd.plot <- ggplot(data = s.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(dlab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -0.5, label.x = 3.9) +
+  stat_regline_equation(label.y = -0.7, label.x = 3.9)  
 
-sc.plot <- ggplot(data = s.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp)) +
+sc.plot <- ggplot(data = s.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(clab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+    stat_cor(label.y = -0.5, label.x = 150) +
+  stat_regline_equation(label.y = -0.7, label.x = 150)
 
 plot_grid(sl.plot, sp.plot, sca.plot, sh.plot, sd.plot, sc.plot, labels = "AUTO", ncol = 2, scale = 0.9)
 
-#ggsave("Ch3_appFig_SSIDscatter_29Jan20.pdf", width = 7, height = 8, units = "in")
+ggsave("Ch3_appFig_SSIDscatter_29Jan20.pdf", width = 10, height = 14, units = "in")
 
 ```
 
@@ -863,57 +876,69 @@ plot_grid(sl.plot, sp.plot, sca.plot, sh.plot, sd.plot, sc.plot, labels = "AUTO"
 
 p.df90 <- subset(p.df, T0_T90 == "T90")
 
-pl.plot <- ggplot(data = p.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp)) +
+pl.plot <- ggplot(data = p.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(llab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 0.68) +
+  stat_regline_equation(label.y = -1.6, label.x = 0.68)  
 
-pp.plot <- ggplot(data = p.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp)) +
+pp.plot <- ggplot(data = p.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(plab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 0.65) +
+  stat_regline_equation(label.y = -1.6, label.x = 0.65) 
 
-pca.plot <- ggplot(data = p.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp)) +
+pca.plot <- ggplot(data = p.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(calab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 1.3) +
+  stat_regline_equation(label.y = -1.6, label.x = 1.3) 
 
-ph.plot <- ggplot(data = p.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp)) +
+ph.plot <- ggplot(data = p.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab("Total host energy reserves") + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 2.2) +
+  stat_regline_equation(label.y = -1.6, label.x = 2.2) 
 
-pd.plot <- ggplot(data = p.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp)) +
+pd.plot <- ggplot(data = p.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(dlab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 3.9) +
+  stat_regline_equation(label.y = -1.6, label.x = 3.9) 
 
-pc.plot <- ggplot(data = p.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp)) +
+pc.plot <- ggplot(data = p.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(clab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 380) +
+  stat_regline_equation(label.y = -1.6, label.x = 380) 
 
 plot_grid(pl.plot, pp.plot, pca.plot, ph.plot, pd.plot, pc.plot, labels = "AUTO", ncol = 2, scale = 0.9)
 
-#ggsave("Ch3_appFig_PSTRscatter_29Jan20.pdf", width = 7, height = 8, units = "in")
+ggsave("Ch3_appFig_PSTRscatter_29Jan20.pdf", width = 10, height = 14, units = "in")
 
 ```
 
@@ -921,57 +946,69 @@ plot_grid(pl.plot, pp.plot, pca.plot, ph.plot, pd.plot, pc.plot, labels = "AUTO"
 
 a.df90 <- subset(a.df, T0_T90 == "T90")
 
-al.plot <- ggplot(data = a.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp)) +
+al.plot <- ggplot(data = a.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(llab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 0.38) +
+  stat_regline_equation(label.y = -1.6, label.x = 0.38) 
 
-ap.plot <- ggplot(data = a.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp)) +
+ap.plot <- ggplot(data = a.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(plab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 0.36) +
+  stat_regline_equation(label.y = -1.6, label.x = 0.36) 
 
-aca.plot <- ggplot(data = a.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp)) +
+aca.plot <- ggplot(data = a.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(calab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 1.2) +
+  stat_regline_equation(label.y = -1.6, label.x = 1.2) 
 
-ah.plot <- ggplot(data = a.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp)) +
+ah.plot <- ggplot(data = a.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab("Total host energy reserves") + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 1.5) +
+  stat_regline_equation(label.y = -1.6, label.x = 1.5) 
 
-ad.plot <- ggplot(data = a.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp)) +
+ad.plot <- ggplot(data = a.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(dlab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = 1, label.x = 13) +
+  stat_regline_equation(label.y = 0.8, label.x = 13) 
 
-ac.plot <- ggplot(data = a.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp)) +
+ac.plot <- ggplot(data = a.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme(legend.position = "none") +
   xlab(clab) + 
   ylab(rlab) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
-  geom_point()
+  geom_point() +
+  stat_cor(label.y = -1.4, label.x = 140) +
+  stat_regline_equation(label.y = -1.6, label.x = 140) 
 
 plot_grid(al.plot, ap.plot, aca.plot, ah.plot, ad.plot, ac.plot, labels = "AUTO", ncol = 2, scale = 0.9)
 
-#ggsave("Ch3_appFig_PASTscatter_29Jan20.pdf", width = 7, height = 8, units = "in")
+ggsave("Ch3_appFig_PASTscatter_29Jan20.pdf", width = 10, height = 14, units = "in")
 
 ```
 
