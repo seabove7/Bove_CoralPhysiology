@@ -206,6 +206,9 @@ pro.model.fig <- ggplot(df2.pro.a)+
   facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))  
 
+#pro.model.fig
+#ggsave("Ch3_appFig_protein_28Jan20.pdf")
+
 ```
 
 ```{r carb model, eval=FALSE, include=FALSE}
@@ -250,6 +253,9 @@ carb.model.fig <- ggplot(df2.carb.a)+
   facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
 
+#carb.model.fig
+#ggsave("Ch3_appFig_carb_28Jan20.pdf")
+
 ```
 
 ```{r lipid model, eval=FALSE, include=FALSE}
@@ -293,6 +299,9 @@ lipid.model.fig <- ggplot(df2.lipid.a)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y")
   #theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid"), plot.background = element_rect(fill = "lightgrey"))
+
+#lipid.model.fig
+#ggsave("Ch3_appFig_lipid_28Jan20.pdf")
 
 ```
 
@@ -438,10 +447,12 @@ ncalc.a<-read.csv("/Users/Colleen/Dropbox/Boston_Experiment/Manuscript1_calcific
 #ncalc.a <- subset(ncalc.a, species != "T")
 ncalc.a$ftemp <- as.factor(ncalc.a$ftemp)
 ncalc.a$fpco2 <- as.factor(ncalc.a$fpco2)
+ncalc.a <- subset(ncalc.a, species != "T")
 ncalc.a$species <- factor(ncalc.a$species, levels = c("S", "P", "A"))
 
 calc.model.fig <- ggplot(ncalc.a)+
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", fill=NA, size=1))+
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey") +
   #scale_x_continuous(breaks = ncalc.a$treat, labels = ncalc.a$fpco2)+
   ylab(rlab)+
   xlab("")+
@@ -450,7 +461,8 @@ calc.model.fig <- ggplot(ncalc.a)+
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 4, scales = "free_y")
 
-#ggsave("/Users/Colleen/ch3_phys_working/Calcification_SICB_03Jan20.pdf", width = 10, height = 2.5, units = "in")
+#calc.model.fig
+#ggsave("/Users/Colleen/ch3_phys_working/Ch3_appFig_rate_29Jan20.pdf", width = 8, height = 3, units = "in")
 
 ```
 
@@ -459,7 +471,7 @@ calc.model.fig <- ggplot(ncalc.a)+
 
 ```{r figure 3, echo=FALSE, fig.height = 10, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-fig1 <- plot_grid(corals, host.model.fig, den.model.fig, chla.model.fig, labels = c("", "A", "B", "C"), ncol = 1, align = "v", axis = 'lb')
+fig1 <- plot_grid(corals, host.model.fig, den.model.fig, chla.model.fig, labels = c("A", "B", "C", "D"), ncol = 1, align = "v", axis = 'lb')
 fig1
 
 ggsave("Fig1_physiology_18Dec19.pdf")
@@ -471,7 +483,6 @@ ggsave("Fig1_physiology_18Dec19.pdf")
 
 # Figure 2: Holobiont PCAs
 
-#### **A |** *Siderastrea siderea*
 ```{r SSID PCA, echo=FALSE, fig.height=4, fig.width=8}
 
 df.90 <- subset(df, T0_T90 == "T90") 
@@ -502,7 +513,7 @@ s.reef.pca <- autoplot(s.pca, data = s.df,
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
   guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 
 # temperature
@@ -515,7 +526,7 @@ s.temp.pca <- autoplot(s.pca, data = s.df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # pco2
 s.pco2.pca <- autoplot(s.pca, data = s.df, 
@@ -527,16 +538,15 @@ s.pco2.pca <- autoplot(s.pca, data = s.df,
     scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
     guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
-plot_grid(s.temp.pca, s.pco2.pca, ncol = 3, scale = 0.8)
+ssid.plot <- plot_grid(s.temp.pca, s.pco2.pca, ncol = 3, scale = 0.8)
 
 #s.pca.mod
 
 
 ```
 
-#### **B |** *Pseudodiploria strigosa*
 ```{r PSTR PCA, echo=FALSE, fig.height=4, fig.width=8}
 
 #### P. strigosa PCAs
@@ -556,7 +566,7 @@ p.reef.pca <- autoplot(p.pca, data = p.df,
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
   guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # temperature
 p.temp.pca <- autoplot(p.pca, data = p.df, 
@@ -568,7 +578,7 @@ p.temp.pca <- autoplot(p.pca, data = p.df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # pco2
 p.pco2.pca <- autoplot(p.pca, data = p.df, 
@@ -580,15 +590,14 @@ p.pco2.pca <- autoplot(p.pca, data = p.df,
   scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
-plot_grid(p.temp.pca, p.pco2.pca, ncol = 3, scale = 0.8)
+pstr.plot <- plot_grid(p.temp.pca, p.pco2.pca, ncol = 3, scale = 0.8)
 
 #p.pca.mod
 
 ```
 
-#### **C |** *Porites astreoides*
 ```{r PAST PCA, echo=FALSE, fig.height=4, fig.width=8}
 
 #### P. astreoides PCAs
@@ -608,7 +617,7 @@ a.reef.pca <- autoplot(a.pca, data = a.df,
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
   guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # temperature
 a.tema.pca <- autoplot(a.pca, data = a.df, 
@@ -620,7 +629,7 @@ a.tema.pca <- autoplot(a.pca, data = a.df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+  
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # pco2
 a.pco2.pca <- autoplot(a.pca, data = a.df, 
@@ -632,13 +641,340 @@ a.pco2.pca <- autoplot(a.pca, data = a.df,
   scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
-plot_grid(a.tema.pca, a.pco2.pca, ncol = 3, scale = 0.8)
+past.plot <- plot_grid(a.tema.pca, a.pco2.pca, ncol = 3, scale = 0.8)
 
 #a.pca.mod
 
 ```
+
+```{r PCA plot, echo=FALSE}
+
+plot_grid(ssid.plot, pstr.plot, past.plot, ncol = 1, labels = c("A", "B", "C"))
+
+ggsave("Figure2_PhysPCA_24Jan20.pdf")
+
+```
+
+
+```{r SSID distance dataframe setup, include=FALSE}
+
+s.dis <- s.pca$x[-62,1:2] # grab PC1 and PC2 distances from prcomp() object
+
+sid.dist <- cbind(s.df[-62,c(1,7,10,11,12,9,21)], s.dis) # combine the datasets
+
+sid.dist$cont.pc1[sid.dist$treat2 == "447_28"] <- sid.dist$PC1[sid.dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
+sid.dist$cont.pc2[sid.dist$treat2 == "447_28"] <- sid.dist$PC2[sid.dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+
+# get the 400_28 PC values
+sid.dist2 <- sid.dist %>%  
+  group_by(colony) %>% 
+  summarise(con2.pc1 = sum(cont.pc1, na.rm = TRUE))
+sid.dist3 <- sid.dist %>% 
+  group_by(colony) %>% 
+  summarise(con2.pc2 = sum(cont.pc2, na.rm = TRUE))
+
+# Make columns of the 400_28 PC values
+sid.dist <- sid.dist %>% 
+  left_join(sid.dist2, by = c("colony" = "colony"))
+sid.dist <- sid.dist %>% 
+  left_join(sid.dist3, by = c("colony" = "colony"))
+
+sid.dist$dist <- sqrt(((sid.dist$PC1 - sid.dist$con2.pc1)^2) + ((sid.dist$PC2 - sid.dist$con2.pc2)^2)) # formula for calculating distance between control and treatment values
+
+```
+
+```{r plots of SSID distances, echo=FALSE}
+
+# just treatment
+sid.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = sid.dist)
+treat.sid.plot <- ggplot(data = sid.dist.sum2, aes(x = fpco2, y = dist, colour = ftemp)) +
+  geom_point(position = position_dodge(width = 0.4)) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
+  geom_errorbar(position = position_dodge(width = 0.4), aes(x = fpco2, ymin = dist - se, ymax = dist + se), width = 0.3) +
+  scale_colour_manual("Temperature", values = c("blue", "red"), labels = c("28C", "31C")) +
+  ylab("Mean distance from control") +
+  ggtitle("S. siderea sample distance by treatment") +
+  xlab("pCO2")
+treat.sid.plot
+
+# reef and treatment
+sid.dist.sum3 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = sid.dist)
+full.sid.plot <- ggplot(data = sid.dist.sum3, aes(x = treat2, y = dist, colour = reef)) +
+  geom_point(position = position_dodge(width = 0.2)) +
+  geom_errorbar(position = position_dodge(width = 0.2), aes(x = treat2, ymin = dist - se, ymax = dist + se), width = 0.3, size = 0.7) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3")) +
+  ylab("Mean distance from control") +
+  xlab("Treatment")
+full.sid.plot
+
+```
+
+```{r SSID distance analysis, echo=FALSE}
+
+s.dis.aov <- aov(dist ~ treat2 * reef, data = sid.dist)
+summary(s.dis.aov)
+sid.dis.tuk <- TukeyHSD(s.dis.aov)
+
+sid.dis.tuk$reef
+sid.dis.tuk$treat2
+
+sid.dis.tab <- as.data.frame(sid.dis.tuk$`treat2:reef`)
+sid.dis.tab$treat <- rownames(sid.dis.tab)
+
+```
+
+```{r PAST distance dataframe setup, include=FALSE}
+
+a.dis <- a.pca$x[-22,1:2] # grab PC1 and PC2 distances from prcomp() object
+
+por.dist <- cbind(a.df[-22,c(1,7,10,11,12,9,21)], a.dis)
+
+por.dist$cont.pc1[por.dist$treat2 == "447_28"] <- por.dist$PC1[por.dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
+por.dist$cont.pc2[por.dist$treat2 == "447_28"] <- por.dist$PC2[por.dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+
+por.dist2 <- por.dist %>% 
+  group_by(colony) %>% 
+  summarise(con2.pc1 = sum(cont.pc1, na.rm = TRUE))
+por.dist3 <- por.dist %>% 
+  group_by(colony) %>% 
+  summarise(con2.pc2 = sum(cont.pc2, na.rm = TRUE))
+
+por.dist <- por.dist %>% 
+  left_join(por.dist2, by = c("colony" = "colony"))
+por.dist <- por.dist %>% 
+  left_join(por.dist3, by = c("colony" = "colony"))
+
+por.dist$dist <- sqrt(((por.dist$PC1 - por.dist$con2.pc1)^2) + ((por.dist$PC2 - por.dist$con2.pc2)^2))
+
+```
+
+```{r plots of PAST distances, echo=FALSE}
+
+# just treatment
+por.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = por.dist)
+treat.por.plot <- ggplot(data = por.dist.sum2, aes(x = fpco2, y = dist, colour = ftemp)) +
+  geom_point(position = position_dodge(width = 0.4)) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
+  geom_errorbar(position = position_dodge(width = 0.4), aes(x = fpco2, ymin = dist - se, ymax = dist + se), width = 0.3) +
+  scale_colour_manual("Temperature", values = c("blue", "red"), labels = c("28C", "31C")) +
+  ylab("Mean distance from control") +
+  ggtitle("P. astreoides sample distance by treatment") +
+  xlab("pCO2")
+treat.por.plot
+
+# reef and treatment
+por.dist.sum3 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = por.dist)
+full.por.plot <- ggplot(data = por.dist.sum3, aes(x = treat2, y = dist, colour = reef)) +
+  geom_point(position = position_dodge(width = 0.2)) +
+  geom_errorbar(position = position_dodge(width = 0.2), aes(x = treat2, ymin = dist - se, ymax = dist + se), width = 0.3, size = 0.7) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(),  axis.text.x = element_text(angle = 45, hjust = 1), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3")) +
+  ylab("Mean distance from control") +
+  xlab("Treatment")
+full.por.plot
+
+```
+
+```{r PAST distance analysis, echo=FALSE}
+
+p.dis.aov <- aov(dist ~ treat2 * reef, data = por.dist)
+summary(p.dis.aov)
+por.dis.tuk <- TukeyHSD(p.dis.aov)
+
+por.dis.tuk$reef
+por.dis.tuk$treat2
+
+por.dis.tab <- as.data.frame(por.dis.tuk$`treat2:reef`)
+por.dis.tab$treat <- rownames(por.dis.tab)
+
+```
+
+```{r full distance plot, echo=FALSE}
+
+plot_grid(full.sid.plot, full.por.plot, ncol = 2, labels = c("A", "B"))
+
+ggsave("Figure3_PCAdistance_24Jan20.pdf")
+
+```
+
+
+```{r SSID scatter plots}
+
+s.df90 <- subset(s.df, T0_T90 == "T90")
+
+sl.plot <- ggplot(data = s.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(llab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+sp.plot <- ggplot(data = s.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(plab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+sca.plot <- ggplot(data = s.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(calab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+sh.plot <- ggplot(data = s.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab("Total host energy reserves") + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+sd.plot <- ggplot(data = s.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(dlab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+sc.plot <- ggplot(data = s.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(clab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+plot_grid(sl.plot, sp.plot, sca.plot, sh.plot, sd.plot, sc.plot, labels = "AUTO", ncol = 2, scale = 0.9)
+
+#ggsave("Ch3_appFig_SSIDscatter_29Jan20.pdf", width = 7, height = 8, units = "in")
+
+```
+
+```{r PSTR scatter plots}
+
+p.df90 <- subset(p.df, T0_T90 == "T90")
+
+pl.plot <- ggplot(data = p.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(llab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+pp.plot <- ggplot(data = p.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(plab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+pca.plot <- ggplot(data = p.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(calab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+ph.plot <- ggplot(data = p.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab("Total host energy reserves") + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+pd.plot <- ggplot(data = p.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(dlab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+pc.plot <- ggplot(data = p.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(clab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+plot_grid(pl.plot, pp.plot, pca.plot, ph.plot, pd.plot, pc.plot, labels = "AUTO", ncol = 2, scale = 0.9)
+
+#ggsave("Ch3_appFig_PSTRscatter_29Jan20.pdf", width = 7, height = 8, units = "in")
+
+```
+
+```{r PAST scatter plots}
+
+a.df90 <- subset(a.df, T0_T90 == "T90")
+
+al.plot <- ggplot(data = a.df90, aes(x = lipid, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(llab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+ap.plot <- ggplot(data = a.df90, aes(x = pro, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(plab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+aca.plot <- ggplot(data = a.df90, aes(x = carb, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(calab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+ah.plot <- ggplot(data = a.df90, aes(x = host, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab("Total host energy reserves") + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+ad.plot <- ggplot(data = a.df90, aes(x = den, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(dlab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+ac.plot <- ggplot(data = a.df90, aes(x = chla, y = rate, colour = fpco2, shape = ftemp)) +
+  theme(legend.position = "none") +
+  xlab(clab) + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  geom_point()
+
+plot_grid(al.plot, ap.plot, aca.plot, ah.plot, ad.plot, ac.plot, labels = "AUTO", ncol = 2, scale = 0.9)
+
+#ggsave("Ch3_appFig_PASTscatter_29Jan20.pdf", width = 7, height = 8, units = "in")
+
+```
+
 
 
 
@@ -845,6 +1181,16 @@ setColWidths(wb, sheet = 5, cols = 1:5, widths = "auto")
 addWorksheet(wb, "Table 6 - total host") 
 writeData(wb, sheet = 6, x = host.tab)
 setColWidths(wb, sheet = 6, cols = 1:5, widths = "auto")
+
+# add 'Table 7' worksheet
+addWorksheet(wb, "Table 7 - SSID dist") 
+writeData(wb, sheet = 7, x = sid.dis.tab)
+setColWidths(wb, sheet = 7, cols = 1:5, widths = "auto")
+
+# add 'Table 8' worksheet
+addWorksheet(wb, "Table 8 - PAST dist") 
+writeData(wb, sheet = 8, x = por.dis.tab)
+setColWidths(wb, sheet = 8, cols = 1:5, widths = "auto")
 
 
 # save workbook
