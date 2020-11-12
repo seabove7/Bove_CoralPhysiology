@@ -31,7 +31,7 @@ always_allow_html: true
 
 ```{r setup, include=FALSE}
 
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 options(warn = -1)
 
 ```
@@ -444,7 +444,7 @@ host.model.fig <-ggplot(df2.host.a)+
 
 ```{r include=FALSE}
 
-ncalc.a<-read.csv("/Users/Colleen/Dropbox/Boston_Experiment/Manuscript1_calcification/R_Code/Paper_code_13Feb19/net_calc.csv")
+ncalc.a<-read.csv("net_calc.csv")
 #ncalc.a <- subset(ncalc.a, species != "T")
 ncalc.a$ftemp <- as.factor(ncalc.a$ftemp)
 ncalc.a$fpco2 <- as.factor(ncalc.a$fpco2)
@@ -659,7 +659,7 @@ ggsave("Figure2_PhysPCA_24Jan20.pdf")
 ```
 
 
-```{r SSID distance dataframe setup, eval=FALSE, include=FALSE}
+```{r SSID distance dataframe setup, include=FALSE}
 
 s.dis <- s.pca$x[-62,1:2] # grab PC1 and PC2 distances from prcomp() object
 
@@ -686,7 +686,7 @@ sid.dist$dist <- sqrt(((sid.dist$PC1 - sid.dist$con2.pc1)^2) + ((sid.dist$PC2 - 
 
 ```
 
-```{r plots of SSID distances, eval=FALSE, include=FALSE}
+```{r plots of SSID distances}
 
 # just treatment
 sid.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = sid.dist)
@@ -713,7 +713,7 @@ full.sid.plot
 
 ```
 
-```{r SSID distance analysis, eval=FALSE, include=FALSE}
+```{r SSID distance analysis}
 
 s.dis.aov <- aov(dist ~ treat2 * reef, data = sid.dist)
 summary(s.dis.aov)
@@ -727,7 +727,7 @@ sid.dis.tab$treat <- rownames(sid.dis.tab)
 
 ```
 
-```{r PAST distance dataframe setup, eval=FALSE, include=FALSE}
+```{r PAST distance dataframe setup}
 
 a.dis <- a.pca$x[-22,1:2] # grab PC1 and PC2 distances from prcomp() object
 
@@ -752,7 +752,7 @@ por.dist$dist <- sqrt(((por.dist$PC1 - por.dist$con2.pc1)^2) + ((por.dist$PC2 - 
 
 ```
 
-```{r plots of PAST distances, eval=FALSE, include=FALSE}
+```{r plots of PAST distances}
 
 # just treatment
 por.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = por.dist)
@@ -779,7 +779,7 @@ full.por.plot
 
 ```
 
-```{r PAST distance analysis, eval=FALSE, include=FALSE}
+```{r PAST distance analysis}
 
 p.dis.aov <- aov(dist ~ treat2 * reef, data = por.dist)
 summary(p.dis.aov)
@@ -793,7 +793,7 @@ por.dis.tab$treat <- rownames(por.dis.tab)
 
 ```
 
-```{r full distance plot, eval=FALSE, include=FALSE}
+```{r full distance plot}
 
 plot_grid(full.sid.plot, full.por.plot, ncol = 2, labels = c("A", "B"))
 
