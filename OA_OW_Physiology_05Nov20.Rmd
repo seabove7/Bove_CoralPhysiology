@@ -9,6 +9,12 @@ output:
     toc: yes
 ---
 
+<style>
+  h2{color: teal !important}
+  h1{color: navy !important}
+  body{background-color: gray95 !important}
+</style>
+
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = FALSE)
@@ -1267,12 +1273,20 @@ s_df$fpco2 <- factor(s_df$fpco2, levels = c("300", "420", "680", "3300"))
 s_pca_mod <- adonis(value ~ reef + ftemp + fpco2, data = s_df_l, method='eu')
 s_pca_mod # view SSID adonis output
 
+# extract pvalues
+s_pval <- s_pca_mod[["aov.tab"]][["Pr(>F)"]]
+
 # perform principal component analysis (PCA)
 s_pca <- prcomp(s_df[,c(14:16,21:23)], center = TRUE, scale= TRUE)
 
 ```
 
-```{r SSID PCA plot, fig.height=3, fig.width=8}
+```{r SSID PCA plot, fig.height=8, fig.width=8}
+
+# create labels for p values calculated above
+s_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[1], digits = 2)))
+s_temp_pval <-substitute(italic(P[temp])==p, list(p = format(s_pval[2], digits = 3)))
+s_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(s_pval[3], digits = 2)))
 
 # reef environment
 s_reef_pca <- autoplot(s_pca, data = s_df, 
@@ -1287,11 +1301,13 @@ s_reef_pca <- autoplot(s_pca, data = s_df,
          loadings.label.hjust = 3, 
          loadings.label.vjust = 1,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA)) +  
+  lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  ggtitle("Temperature")
+  annotate("text", x = -0.39, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3) +
+  ggtitle("Reef Environment")
 
 # temperature
 s_temp_pca <- autoplot(s_pca, data = s_df, 
@@ -1308,11 +1324,13 @@ s_temp_pca <- autoplot(s_pca, data = s_df,
          loadings.label.vjust = 1,
          loadings.label.repel = TRUE) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
+  lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  ggtitle("Acidification")
+  annotate("text", x = -0.34, y = -0.38, label = deparse(s_temp_pval), parse = TRUE, size = 3) +  
+  ggtitle("Temperature")
 
 # pco2
 s_pco2_pca <- autoplot(s_pca, data = s_df, 
@@ -1329,14 +1347,18 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
          loadings.label.vjust = 1,
          loadings.label.repel = TRUE) +
     scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
+    lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +   
     scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
     guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  ggtitle("Reef Environment")
+  annotate("text", x = -0.365, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3) +   
+  ggtitle("Acidification")
 
-SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8)
-SSID_plot
+
+plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 2, scale = 0.8) # markdown figure
+
+SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8) # for final figure
 
 ```
 
@@ -1353,12 +1375,20 @@ p_df$fpco2 <- factor(p_df$fpco2, levels = c("300", "420", "680", "3300"))
 p_pca_mod <- adonis(value ~ reef + ftemp + fpco2, data = p_df_l, method='eu')
 p_pca_mod # view PSTR adonis output
 
+# extract pvalues
+p_pval <- p_pca_mod[["aov.tab"]][["Pr(>F)"]]
+
 # perform principal component analysis (PCA)
 p_pca <- prcomp(p_df[,c(14:16,21:23)], center = TRUE, scale= TRUE)
 
 ```
 
-```{r PSTR PCA plot, fig.height=3, fig.width=8}
+```{r PSTR PCA plot, fig.height=8, fig.width=8}
+
+# create labels for p values calculated above
+p_reef_pval <-substitute(italic(P[reef])==p, list(p = format(p_pval[1], digits = 2)))
+p_temp_pval <-substitute(italic(P[temp])==p, list(p = format(p_pval[2], digits = 3)))
+p_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3], digits = 2)))
 
 # reef environment
 p_reef_pca <- autoplot(p_pca, data = p_df, 
@@ -1373,9 +1403,11 @@ p_reef_pca <- autoplot(p_pca, data = p_df,
          loadings.label.hjust = -1, 
          loadings.label.vjust = 2,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))+
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA))+
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
+  lims(x = c(-0.5,0.5), y = c(-0.5,0.7)) +   
+  annotate("text", x = -0.36, y = -0.48, label = deparse(p_reef_pval), parse = TRUE, size = 3) +     
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # temperature
@@ -1393,9 +1425,11 @@ p_temp_pca <- autoplot(p_pca, data = p_df,
          loadings.label.vjust = 2,
          loadings.label.repel = TRUE) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
-  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
+  lims(x = c(-0.5,0.5), y = c(-0.5,0.7)) +   
+  annotate("text", x = -0.345, y = -0.48, label = deparse(p_temp_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # pco2
@@ -1413,13 +1447,16 @@ p_pco2_pca <- autoplot(p_pca, data = p_df,
          loadings.label.vjust = 2,
          loadings.label.repel = TRUE) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
   scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
+  lims(x = c(-0.5,0.5), y = c(-0.5,0.7)) +   
+  annotate("text", x = -0.345, y = -0.48, label = deparse(p_pco2_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
-PSTR_plot <- plot_grid(p_temp_pca, p_pco2_pca, p_reef_pca, ncol = 3, scale = 0.8)
-PSTR_plot
+plot_grid(p_temp_pca, p_pco2_pca, p_reef_pca, ncol = 2, scale = 0.8) # markdown figure
+
+PSTR_plot <- plot_grid(p_temp_pca, p_pco2_pca, p_reef_pca, ncol = 3, scale = 0.8) # for plotting final figure
 
 ```
 
@@ -1436,12 +1473,20 @@ a_df$fpco2 <- factor(a_df$fpco2, levels = c("300", "420", "680", "3300"))
 a_pca_mod <- adonis(value ~ reef + ftemp + fpco2, data = a_df_l, method='eu')
 a_pca_mod # view PAST adonis output
 
+# extract pvalues
+a_pval <- a_pca_mod[["aov.tab"]][["Pr(>F)"]]
+
 # perform principal component analysis (PCA)
 a_pca <- prcomp(a_df[,c(14:16,21:23)], center = TRUE, scale= TRUE)
 
 ```
 
-```{r PAST PCA plot, fig.height=4, fig.width=8}
+```{r PAST PCA plot, fig.height=8, fig.width=8}
+
+# create labels for p values calculated above
+a_reef_pval <-substitute(italic(P[reef])==p, list(p = format(a_pval[1], digits = 2)))
+a_temp_pval <-substitute(italic(P[temp])==p, list(p = format(a_pval[2], digits = 3)))
+a_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(a_pval[3], digits = 2)))
 
 # reef environment
 a_reef_pca <- autoplot(a_pca, data = a_df, 
@@ -1456,9 +1501,11 @@ a_reef_pca <- autoplot(a_pca, data = a_df,
          loadings.label.hjust = -1, 
          loadings.label.vjust = 1,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3"))+
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))+
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA))+
   guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  lims(x = c(-0.5,0.4), y = c(-0.5,0.45)) +   
+  annotate("text", x = -0.37, y = -0.49, label = deparse(a_reef_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
 
 # temperature
@@ -1476,9 +1523,11 @@ a_tema_pca <- autoplot(a_pca, data = a_df,
          loadings.label.vjust = 1,
          loadings.label.repel = TRUE) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  lims(x = c(-0.5,0.4), y = c(-0.5,0.45)) +   
+  annotate("text", x = -0.36, y = -0.49, label = deparse(a_temp_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
 
 # pco2
@@ -1496,13 +1545,16 @@ a_pco2_pca <- autoplot(a_pca, data = a_df,
          loadings.label.vjust = 1,
          loadings.label.repel = TRUE) +
   scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
   scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
+  lims(x = c(-0.5,0.4), y = c(-0.5,0.45)) +   
+  annotate("text", x = -0.35, y = -0.49, label = deparse(a_pco2_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
 
-PAST_plot <- plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 3, scale = 0.8)
-PAST_plot
+plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 2, scale = 0.8) # markdown figure
+
+PAST_plot <- plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 3, scale = 0.8) # for plotting final figure
 
 ```
 
@@ -1511,7 +1563,7 @@ PAST_plot
 ```{r PCA plot, fig.height=12, fig.width=11}
 
 plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), rel_heights = c(0.82, 0.75, 1)) +
-  ggsave("Figure2_PhysPCA.pdf", width = 11, height = 12)
+  ggsave("Figure2_PhysPCA.pdf", width = 11.5, height = 12)
 
 ```
 
@@ -1520,147 +1572,322 @@ plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), 
 
 *This is still being updated at the moment*
 
-```{r SSID distance dataframe setup, eval = FALSE, include=FALSE}
+### Control Comparison (400 $\mu$atm; 28 &deg;C)
 
-s.dis <- s_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+#### *S. siderea*
 
-sid.dist <- cbind(s_df[,c(1,7,10,11,12,9,25)], s.dis) # combine the datasets
+aov(distance ~ *p*CO2 * temperature * reef)
 
-sid.dist$cont.pc1[sid.dist$treat2 == "447_28"] <- sid.dist$PC1[sid.dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
-sid.dist$cont.pc2[sid.dist$treat2 == "447_28"] <- sid.dist$PC2[sid.dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+```{r SSID distance dataframe setup}
+
+s_dis <- s_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+
+sid_dist <- cbind(s_df[,c(1,7,10,11,12,9,25)], s_dis) # combine the datasets
+
+sid_dist$cont_pc1[sid_dist$treat2 == "447_28"] <- sid_dist$PC1[sid_dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
+sid_dist$cont_pc2[sid_dist$treat2 == "447_28"] <- sid_dist$PC2[sid_dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
 
 # get the 400_28 PC values
-sid.dist2 <- sid.dist %>%  
+sid_dist2 <- sid_dist %>%  
   group_by(colony) %>% 
-  summarise(con2.pc1 = sum(cont.pc1, na.rm = TRUE))
-sid.dist3 <- sid.dist %>% 
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
+sid_dist3 <- sid_dist %>% 
   group_by(colony) %>% 
-  summarise(con2.pc2 = sum(cont.pc2, na.rm = TRUE))
+  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
 
 # Make columns of the 400_28 PC values
-sid.dist <- sid.dist %>% 
-  left_join(sid.dist2, by = c("colony" = "colony"))
-sid.dist <- sid.dist %>% 
-  left_join(sid.dist3, by = c("colony" = "colony"))
+sid_dist <- sid_dist %>% 
+  left_join(sid_dist2, by = c("colony" = "colony"))
+sid_dist <- sid_dist %>% 
+  left_join(sid_dist3, by = c("colony" = "colony"))
 
-sid.dist$dist <- sqrt(((sid.dist$PC1 - sid.dist$con2.pc1)^2) + ((sid.dist$PC2 - sid.dist$con2.pc2)^2)) # formula for calculating distance between control and treatment values
+sid_dist$dist <- sqrt(((sid_dist$PC1 - sid_dist$con2_pc1)^2) + ((sid_dist$PC2 - sid_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+sid_dist$treat_plot <- paste(sid_dist$fpco2, sid_dist$ftemp, sep = "_")
 
 ```
 
-```{r plots of SSID distances, eval=FALSE, include=FALSE}
+```{r SSID distance analysis}
+
+s_dis_aov <- aov(dist ~ fpco2 * ftemp * reef, data = sid_dist)
+summary(s_dis_aov)
+sid_dis_tuk <- TukeyHSD(s_dis_aov)
+
+sid_dis_tab <- as.data.frame(sid_dis_tuk$`treat2:reef`)
+sid_dis_tab$treat <- rownames(sid_dis_tab)
+
+```
+
+Reef environment:
+```{r}
+
+sid_dis_tuk$reef
+
+```
+
+Temperature:
+```{r}
+
+sid_dis_tuk$ftemp
+```
+
+*p*CO~2~:
+```{r}
+
+sid_dis_tuk$fpco2
+
+```
+
+<br/>
+
+```{r plots of SSID distances, fig.height = 3, fig.width = 10}
 
 # just treatment
-sid.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = sid.dist)
-treat.sid.plot <- ggplot(data = sid.dist.sum2, aes(x = fpco2, y = dist, colour = ftemp)) +
-  geom_point(position = position_dodge(width = 0.4)) +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
-  geom_errorbar(position = position_dodge(width = 0.4), aes(x = fpco2, ymin = dist - se, ymax = dist + se), width = 0.3) +
-  scale_colour_manual("Temperature", values = c("blue", "red"), labels = c("28C", "31C")) +
+sid_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = sid_dist)
+sid_dist_sum2$treat <- paste(sid_dist_sum2$fpco2, sid_dist_sum2$ftemp, sep = "_")
+sid_dist$treat_plot <- ordered(sid_dist$treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+
+sid_con_dis_plot <- ggplot(sid_dist_sum2) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
   ylab("Mean distance from control") +
-  ggtitle("S. siderea sample distance by treatment") +
-  xlab("pCO2")
-treat.sid.plot
-
-# reef and treatment
-sid.dist.sum3 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = sid.dist)
-full.sid.plot <- ggplot(data = sid.dist.sum3, aes(x = treat2, y = dist, colour = reef)) +
-  geom_point(position = position_dodge(width = 0.2)) +
-  geom_errorbar(position = position_dodge(width = 0.2), aes(x = treat2, ymin = dist - se, ymax = dist + se), width = 0.3, size = 0.7) +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3")) +
-  ylab("Mean distance from control") +
-  xlab("Treatment")
-full.sid.plot
+  xlab("") +
+  ylim(0, 7) +
+  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
+  geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = sid_dist) +
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
+  geom_vline(xintercept = c(2.5, 4.5, 6.5)) +
+  annotate("text", x = 1, y = 7, label = "pre-industrial") +
+  annotate("text", x = 3, y = 7, label = "present-day") +
+  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 7, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
+sid_con_dis_plot
 
 ```
 
-```{r SSID distance analysis, eval=FALSE, include=FALSE}
+---
 
-s.dis.aov <- aov(dist ~ treat2 * reef, data = sid.dist)
-summary(s.dis.aov)
-sid.dis.tuk <- TukeyHSD(s.dis.aov)
+<br/>
 
-sid.dis.tuk$reef
-sid.dis.tuk$treat2
 
-sid.dis.tab <- as.data.frame(sid.dis.tuk$`treat2:reef`)
-sid.dis.tab$treat <- rownames(sid.dis.tab)
+#### *P. strigosa*
 
-```
+aov(distance ~ *p*CO2 + temperature + reef + *p*CO2:temperature)
 
-```{r PAST distance dataframe setup, eval=FALSE, include=FALSE}
+```{r PSTR distance dataframe setup}
 
-a.dis <- a_pca$x[-22,1:2] # grab PC1 and PC2 distances from prcomp() object
+p_dis <- p_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
 
-por.dist <- cbind(a_df[-22,c(1,7,10,11,12,9,21)], a.dis)
+dip_dist <- cbind(p_df[,c(1,7,10,11,12,9,25)], p_dis) # combine the datasets
 
-por.dist$cont.pc1[por.dist$treat2 == "447_28"] <- por.dist$PC1[por.dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
-por.dist$cont.pc2[por.dist$treat2 == "447_28"] <- por.dist$PC2[por.dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+dip_dist$cont_pc1[dip_dist$treat2 == "447_28"] <- dip_dist$PC1[dip_dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
+dip_dist$cont_pc2[dip_dist$treat2 == "447_28"] <- dip_dist$PC2[dip_dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
 
-por.dist2 <- por.dist %>% 
+# get the 400_28 PC values
+dip_dist2 <- dip_dist %>%  
   group_by(colony) %>% 
-  summarise(con2.pc1 = sum(cont.pc1, na.rm = TRUE))
-por.dist3 <- por.dist %>% 
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
+dip_dist3 <- dip_dist %>% 
   group_by(colony) %>% 
-  summarise(con2.pc2 = sum(cont.pc2, na.rm = TRUE))
+  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
 
-por.dist <- por.dist %>% 
-  left_join(por.dist2, by = c("colony" = "colony"))
-por.dist <- por.dist %>% 
-  left_join(por.dist3, by = c("colony" = "colony"))
+# Make columns of the 400_28 PC values
+dip_dist <- dip_dist %>% 
+  left_join(dip_dist2, by = c("colony" = "colony"))
+dip_dist <- dip_dist %>% 
+  left_join(dip_dist3, by = c("colony" = "colony"))
 
-por.dist$dist <- sqrt(((por.dist$PC1 - por.dist$con2.pc1)^2) + ((por.dist$PC2 - por.dist$con2.pc2)^2))
+dip_dist$dist <- sqrt(((dip_dist$PC1 - dip_dist$con2_pc1)^2) + ((dip_dist$PC2 - dip_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+dip_dist$treat_plot <- paste(dip_dist$fpco2, dip_dist$ftemp, sep = "_")
 
 ```
 
-```{r plots of PAST distances, eval=FALSE, include=FALSE}
+```{r PSTR distance analysis}
+
+p_dip_aov <- aov(dist ~ fpco2 + ftemp + reef + fpco2:ftemp, data = dip_dist)
+summary(p_dip_aov)
+dip_dip_tuk <- TukeyHSD(p_dip_aov)
+
+dip_dip_tab <- as.data.frame(dip_dip_tuk$`treat2:reef`)
+dip_dip_tab$treat <- rownames(dip_dip_tab)
+
+```
+
+Reef environment:
+```{r}
+
+dip_dip_tuk$reef
+
+```
+
+Temperature:
+```{r}
+
+dip_dip_tuk$ftemp
+```
+
+*p*CO~2~:
+```{r}
+
+dip_dip_tuk$fpco2
+
+```
+
+<br/>
+  
+```{r plots of PSTR distances, fig.height = 3, fig.width = 10}
 
 # just treatment
-por.dist.sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp"), data = por.dist)
-treat.por.plot <- ggplot(data = por.dist.sum2, aes(x = fpco2, y = dist, colour = ftemp)) +
-  geom_point(position = position_dodge(width = 0.4)) +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
-  geom_errorbar(position = position_dodge(width = 0.4), aes(x = fpco2, ymin = dist - se, ymax = dist + se), width = 0.3) +
-  scale_colour_manual("Temperature", values = c("blue", "red"), labels = c("28C", "31C")) +
+dip_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = dip_dist)
+dip_dist_sum2$treat <- paste(dip_dist_sum2$fpco2, dip_dist_sum2$ftemp, sep = "_")
+dip_dist$treat_plot <- ordered(dip_dist$treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+
+dip_con_dis_plot <- ggplot(dip_dist_sum2) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
   ylab("Mean distance from control") +
-  ggtitle("P. astreoides sample distance by treatment") +
-  xlab("pCO2")
-treat.por.plot
+  xlab("") +
+  ylim(0, 7) +
+  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
+  geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = dip_dist) +
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
+  geom_vline(xintercept = c(2.5, 4.5, 6.5)) +
+  annotate("text", x = 1, y = 7, label = "pre-industrial") +
+  annotate("text", x = 3, y = 7, label = "present-day") +
+  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 7, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
+dip_con_dis_plot
 
-# reef and treatment
-por.dist.sum3 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = por.dist)
-full.por.plot <- ggplot(data = por.dist.sum3, aes(x = treat2, y = dist, colour = reef)) +
-  geom_point(position = position_dodge(width = 0.2)) +
-  geom_errorbar(position = position_dodge(width = 0.2), aes(x = treat2, ymin = dist - se, ymax = dist + se), width = 0.3, size = 0.7) +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(),  axis.text.x = element_text(angle = 45, hjust = 1), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", fill=NA, size=1)) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("paleturquoise3", "orange3")) +
+```
+
+---
+
+<br/>
+
+
+#### *P. astreoides*
+
+aov(distance ~ *p*CO2 + temperature + reef)
+
+```{r PAST distance dataframe setup}
+
+a_dis <- a_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+
+por_dist <- cbind(a_df[,c(1,7,10,11,12,9,25)], a_dis) # combine the datasets
+
+por_dist$cont_pc1[por_dist$treat2 == "447_28"] <- por_dist$PC1[por_dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
+por_dist$cont_pc2[por_dist$treat2 == "447_28"] <- por_dist$PC2[por_dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+
+# get the 400_28 PC values
+por_dist2 <- por_dist %>%  
+  group_by(colony) %>% 
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
+por_dist3 <- por_dist %>% 
+  group_by(colony) %>% 
+  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+
+# Make columns of the 400_28 PC values
+por_dist <- por_dist %>% 
+  left_join(por_dist2, by = c("colony" = "colony"))
+por_dist <- por_dist %>% 
+  left_join(por_dist3, by = c("colony" = "colony"))
+
+por_dist$dist <- sqrt(((por_dist$PC1 - por_dist$con2_pc1)^2) + ((por_dist$PC2 - por_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+por_dist$treat_plot <- paste(por_dist$fpco2, por_dist$ftemp, sep = "_")
+
+```
+
+```{r PAST distance analysis}
+
+a_por_aov <- aov(dist ~ fpco2 + ftemp + reef, data = por_dist)
+summary(a_por_aov)
+por_por_tuk <- TukeyHSD(a_por_aov)
+
+por_por_tab <- as.data.frame(por_por_tuk$`treat2:reef`)
+por_por_tab$treat <- rownames(por_por_tab)
+
+```
+
+Reef environment:
+```{r}
+
+por_por_tuk$reef
+
+```
+
+Temperature:
+```{r}
+
+por_por_tuk$ftemp
+
+```
+
+*p*CO~2~:
+```{r}
+
+por_por_tuk$fpco2
+
+```
+
+<br/>
+  
+```{r plots of PAST distances, fig.height = 3, fig.width = 10}
+
+# just treatment
+por_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = por_dist)
+por_dist_sum2$treat <- paste(por_dist_sum2$fpco2, por_dist_sum2$ftemp, sep = "_")
+por_dist$treat_plot <- ordered(por_dist$treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+
+por_con_dis_plot <- ggplot(por_dist_sum2) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
   ylab("Mean distance from control") +
-  xlab("Treatment")
-full.por.plot
+  xlab("") +
+  ylim(0, 7) +
+  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
+  geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = por_dist) +
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
+  geom_vline(xintercept = c(2.5, 4.5, 6.5)) +
+  annotate("text", x = 1, y = 7, label = "pre-industrial") +
+  annotate("text", x = 3, y = 7, label = "present-day") +
+  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 7, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
+por_con_dis_plot
 
 ```
 
-```{r PAST distance analysis, eval=FALSE, include=FALSE}
+---
 
-p.dis.aov <- aov(dist ~ treat2 * reef, data = por.dist)
-summary(p.dis.aov)
-por.dis.tuk <- TukeyHSD(p.dis.aov)
+<br/>
 
-por.dis.tuk$reef
-por.dis.tuk$treat2
 
-por.dis.tab <- as.data.frame(por.dis.tuk$`treat2:reef`)
-por.dis.tab$treat <- rownames(por.dis.tab)
 
-```
+```{r full distance plot, fig.width = 10, fig.height = 9, eval = FALSE}
 
-```{r full distance plot, eval=FALSE, include=FALSE}
+plot_grid(sid_con_dis_plot, dip_con_dis_plot, por_con_dis_plot, ncol = 1, labels = "AUTO")
 
-plot_grid(full.sid.plot, full.por.plot, ncol = 2, labels = c("A", "B"))
-
-ggsave("Figure3_PCAdistance_24Jan20.pdf")
+#ggsave("Figure3_PCAdistance_24Jan20.pdf")
 
 ```
+
+<br/>
+
+### T0 Comparison 
+
+#### *S. siderea*
+
+#### *P. strigosa*
+
+#### *P. astreoides*
+
+<br/>
+
+
 
 
 
@@ -1892,6 +2119,10 @@ saveWorkbook(wb, file="Ch3_Phys_tables.xlsx", overwrite = TRUE)
 <br/>
 <br/>
 <br/>
+
+## Session information
+
+Session information from the last run date on `r date`:
 
 ```{r}
 sessionInfo()
