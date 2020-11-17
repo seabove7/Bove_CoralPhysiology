@@ -1265,6 +1265,7 @@ plot_grid(por_chlaVrate, por_redVchla, por_rateVpro, por_carbVlipid, por_carbVpr
 ```{r SSID PCA}
 
 # set up the dataframe
+s_df <- unique(s_df) # remove any duplicate rows
 s_df_l <- gather(s_df, param, value, c(14:16,21:23))
 s_df$fpco2 <- factor(s_df$fpco2, levels = c("300", "420", "680", "3300"))
 
@@ -1367,6 +1368,7 @@ SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8
 ```{r PSTR PCA}
 
 # set up the dataframe
+p_df <- unique(p_df) # remove duplicate rows
 p_df_l <- gather(p_df, param, value, c(14:16,21:23))
 p_df$fpco2 <- factor(p_df$fpco2, levels = c("300", "420", "680", "3300"))
 
@@ -1465,6 +1467,8 @@ PSTR_plot <- plot_grid(p_temp_pca, p_pco2_pca, p_reef_pca, ncol = 3, scale = 0.8
 ```{r PAST PCA}
 
 # set up the dataframe
+a_df <- unique(a_df)
+a_df <- a_df[-17,] # we have two from the same colony in 400_28 that are performing similarly so one is being removed (CFAD12)
 a_df_l <- gather(a_df, param, value, c(14:16,21:23))
 a_df$fpco2 <- factor(a_df$fpco2, levels = c("300", "420", "680", "3300"))
 
@@ -1504,7 +1508,7 @@ a_reef_pca <- autoplot(a_pca, data = a_df,
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))+
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA))+
   guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  lims(x = c(-0.5,0.4), y = c(-0.5,0.45)) +   
+  lims(x = c(-0.5,0.5), y = c(-0.5,0.5)) +  
   annotate("text", x = -0.37, y = -0.49, label = deparse(a_reef_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
 
@@ -1526,7 +1530,7 @@ a_tema_pca <- autoplot(a_pca, data = a_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  lims(x = c(-0.5,0.4), y = c(-0.5,0.45)) +   
+  lims(x = c(-0.5,0.5), y = c(-0.5,0.5)) +   
   annotate("text", x = -0.36, y = -0.49, label = deparse(a_temp_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
 
@@ -1548,7 +1552,7 @@ a_pco2_pca <- autoplot(a_pca, data = a_df,
   scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
   scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
-  lims(x = c(-0.5,0.4), y = c(-0.5,0.45)) +   
+  lims(x = c(-0.5,0.5), y = c(-0.5,0.5)) +   
   annotate("text", x = -0.35, y = -0.49, label = deparse(a_pco2_pval), parse = TRUE, size = 3) + 
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
 
@@ -1570,6 +1574,18 @@ plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), 
 
 ## Plasticity analyses{.tabset} 
 
+<span style="color: red;">
+**Questions to ask:**
+</span>
+
+* What should I use as a loading in my PCA?
+* Calculating distance from T0/control mean or from colony value?
+* What about duplicate samples from same colony per treatment or from same sample?
+* What about samples that don't have a T0 or control fragment? Should I be comparing within colony or within T0/control?
+* I think I am going to model the responses so that colony is being considered. Thoughts?
+
+<br/>
+
 ### Control Comparison (400 $\mu$atm; 28 &deg;C)
 
 #### *S. siderea*
@@ -1581,6 +1597,7 @@ aov(distance ~ *p*CO2 * temperature * reef)
 s_dis <- s_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
 
 sid_dist <- cbind(s_df[,c(1,7,10,11,12,9,25)], s_dis) # combine the datasets
+
 
 sid_dist$cont_pc1[sid_dist$treat2 == "447_28"] <- sid_dist$PC1[sid_dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
 sid_dist$cont_pc2[sid_dist$treat2 == "447_28"] <- sid_dist$PC2[sid_dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
@@ -1626,6 +1643,7 @@ Temperature:
 ```{r}
 
 sid_dis_tuk$ftemp
+
 ```
 
 *p*CO~2~:
@@ -1723,6 +1741,7 @@ Temperature:
 ```{r}
 
 dip_dip_tuk$ftemp
+
 ```
 
 *p*CO~2~:
@@ -1877,14 +1896,9 @@ plot_grid(sid_con_dis_plot, dip_con_dis_plot, por_con_dis_plot, ncol = 1, labels
 
 ### T0 Comparison 
 
-#### *S. siderea*
+```{r PCA with T0}
 
-**Questions to ask:**
-* What should I use as a loading in my PCA?
-* Calculating distance from T0/control mean or from colony value?
-
-```{r testing PCA with T0}
-
+# set up the PCA dataframe to include T0 samples
 df_plast <- subset(df, species != "T") 
 df_plast <- df_plast[,-c(17:37)]
 df_plast <- completeFun(df_plast, "den")
@@ -1894,23 +1908,34 @@ df_plast <- completeFun(df_plast, "carb")
 df_plast$time <- gsub("T", "", df_plast$T0_T90)
 df_plast$time <- as.numeric(df_plast$time)
 
+```
+
+#### *S. siderea*
+
+```{r SSID T0 PCA df setup}
+
 ## specific species dataframes
 s_plast <- subset(df_plast, species == "S") 
 
 # set up the dataframe
+s_plast <- unique(s_plast) # remove duplicate sample rows
 s_plast_l <- gather(s_plast, param, value, c(14:18))
 s_plast$fpco2 <- factor(s_plast$fpco2, levels = c("300", "420", "680", "3300"))
 
+# PERMANOVA
 s_pca_plast_mod <- adonis(value ~ treat2, data = s_plast_l, method='eu')
 s_pca_plast_mod # view SSID adonis output
 
+# calculate PCs
 s_plast_pca <- prcomp(s_plast[,c(14:18)], center = TRUE, scale= TRUE)
 
+```
 
-s_plast$time2 <- factor(s_plast$time)
+```{r SSID T0 PCA plot, fig.width = 4, fig.height = 3.7, fig.align = "center"}
 
+# plot the PCA (colour by timepoint only)
 autoplot(s_plast_pca, data = s_plast, 
-         colour = "time2",
+         colour = "T0_T90",
          frame = TRUE, 
          frame.type = "norm",
          loadings = TRUE, 
@@ -1921,26 +1946,25 @@ autoplot(s_plast_pca, data = s_plast,
          loadings.label.hjust = -1, 
          loadings.label.vjust = 0.1,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("Time", labels = c("T0", "T90"),  values = c("#E69F00", "#56B4E9")) +
-  scale_fill_manual("Time", labels = c("T0", "T90"), values = c(NA, NA)) +  
+  scale_colour_manual("", labels = c("T0", "T90"),  values = c("#E69F00", "#56B4E9")) +
+  scale_fill_manual("", labels = c("T0", "T90"), values = c(NA, NA)) +  
   #lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
   guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.87,0.85))
   #annotate("text", x = -0.39, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
 ```
 
-
-```{r SSID T0 distance dataframe setup}
+```{r SSID T0 distance calculation and analysisp}
 
 s_plast_dis <- s_plast_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
 
 sid_plast_dist <- cbind(s_plast, s_plast_dis) # combine the datasets
 
-sid_plast_dist$cont_pc1[sid_plast_dist$treat2 == "T0"] <- sid_plast_dist$PC1[sid_plast_dist$treat2 == "T0"] # this adds column with the control value PC1 per colony
-sid_plast_dist$cont_pc2[sid_plast_dist$treat2 == "T0"] <- sid_plast_dist$PC2[sid_plast_dist$treat2 == "T0"] # this adds column with the control value PC2 per colony
+sid_plast_dist$cont_pc1[sid_plast_dist$treat2 == "T0"] <- sid_plast_dist$PC1[sid_plast_dist$treat2 == "T0"] # this adds column with the T0 value PC1 per colony
+sid_plast_dist$cont_pc2[sid_plast_dist$treat2 == "T0"] <- sid_plast_dist$PC2[sid_plast_dist$treat2 == "T0"] # this adds column with the T0 value PC2 per colony
 
-# get the 400_28 PC values
+# get the T0 PC values
 sid_plast_dist2 <- sid_plast_dist %>%  
   group_by(colony) %>% 
   summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
@@ -1948,270 +1972,465 @@ sid_plast_dist3 <- sid_plast_dist %>%
   group_by(colony) %>% 
   summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
 
-# Make columns of the 400_28 PC values
+# Make columns of the T0 PC values
 sid_plast_dist <- sid_plast_dist %>% 
   left_join(sid_plast_dist2, by = c("colony" = "colony"))
 sid_plast_dist <- sid_plast_dist %>% 
   left_join(sid_plast_dist3, by = c("colony" = "colony"))
 
-sid_plast_dist$dist <- sqrt(((sid_plast_dist$PC1 - sid_plast_dist$con2_pc1)^2) + ((sid_plast_dist$PC2 - sid_plast_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+sid_plast_dist$dist <- sqrt(((sid_plast_dist$PC1 - sid_plast_dist$con2_pc1)^2) + ((sid_plast_dist$PC2 - sid_plast_dist$con2_pc2)^2)) # formula for calculating distance between T0 and treatment values (T90)
 sid_plast_dist$treat_plot <- paste(sid_plast_dist$fpco2, sid_plast_dist$ftemp, sep = "_")
 
 
+## calculate mean and SE per treatment/reef
 sid_plast_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = sid_plast_dist)
-#sid_plast_dist_sum2$treat <- paste(sid_plast_dist_sum2$fpco2, sid_plast_dist_sum2$ftemp, sep = "_")
-#sid_plast_dist$treat_plot <- ordered(sid_plast_dist$treat_plot, levels = c("T", "300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
 
-ggplot(sid_plast_dist_sum2) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
-  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
-  ylab("Mean distance from control") +
-  xlab("") +
-  ylim(0, 7) +
-  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat2, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = sid_plast_dist) +
-  geom_errorbar(position = dodge, aes(x = treat2, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5)
-
-aov(dist ~ treat2 + reef, data = sid_plast_dist)
-
+# print output of aov model
 summary(aov(dist ~ treat2 + reef, data = sid_plast_dist))
 
 ```
 
+```{r SSID T0 distance plot, fig.height = 3, fig.width = 10}
 
+ggplot(sid_plast_dist_sum2) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position = c(0.05, 0.65), panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
+  ylab("Mean distance from T0") +
+  xlab("") +
+  ylim(0, 7) +
+  geom_point(aes(x = treat2, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = sid_plast_dist) +
+  scale_colour_manual("", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  geom_vline(xintercept = c(1.5, 3.5, 5.5, 7.5)) +
+  annotate("text", x = 0.75, y = 7, label = "T0") +
+  annotate("text", x = 2, y = 7, label = "pre-industrial") +  
+  annotate("text", x = 4, y = 7, label = "present-day") +
+  annotate("text", x = 6.1, y = 7, label = "end-of-century") +
+  annotate("text", x = 7.9, y = 7, label = "extreme") +
+  geom_errorbar(position = dodge, aes(x = treat2, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5)
 
-
-
-#### *P. strigosa*
-
-#### *P. astreoides*
+```
 
 <br/>
 
 
+#### *P. strigosa*
+
+```{r PSTR T0 PCA df setup}
+
+## specific species dataframes
+p_plast <- subset(df_plast, species == "P") 
+
+# set up the dataframe
+p_plast <- unique(p_plast) # remove duplicate sample rows
+p_plast_l <- gather(p_plast, param, value, c(14:18))
+p_plast$fpco2 <- factor(p_plast$fpco2, levels = c("300", "420", "680", "3300"))
+
+# PERMANOVA
+p_pca_plast_mod <- adonis(value ~ treat2, data = p_plast_l, method='eu')
+p_pca_plast_mod # view PSTR adonis output
+
+# calculate PCs
+p_plast_pca <- prcomp(p_plast[,c(14:18)], center = TRUE, scale= TRUE)
+
+```
+
+```{r PSTR T0 PCA plot, fig.width = 4, fig.height = 3.7, fig.align = "center"}
+
+# plot the PCA (colour by timepoint only)
+autoplot(p_plast_pca, data = p_plast, 
+         colour = "T0_T90",
+         frame = TRUE, 
+         frame.type = "norm",
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = -1, 
+         loadings.label.vjust = 0.1,
+         loadings.label.repel = TRUE) +
+  scale_colour_manual("", labels = c("T0", "T90"),  values = c("#E69F00", "#56B4E9")) +
+  scale_fill_manual("", labels = c("T0", "T90"), values = c(NA, NA)) +  
+  #lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.87,0.85))
+#annotate("text", x = -0.39, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3)
+
+```
+
+```{r PSTR T0 distance calculation and analysisp}
+
+p_plast_dis <- p_plast_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+
+dip_plast_dist <- cbind(p_plast, p_plast_dis) # combine the datasets
+
+dip_plast_dist$cont_pc1[dip_plast_dist$treat2 == "T0"] <- dip_plast_dist$PC1[dip_plast_dist$treat2 == "T0"] # this adds column with the T0 value PC1 per colony
+dip_plast_dist$cont_pc2[dip_plast_dist$treat2 == "T0"] <- dip_plast_dist$PC2[dip_plast_dist$treat2 == "T0"] # this adds column with the T0 value PC2 per colony
+
+# get the T0 PC values
+dip_plast_dist2 <- dip_plast_dist %>%  
+  group_by(colony) %>% 
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
+dip_plast_dist3 <- dip_plast_dist %>% 
+  group_by(colony) %>% 
+  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+
+# Make columns of the T0 PC values
+dip_plast_dist <- dip_plast_dist %>% 
+  left_join(dip_plast_dist2, by = c("colony" = "colony"))
+dip_plast_dist <- dip_plast_dist %>% 
+  left_join(dip_plast_dist3, by = c("colony" = "colony"))
+
+dip_plast_dist$dist <- sqrt(((dip_plast_dist$PC1 - dip_plast_dist$con2_pc1)^2) + ((dip_plast_dist$PC2 - dip_plast_dist$con2_pc2)^2)) # formula for calculating distance between T0 and treatment values (T90)
+dip_plast_dist$treat_plot <- paste(dip_plast_dist$fpco2, dip_plast_dist$ftemp, sep = "_")
 
 
+## calculate mean and SE per treatment/reef
+dip_plast_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = dip_plast_dist)
+
+# print output of aov model
+summary(aov(dist ~ treat2 + reef, data = dip_plast_dist))
+
+```
+
+```{r PSTR T0 distance plot, fig.height = 3, fig.width = 10}
+
+ggplot(dip_plast_dist_sum2) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position = c(0.05, 0.65), panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
+  ylab("Mean distance from T0") +
+  xlab("") +
+  ylim(0, 7) +
+  geom_point(aes(x = treat2, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = dip_plast_dist) +
+  scale_colour_manual("", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  geom_vline(xintercept = c(1.5, 3.5, 5.5, 7.5)) +
+  annotate("text", x = 0.75, y = 7, label = "T0") +
+  annotate("text", x = 2, y = 7, label = "pre-industrial") +  
+  annotate("text", x = 4, y = 7, label = "present-day") +
+  annotate("text", x = 6.1, y = 7, label = "end-of-century") +
+  annotate("text", x = 7.9, y = 7, label = "extreme") +
+  geom_errorbar(position = dodge, aes(x = treat2, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5)
+
+```
+
+<br/>
 
 
+#### *P. astreoides*
 
-```{r protein table, include=FALSE, eval = FALSE}
+```{r PAST T0 PCA df setup}
 
-pro.tab <- df_pro_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
-pro.tab$binder <- paste(pro.tab$species, pro.tab$treat2, sep = "_")
+## specific species dataframes
+a_plast <- subset(df_plast, species == "A") 
 
-T90.pro.mean <- summarySE(data=pro.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90.pro.low <- summarySE(data=pro.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90.pro.up <- summarySE(data=pro.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+# set up the dataframe
+a_plast <- unique(a_plast) # remove duplicate sample rows
+a_plast_l <- gather(a_plast, param, value, c(14:18))
+a_plast$fpco2 <- factor(a_plast$fpco2, levels = c("300", "420", "680", "3300"))
 
-pro.tab <- cbind(T90.pro.mean, T90.pro.low, T90.pro.up)[, c(1,2,4,5,13,21)]
-pro.tab$mean <- round(pro.tab$mean, 2)
-pro.tab$lowerci <- round(pro.tab$lowerci, 2)
-pro.tab$upperci <- round(pro.tab$upperci, 2)
+# PERMANOVA
+a_pca_plast_mod <- adonis(value ~ treat2, data = a_plast_l, method='eu')
+a_pca_plast_mod # view PAST adonis output
 
-colnames(pro.tab)[colnames(pro.tab)=="treat2"] <- "treatment"
-colnames(pro.tab)[colnames(pro.tab)=="lowerci"] <- "lower 95%"
-colnames(pro.tab)[colnames(pro.tab)=="upperci"] <- "upper 95%"
-pro.tab$treatment <- factor(pro.tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+# calculate PCs
+a_plast_pca <- prcomp(a_plast[,c(14:18)], center = TRUE, scale= TRUE)
 
-table1 <- kable(pro.tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral host protein content and 95% confidence intervals for each  species") %>%
+```
+
+```{r PAST T0 PCA plot, fig.width = 4, fig.height = 3.7, fig.align = "center"}
+
+# plot the PCA (colour by timepoint only)
+autoplot(a_plast_pca, data = a_plast, 
+         colour = "T0_T90",
+         frame = TRUE, 
+         frame.type = "norm",
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = -1, 
+         loadings.label.vjust = 0.1,
+         loadings.label.repel = TRUE) +
+  scale_colour_manual("", labels = c("T0", "T90"),  values = c("#E69F00", "#56B4E9")) +
+  scale_fill_manual("", labels = c("T0", "T90"), values = c(NA, NA)) +  
+  #lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.1,0.1))
+#annotate("text", x = -0.39, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3)
+
+```
+
+```{r PAST T0 distance calculation and analysisp}
+
+a_plast_dis <- a_plast_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+
+por_plast_dist <- cbind(a_plast, a_plast_dis) # combine the datasets
+
+por_plast_dist$cont_pc1[por_plast_dist$treat2 == "T0"] <- por_plast_dist$PC1[por_plast_dist$treat2 == "T0"] # this adds column with the T0 value PC1 per colony
+por_plast_dist$cont_pc2[por_plast_dist$treat2 == "T0"] <- por_plast_dist$PC2[por_plast_dist$treat2 == "T0"] # this adds column with the T0 value PC2 per colony
+
+# get the T0 PC values
+por_plast_dist2 <- por_plast_dist %>%  
+  group_by(colony) %>% 
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
+por_plast_dist3 <- por_plast_dist %>% 
+  group_by(colony) %>% 
+  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+
+# Make columns of the T0 PC values
+por_plast_dist <- por_plast_dist %>% 
+  left_join(por_plast_dist2, by = c("colony" = "colony"))
+por_plast_dist <- por_plast_dist %>% 
+  left_join(por_plast_dist3, by = c("colony" = "colony"))
+
+por_plast_dist$dist <- sqrt(((por_plast_dist$PC1 - por_plast_dist$con2_pc1)^2) + ((por_plast_dist$PC2 - por_plast_dist$con2_pc2)^2)) # formula for calculating distance between T0 and treatment values (T90)
+por_plast_dist$treat_plot <- paste(por_plast_dist$fpco2, por_plast_dist$ftemp, sep = "_")
+
+
+## calculate mean and SE per treatment/reef
+por_plast_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = por_plast_dist)
+
+# print output of aov model
+summary(aov(dist ~ treat2 + reef, data = por_plast_dist))
+
+```
+
+```{r PAST T0 distance plot, fig.height = 3, fig.width = 10}
+
+ggplot(por_plast_dist_sum2) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position = c(0.05, 0.65), panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
+  ylab("Mean distance from T0") +
+  xlab("") +
+  ylim(0, 7) +
+  geom_point(aes(x = treat2, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = por_plast_dist) +
+  scale_colour_manual("", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  geom_vline(xintercept = c(1.5, 3.5, 5.5, 7.5)) +
+  annotate("text", x = 0.75, y = 7, label = "T0") +
+  annotate("text", x = 2, y = 7, label = "pre-industrial") +  
+  annotate("text", x = 4, y = 7, label = "present-day") +
+  annotate("text", x = 6.1, y = 7, label = "end-of-century") +
+  annotate("text", x = 7.9, y = 7, label = "extreme") +
+  geom_errorbar(position = dodge, aes(x = treat2, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5)
+
+```
+
+<br/>
+
+
+## Supplemental Tables{.tabset} 
+
+
+```{r protein table}
+
+pro_tab <- df_pro_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+pro_tab$binder <- paste(pro_tab$species, pro_tab$treat2, sep = "_")
+
+T90_pro_mean <- summarySE(data=pro_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90_pro_low <- summarySE(data=pro_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90_pro_up <- summarySE(data=pro_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+
+pro_tab <- cbind(T90_pro_mean, T90_pro_low, T90_pro_up)[, c(1,2,4,5,13,21)]
+pro_tab$mean <- round(pro_tab$mean, 2)
+pro_tab$lowerci <- round(pro_tab$lowerci, 2)
+pro_tab$upperci <- round(pro_tab$upperci, 2)
+
+colnames(pro_tab)[colnames(pro_tab)=="treat2"] <- "treatment"
+colnames(pro_tab)[colnames(pro_tab)=="lowerci"] <- "lower 95%"
+colnames(pro_tab)[colnames(pro_tab)=="upperci"] <- "upper 95%"
+pro_tab$treatment <- factor(pro_tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+
+table1 <- kable(pro_tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral host protein content and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 9) %>%
-  pack_rows("(b) PSTR", 10, 18) %>%
-  pack_rows("(c) PAST", 19, 27)
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24)
 table1
 
 ```
 
-```{r lipid table, include=FALSE, eval = FALSE}
+```{r lipid table}
 
-lipid.tab <- df_lipid_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
-lipid.tab$binder <- paste(lipid.tab$species, lipid.tab$treat2, sep = "_")
+lipid_tab <- df_lipid_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+lipid_tab$binder <- paste(lipid_tab$species, lipid_tab$treat2, sep = "_")
 
-T90.lipid.mean <- summarySE(data=lipid.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90.lipid.low <- summarySE(data=lipid.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90.lipid.up <- summarySE(data=lipid.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+T90_lipid_mean <- summarySE(data=lipid_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90_lipid_low <- summarySE(data=lipid_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90_lipid_up <- summarySE(data=lipid_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-lipid.tab <- cbind(T90.lipid.mean, T90.lipid.low, T90.lipid.up)[, c(1,2,4,5,13,21)]
-lipid.tab$mean <- round(lipid.tab$mean, 2)
-lipid.tab$lowerci <- round(lipid.tab$lowerci, 2)
-lipid.tab$upperci <- round(lipid.tab$upperci, 2)
+lipid_tab <- cbind(T90_lipid_mean, T90_lipid_low, T90_lipid_up)[, c(1,2,4,5,13,21)]
+lipid_tab$mean <- round(lipid_tab$mean, 2)
+lipid_tab$lowerci <- round(lipid_tab$lowerci, 2)
+lipid_tab$upperci <- round(lipid_tab$upperci, 2)
 
-colnames(lipid.tab)[colnames(lipid.tab)=="treat2"] <- "treatment"
-colnames(lipid.tab)[colnames(lipid.tab)=="lowerci"] <- "lower 95%"
-colnames(lipid.tab)[colnames(lipid.tab)=="upperci"] <- "upper 95%"
-lipid.tab$treatment <- factor(lipid.tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+colnames(lipid_tab)[colnames(lipid_tab)=="treat2"] <- "treatment"
+colnames(lipid_tab)[colnames(lipid_tab)=="lowerci"] <- "lower 95%"
+colnames(lipid_tab)[colnames(lipid_tab)=="upperci"] <- "upper 95%"
+lipid_tab$treatment <- factor(lipid_tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table2 <- kable(lipid.tab[,-c(1)], booktabs = T, caption = "Table 2. T90 modeled mean coral host lipid content and 95% confidence intervals for each  species") %>%
+table2 <- kable(lipid_tab[,-c(1)], booktabs = T, caption = "Table 2. T90 modeled mean coral host lipid content and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 9) %>%
-  pack_rows("(b) PSTR", 10, 18) %>%
-  pack_rows("(c) PAST", 19, 27)
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24)
 table2
 
 ```
 
-```{r carbohydrate table, include=FALSE, eval = FALSE}
+```{r carbohydrate table}
 
-carb.tab <- df_carb_a[,c(9,15,18:20)] #subset for species, treatment, and model values
-carb.tab$binder <- paste(carb.tab$species, carb.tab$treat2, sep = "_")
+carb_tab <- df_carb_a[,c(9,15,18:20)] #subset for species, treatment, and model values
+carb_tab$binder <- paste(carb_tab$species, carb_tab$treat2, sep = "_")
 
-T90.carb.mean <- summarySE(data=carb.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90.carb.low <- summarySE(data=carb.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90.carb.up <- summarySE(data=carb.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+T90_carb_mean <- summarySE(data=carb_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90_carb_low <- summarySE(data=carb_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90_carb_up <- summarySE(data=carb_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-carb.tab <- cbind(T90.carb.mean, T90.carb.low, T90.carb.up)[, c(1,2,4,5,13,21)]
-carb.tab$mean <- round(carb.tab$mean, 2)
-carb.tab$lowerci <- round(carb.tab$lowerci, 2)
-carb.tab$upperci <- round(carb.tab$upperci, 2)
+carb_tab <- cbind(T90_carb_mean, T90_carb_low, T90_carb_up)[, c(1,2,4,5,13,21)]
+carb_tab$mean <- round(carb_tab$mean, 2)
+carb_tab$lowerci <- round(carb_tab$lowerci, 2)
+carb_tab$upperci <- round(carb_tab$upperci, 2)
 
-colnames(carb.tab)[colnames(carb.tab)=="treat2"] <- "treatment"
-colnames(carb.tab)[colnames(carb.tab)=="lowerci"] <- "lower 95%"
-colnames(carb.tab)[colnames(carb.tab)=="upperci"] <- "upper 95%"
-carb.tab$treatment <- factor(carb.tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+colnames(carb_tab)[colnames(carb_tab)=="treat2"] <- "treatment"
+colnames(carb_tab)[colnames(carb_tab)=="lowerci"] <- "lower 95%"
+colnames(carb_tab)[colnames(carb_tab)=="upperci"] <- "upper 95%"
+carb_tab$treatment <- factor(carb_tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table3 <- kable(carb.tab[,-c(1)], booktabs = T, caption = "Table 3. T90 modeled mean coral host carbohydrate content and 95% confidence intervals for each  species") %>%
+table3 <- kable(carb_tab[,-c(1)], booktabs = T, caption = "Table 3. T90 modeled mean coral host carbohydrate content and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 9) %>%
-  pack_rows("(b) PSTR", 10, 18) %>%
-  pack_rows("(c) PAST", 19, 27)
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24)
 table3
 
 ```
 
-```{r density table, include=FALSE, eval = FALSE}
+```{r density table}
 
-den.tab <- df_den_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
-den.tab$binder <- paste(den.tab$species, den.tab$treat2, sep = "_")
+den_tab <- df_den_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+den_tab$binder <- paste(den_tab$species, den_tab$treat2, sep = "_")
 
-T90.den.mean <- summarySE(data=den.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90.den.low <- summarySE(data=den.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90.den.up <- summarySE(data=den.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+T90_den_mean <- summarySE(data=den_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90_den_low <- summarySE(data=den_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90_den_up <- summarySE(data=den_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-den.tab <- cbind(T90.den.mean, T90.den.low, T90.den.up)[, c(1,2,4,5,13,21)]
-den.tab$mean <- round(den.tab$mean, 2)
-den.tab$lowerci <- round(den.tab$lowerci, 2)
-den.tab$upperci <- round(den.tab$upperci, 2)
+den_tab <- cbind(T90_den_mean, T90_den_low, T90_den_up)[, c(1,2,4,5,13,21)]
+den_tab$mean <- round(den_tab$mean, 2)
+den_tab$lowerci <- round(den_tab$lowerci, 2)
+den_tab$upperci <- round(den_tab$upperci, 2)
 
-colnames(den.tab)[colnames(den.tab)=="treat2"] <- "treatment"
-colnames(den.tab)[colnames(den.tab)=="lowerci"] <- "lower 95%"
-colnames(den.tab)[colnames(den.tab)=="upperci"] <- "upper 95%"
-den.tab$treatment <- factor(den.tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+colnames(den_tab)[colnames(den_tab)=="treat2"] <- "treatment"
+colnames(den_tab)[colnames(den_tab)=="lowerci"] <- "lower 95%"
+colnames(den_tab)[colnames(den_tab)=="upperci"] <- "upper 95%"
+den_tab$treatment <- factor(den_tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table4 <- kable(den.tab[,-c(1)], booktabs = T, caption = "Table 4. T90 modeled mean algal endosymbiont cell density and 95% confidence intervals for each  species") %>%
+table4 <- kable(den_tab[,-c(1)], booktabs = T, caption = "Table 4. T90 modeled mean algal endosymbiont cell density and 95% confidence intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 9) %>%
-  pack_rows("(b) PSTR", 10, 18) %>%
-  pack_rows("(c) PAST", 19, 27)
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24)
 table4
 
 ```
 
-```{r chlorophyll table, include=FALSE, eval = FALSE}
+```{r chlorophyll table}
 
-chla.tab <- df_chla_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
-chla.tab$binder <- paste(chla.tab$species, chla.tab$treat2, sep = "_")
+chla_tab <- df_chla_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
+chla_tab$binder <- paste(chla_tab$species, chla_tab$treat2, sep = "_")
 
-T90.chla.mean <- summarySE(data=chla.tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90.chla.low <- summarySE(data=chla.tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90.chla.up <- summarySE(data=chla.tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+T90_chla_mean <- summarySE(data=chla_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
+T90_chla_low <- summarySE(data=chla_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
+T90_chla_up <- summarySE(data=chla_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-chla.tab <- cbind(T90.chla.mean, T90.chla.low, T90.chla.up)[, c(1,2,4,5,13,21)]
-chla.tab$mean <- round(chla.tab$mean, 2)
-chla.tab$lowerci <- round(chla.tab$lowerci, 2)
-chla.tab$upperci <- round(chla.tab$upperci, 2)
+chla_tab <- cbind(T90_chla_mean, T90_chla_low, T90_chla_up)[, c(1,2,4,5,13,21)]
+chla_tab$mean <- round(chla_tab$mean, 2)
+chla_tab$lowerci <- round(chla_tab$lowerci, 2)
+chla_tab$upperci <- round(chla_tab$upperci, 2)
 
-colnames(chla.tab)[colnames(chla.tab)=="treat2"] <- "treatment"
-colnames(chla.tab)[colnames(chla.tab)=="lowerci"] <- "lower 95%"
-colnames(chla.tab)[colnames(chla.tab)=="upperci"] <- "upper 95%"
-chla.tab$treatment <- factor(chla.tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+colnames(chla_tab)[colnames(chla_tab)=="treat2"] <- "treatment"
+colnames(chla_tab)[colnames(chla_tab)=="lowerci"] <- "lower 95%"
+colnames(chla_tab)[colnames(chla_tab)=="upperci"] <- "upper 95%"
+chla_tab$treatment <- factor(chla_tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table5 <- kable(chla.tab[,-c(1)], booktabs = T, caption = "Table 5. T90 modeled mean algal endosymbiont chlorophyll a content and 95% confichlace intervals for each  species") %>%
+table5 <- kable(chla_tab[,-c(1)], booktabs = T, caption = "Table 5. T90 modeled mean algal endosymbiont chlorophyll a content and 95% confichlace intervals for each  species") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 9) %>%
-  pack_rows("(b) PSTR", 10, 18) %>%
-  pack_rows("(c) PAST", 19, 27)
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24)
 table5
 
 ```
 
-```{r host table, include=FALSE, eval = FALSE}
+```{r host table}
 
-host.tab <- df_host_a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
-host.tab$binder <- paste(host.tab$species, host.tab$param, host.tab$treat2, sep = "_")
+host_tab <- df_host_a[,c(9,15,16,18:20)] #subset for species, treatment, parameter, and model values
+host_tab$binder <- paste(host_tab$species, host_tab$param, host_tab$treat2, sep = "_")
 
-T90.host.mean <- summarySE(data=host.tab, measurevar = "mean", groupvars = c("species", "param", "treat2", "binder"))
-T90.host.low <- summarySE(data=host.tab, measurevar = "lowerci", groupvars = c("species", "param", "treat2", "binder"))
-T90.host.up <- summarySE(data=host.tab, measurevar = "upperci", groupvars = c("species", "param", "treat2", "binder"))
+T90_host_mean <- summarySE(data=host_tab, measurevar = "mean", groupvars = c("species", "param", "treat2", "binder"))
+T90_host_low <- summarySE(data=host_tab, measurevar = "lowerci", groupvars = c("species", "param", "treat2", "binder"))
+T90_host_up <- summarySE(data=host_tab, measurevar = "upperci", groupvars = c("species", "param", "treat2", "binder"))
 
-host.tab <- cbind(T90.host.mean, T90.host.low, T90.host.up)[, c(1,3,5,6,15,24)]
-host.tab$mean <- round(host.tab$mean, 2)
-host.tab$lowerci <- round(host.tab$lowerci, 2)
-host.tab$upperci <- round(host.tab$upperci, 2)
+host_tab <- cbind(T90_host_mean, T90_host_low, T90_host_up)[, c(1,3,5,6,15,24)]
+host_tab$mean <- round(host_tab$mean, 2)
+host_tab$lowerci <- round(host_tab$lowerci, 2)
+host_tab$upperci <- round(host_tab$upperci, 2)
 
-colnames(host.tab)[colnames(host.tab)=="treat2"] <- "treatment"
-colnames(host.tab)[colnames(host.tab)=="lowerci"] <- "lower 95%"
-colnames(host.tab)[colnames(host.tab)=="upperci"] <- "upper 95%"
-host.tab$treatment <- factor(host.tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
+colnames(host_tab)[colnames(host_tab)=="treat2"] <- "treatment"
+colnames(host_tab)[colnames(host_tab)=="lowerci"] <- "lower 95%"
+colnames(host_tab)[colnames(host_tab)=="upperci"] <- "upper 95%"
+host_tab$treatment <- factor(host_tab$treatment, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"))
 
-table6 <- kable(host.tab[,-c(1)], booktabs = T, caption = "Table 6. Total coral host physiology at T90 modeled mean and 95% confidence intervals for each physiological parameter per species ") %>%
+table6 <- kable(host_tab[,-c(1)], booktabs = T, caption = "Table 6. Total coral host physiology at T90 modeled mean and 95% confidence intervals for each physiological parameter per species ") %>%
   kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 9) %>%
-  pack_rows("(b) PSTR", 10, 18) %>%
-  pack_rows("(c) PAST", 19, 27)
+  pack_rows("(a) SSID", 1, 8) %>%
+  pack_rows("(b) PSTR", 9, 16) %>%
+  pack_rows("(c) PAST", 17, 24)
 table6
 
 ```
 
 
-```{r excel WB, include=FALSE, eval = FALSE}
+```{r excel WB, message=FALSE, warning=FALSE}
 
 ### Create workbook
 wb <- createWorkbook()
 
 # add 'Table 1' worksheet
 addWorksheet(wb, "Table 1 - protein") 
-writeData(wb, sheet = 1, x = pro.tab)
+writeData(wb, sheet = 1, x = pro_tab)
 setColWidths(wb, sheet = 1, cols = 1:5, widths = "auto")
 
 # add 'Table 2' worksheet
 addWorksheet(wb, "Table 2 - lipid") 
-writeData(wb, sheet = 2, x = lipid.tab)
+writeData(wb, sheet = 2, x = lipid_tab)
 setColWidths(wb, sheet = 2, cols = 1:5, widths = "auto")
 
 # add 'Table 3' worksheet
 addWorksheet(wb, "Table 3 - carbohydrate") 
-writeData(wb, sheet = 3, x = carb.tab)
+writeData(wb, sheet = 3, x = carb_tab)
 setColWidths(wb, sheet = 3, cols = 1:5, widths = "auto")
 
 # add 'Table 4' worksheet
 addWorksheet(wb, "Table 4 - density") 
-writeData(wb, sheet = 4, x = den.tab)
+writeData(wb, sheet = 4, x = den_tab)
 setColWidths(wb, sheet = 4, cols = 1:5, widths = "auto")
 
 # add 'Table 5' worksheet
 addWorksheet(wb, "Table 5 - chlorophyll") 
-writeData(wb, sheet = 5, x = chla.tab)
+writeData(wb, sheet = 5, x = chla_tab)
 setColWidths(wb, sheet = 5, cols = 1:5, widths = "auto")
 
 # add 'Table 6' worksheet
 addWorksheet(wb, "Table 6 - total host") 
-writeData(wb, sheet = 6, x = host.tab)
+writeData(wb, sheet = 6, x = host_tab)
 setColWidths(wb, sheet = 6, cols = 1:5, widths = "auto")
 
-# add 'Table 7' worksheet
-addWorksheet(wb, "Table 7 - SSID dist") 
-writeData(wb, sheet = 7, x = sid.dis.tab)
-setColWidths(wb, sheet = 7, cols = 1:5, widths = "auto")
-
-# add 'Table 8' worksheet
-addWorksheet(wb, "Table 8 - PAST dist") 
-writeData(wb, sheet = 8, x = por.dis.tab)
-setColWidths(wb, sheet = 8, cols = 1:5, widths = "auto")
-
-
 # save workbook
-saveWorkbook(wb, file="Ch3_Phys_tables.xlsx", overwrite = TRUE)
+saveWorkbook(wb, file="Supplemental_Tables.xlsx", overwrite = TRUE)
 
 
 ```
@@ -2219,8 +2438,7 @@ saveWorkbook(wb, file="Ch3_Phys_tables.xlsx", overwrite = TRUE)
 
 
 <br/>
-<br/>
-<br/>
+
 
 ## Session information
 
