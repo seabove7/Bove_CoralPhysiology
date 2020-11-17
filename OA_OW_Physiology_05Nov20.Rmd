@@ -1570,8 +1570,6 @@ plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), 
 
 ## Plasticity analyses{.tabset} 
 
-*This is still being updated at the moment*
-
 ### Control Comparison (400 $\mu$atm; 28 &deg;C)
 
 #### *S. siderea*
@@ -1880,6 +1878,110 @@ plot_grid(sid_con_dis_plot, dip_con_dis_plot, por_con_dis_plot, ncol = 1, labels
 ### T0 Comparison 
 
 #### *S. siderea*
+
+**Questions to ask:**
+* What should I use as a loading in my PCA?
+* Calculating distance from T0/control mean or from colony value?
+
+```{r testing PCA with T0}
+
+df_plast <- subset(df, species != "T") 
+df_plast <- df_plast[,-c(17:37)]
+df_plast <- completeFun(df_plast, "den")
+df_plast <- completeFun(df_plast, "host")
+df_plast <- completeFun(df_plast, "lipid")
+df_plast <- completeFun(df_plast, "carb")
+df_plast$time <- gsub("T", "", df_plast$T0_T90)
+df_plast$time <- as.numeric(df_plast$time)
+
+## specific species dataframes
+s_plast <- subset(df_plast, species == "S") 
+
+# set up the dataframe
+s_plast_l <- gather(s_plast, param, value, c(14:18))
+s_plast$fpco2 <- factor(s_plast$fpco2, levels = c("300", "420", "680", "3300"))
+
+s_pca_plast_mod <- adonis(value ~ treat2, data = s_plast_l, method='eu')
+s_pca_plast_mod # view SSID adonis output
+
+s_plast_pca <- prcomp(s_plast[,c(14:18)], center = TRUE, scale= TRUE)
+
+
+s_plast$time2 <- factor(s_plast$time)
+
+autoplot(s_plast_pca, data = s_plast, 
+         colour = "time2",
+         frame = TRUE, 
+         frame.type = "norm",
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = -1, 
+         loadings.label.vjust = 0.1,
+         loadings.label.repel = TRUE) +
+  scale_colour_manual("Time", labels = c("T0", "T90"),  values = c("#E69F00", "#56B4E9")) +
+  scale_fill_manual("Time", labels = c("T0", "T90"), values = c(NA, NA)) +  
+  #lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom")
+  #annotate("text", x = -0.39, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+
+```
+
+
+```{r SSID T0 distance dataframe setup}
+
+s_plast_dis <- s_plast_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+
+sid_plast_dist <- cbind(s_plast, s_plast_dis) # combine the datasets
+
+sid_plast_dist$cont_pc1[sid_plast_dist$treat2 == "T0"] <- sid_plast_dist$PC1[sid_plast_dist$treat2 == "T0"] # this adds column with the control value PC1 per colony
+sid_plast_dist$cont_pc2[sid_plast_dist$treat2 == "T0"] <- sid_plast_dist$PC2[sid_plast_dist$treat2 == "T0"] # this adds column with the control value PC2 per colony
+
+# get the 400_28 PC values
+sid_plast_dist2 <- sid_plast_dist %>%  
+  group_by(colony) %>% 
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
+sid_plast_dist3 <- sid_plast_dist %>% 
+  group_by(colony) %>% 
+  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+
+# Make columns of the 400_28 PC values
+sid_plast_dist <- sid_plast_dist %>% 
+  left_join(sid_plast_dist2, by = c("colony" = "colony"))
+sid_plast_dist <- sid_plast_dist %>% 
+  left_join(sid_plast_dist3, by = c("colony" = "colony"))
+
+sid_plast_dist$dist <- sqrt(((sid_plast_dist$PC1 - sid_plast_dist$con2_pc1)^2) + ((sid_plast_dist$PC2 - sid_plast_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+sid_plast_dist$treat_plot <- paste(sid_plast_dist$fpco2, sid_plast_dist$ftemp, sep = "_")
+
+
+sid_plast_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("treat2", "reef"), data = sid_plast_dist)
+#sid_plast_dist_sum2$treat <- paste(sid_plast_dist_sum2$fpco2, sid_plast_dist_sum2$ftemp, sep = "_")
+#sid_plast_dist$treat_plot <- ordered(sid_plast_dist$treat_plot, levels = c("T", "300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+
+ggplot(sid_plast_dist_sum2) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
+  ylab("Mean distance from control") +
+  xlab("") +
+  ylim(0, 7) +
+  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
+  geom_point(aes(x = treat2, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = sid_plast_dist) +
+  geom_errorbar(position = dodge, aes(x = treat2, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5)
+
+aov(dist ~ treat2 + reef, data = sid_plast_dist)
+
+summary(aov(dist ~ treat2 + reef, data = sid_plast_dist))
+
+```
+
+
+
+
 
 #### *P. strigosa*
 
