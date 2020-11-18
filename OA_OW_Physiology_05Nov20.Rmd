@@ -1574,16 +1574,6 @@ plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), 
 
 ## Plasticity analyses{.tabset} 
 
-<span style="color: red;">
-**Questions to ask:**
-</span>
-
-* What should I use as a loading in my PCA?
-* Calculating distance from T0/control mean or from colony value?
-* What about duplicate samples from same colony per treatment or from same sample?
-* What about samples that don't have a T0 or control fragment? Should I be comparing within colony or within T0/control?
-* I think I am going to model the responses so that colony is being considered. Thoughts?
-
 <br/>
 
 ### Control Comparison (400 $\mu$atm; 28 &deg;C)
@@ -1660,7 +1650,7 @@ sid_dis_tuk$fpco2
 # just treatment
 sid_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = sid_dist)
 sid_dist_sum2$treat <- paste(sid_dist_sum2$fpco2, sid_dist_sum2$ftemp, sep = "_")
-sid_dist$treat_plot <- ordered(sid_dist$treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+sid_dist$treat_plot <- ordered(sid_dist$treat_plot, levels = c("420_28", "300_28", "300_31", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
 
 sid_con_dis_plot <- ggplot(sid_dist_sum2) +
   theme_bw() +
@@ -1672,9 +1662,10 @@ sid_con_dis_plot <- ggplot(sid_dist_sum2) +
   #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
   geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = sid_dist) +
   geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(2.5, 4.5, 6.5)) +
-  annotate("text", x = 1, y = 7, label = "pre-industrial") +
-  annotate("text", x = 3, y = 7, label = "present-day") +
+  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
+  annotate("text", x = 0.8, y = 7, label = "control") +  
+  annotate("text", x = 2, y = 7, label = "pre-industrial") +
+  annotate("text", x = 4, y = 7, label = "present-day") +
   annotate("text", x = 5.1, y = 7, label = "end-of-century") +
   annotate("text", x = 6.9, y = 7, label = "extreme") +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
@@ -1758,7 +1749,7 @@ dip_dip_tuk$fpco2
 # just treatment
 dip_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = dip_dist)
 dip_dist_sum2$treat <- paste(dip_dist_sum2$fpco2, dip_dist_sum2$ftemp, sep = "_")
-dip_dist$treat_plot <- ordered(dip_dist$treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+dip_dist$treat_plot <- ordered(dip_dist$treat_plot, levels = c("420_28", "300_28", "300_31", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
 
 dip_con_dis_plot <- ggplot(dip_dist_sum2) +
   theme_bw() +
@@ -1770,9 +1761,10 @@ dip_con_dis_plot <- ggplot(dip_dist_sum2) +
   #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
   geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = dip_dist) +
   geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(2.5, 4.5, 6.5)) +
-  annotate("text", x = 1, y = 7, label = "pre-industrial") +
-  annotate("text", x = 3, y = 7, label = "present-day") +
+  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
+  annotate("text", x = 0.8, y = 7, label = "control") +  
+  annotate("text", x = 2, y = 7, label = "pre-industrial") +
+  annotate("text", x = 4, y = 7, label = "present-day") +
   annotate("text", x = 5.1, y = 7, label = "end-of-century") +
   annotate("text", x = 6.9, y = 7, label = "extreme") +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
@@ -1856,7 +1848,7 @@ por_por_tuk$fpco2
 # just treatment
 por_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = por_dist)
 por_dist_sum2$treat <- paste(por_dist_sum2$fpco2, por_dist_sum2$ftemp, sep = "_")
-por_dist$treat_plot <- ordered(por_dist$treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+por_dist$treat_plot <- ordered(por_dist$treat_plot, levels = c("420_28", "300_28", "300_31", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
 
 por_con_dis_plot <- ggplot(por_dist_sum2) +
   theme_bw() +
@@ -1868,9 +1860,10 @@ por_con_dis_plot <- ggplot(por_dist_sum2) +
   #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
   geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = por_dist) +
   geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(2.5, 4.5, 6.5)) +
-  annotate("text", x = 1, y = 7, label = "pre-industrial") +
-  annotate("text", x = 3, y = 7, label = "present-day") +
+  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
+  annotate("text", x = 0.8, y = 7, label = "control") +  
+  annotate("text", x = 2, y = 7, label = "pre-industrial") +
+  annotate("text", x = 4, y = 7, label = "present-day") +
   annotate("text", x = 5.1, y = 7, label = "end-of-century") +
   annotate("text", x = 6.9, y = 7, label = "extreme") +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
@@ -1894,7 +1887,7 @@ plot_grid(sid_con_dis_plot, dip_con_dis_plot, por_con_dis_plot, ncol = 1, labels
 
 <br/>
 
-### T0 Comparison 
+### T0 Comparison (*not including this one*)
 
 ```{r PCA with T0}
 
