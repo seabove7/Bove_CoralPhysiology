@@ -87,7 +87,7 @@ date <- Sys.Date()
 
 ```{r original dataframe adjustment, include=FALSE}
 
-df <- read_csv("phys_all_21Oct19.csv") # read in full dataframe
+df <- read_csv("Data/Raw_data/phys_all_21Oct19.csv") # read in full dataframe
 
 # remove unnecessary column
 df$X1 <- NULL
@@ -171,10 +171,10 @@ seed = 7 #seed to make results replicatable (our seed was 7)
 ### I want to replace these images with field images taken of these species!!!
 
 # make combination of all coral images
-s <- cowplot::ggdraw() + cowplot::draw_image("SSID.png", scale = 0.9) 
-p <- cowplot::ggdraw() + cowplot::draw_image("PSTR.png", scale = 0.9)
-a <- cowplot::ggdraw() + cowplot::draw_image("PAST.png", scale = 0.9)
-#u <- cowplot::ggdraw() + cowplot::draw_image("UTEN.png", scale = 0.9) # not including UTEN in the manuscript so it has been omitted 
+s <- cowplot::ggdraw() + cowplot::draw_image("Figures/Supplemental_Figures/SSID.png", scale = 0.9) 
+p <- cowplot::ggdraw() + cowplot::draw_image("Figures/Supplemental_Figures/PSTR.png", scale = 0.9)
+a <- cowplot::ggdraw() + cowplot::draw_image("Figures/Supplemental_Figures/PAST.png", scale = 0.9)
+#u <- cowplot::ggdraw() + cowplot::draw_image("Figures/Supplemental_Figures/UTEN.png", scale = 0.9) # not including UTEN in the manuscript so it has been omitted 
 corals <- cowplot::plot_grid(s, p, a, ncol = 3, scale=0.7) # final combination of species images
 
 ```
@@ -184,7 +184,7 @@ corals <- cowplot::plot_grid(s, p, a, ncol = 3, scale=0.7) # final combination o
 Physiological response parameters were assessed using mixed-effects linear models across species and treatments. Model selection was carried out using backward elimination of random-effects followed by fixed-effects using the package [*lmerTest*](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf) (version `r packageVersion("lmerTest")`)
 
 
-```{r T0 model selection, include=FALSE}
+```{r T0 model selection, eval=FALSE, include=FALSE}
 
 ### Planning to model all measured values in response to parameter and species
 
@@ -298,7 +298,7 @@ pro_model_fig <- ggplot(df_pro_a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci), colour = "#009E73", position = dodge, size = 1, data = df_T0_pro)+ # add T0 CIs
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y") +
-  ggsave(paste0("Figures/Protein_boot_figure_", date, ".pdf"), width = 10, height = 3)
+  ggsave(paste0("Figures/Supplemental_Figures/Protein_boot_figure.pdf"), width = 10, height = 3)
 pro_model_fig
 
 ```
@@ -376,7 +376,7 @@ carb_model_fig <- ggplot(df_carb_a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci), colour = "#009E73", position = dodge, size = 1, data = df_T0_carb)+ # add T0 CIs
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y") +
-  ggsave(paste0("Figures/Carbohydrate_boot_figure_", date, ".pdf"), width = 10, height = 3)
+  ggsave(paste0("Figures/Supplemental_Figures/Carbohydrate_boot_figure.pdf"), width = 10, height = 3)
 carb_model_fig
 
 ```
@@ -452,7 +452,7 @@ lipid_model_fig <- ggplot(df_lipid_a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci), colour = "#009E73", position = dodge, size = 1, data = df_T0_lipid)+ # add T0 CIs
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y") +
-  ggsave(paste0("Figures/Lipid_boot_figure_", date, ".pdf"), width = 10, height = 3)
+  ggsave(paste0("Figures/Supplemental_Figures/Lipid_boot_figure.pdf"), width = 10, height = 3)
 lipid_model_fig
 
 ```
@@ -530,7 +530,7 @@ den_model_fig <- ggplot(df_den_a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci), colour = "#009E73", position = dodge, size = 1, data = df_T0_den)+ # add T0 CIs
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y") +
-  ggsave(paste0("Figures/Density_boot_figure_", date, ".pdf"), width = 10, height = 3)
+  ggsave(paste0("Figures/Supplemental_Figures/Density_boot_figure.pdf"), width = 10, height = 3)
 den_model_fig
 
 ```
@@ -607,7 +607,7 @@ chla_model_fig <- ggplot(df_chla_a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci), colour = "#009E73", position = dodge, size = 1, data = df_T0_chla)+ # add T0 CIs
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y") +
-  ggsave(paste0("Figures/Chlorophyll_boot_figure_", date, ".pdf"), width = 10, height = 3)
+  ggsave(paste0("Figures/Supplemental_Figures/Chlorophyll_boot_figure.pdf"), width = 10, height = 3)
 chla_model_fig
 
 ```
@@ -684,7 +684,7 @@ host_model_fig <- ggplot(df_host_a)+
   geom_linerange(aes(x = treat, ymin = lowerci, ymax = upperci), colour = "#009E73", position = dodge, size = 1, data = df_T0_host)+ # add T0 CIs
   scale_color_manual("Temperature", values = c("#0072B2", "#D55E00", "#009E73"))+
   facet_wrap(~species, ncol = 3, scales = "free_y") +
-  ggsave(paste0("Figures/TotalHost_boot_figure_", date, ".pdf"), width = 10, height = 3)
+  ggsave(paste0("Figures/Supplemental_Figures/TotalHost_boot_figure.pdf"), width = 10, height = 3)
 host_model_fig
 
 ```
@@ -699,7 +699,7 @@ host_model_fig
 
 ```{r calcification rate, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-ncalc_a<-read.csv("net_calc.csv")
+ncalc_a<-read.csv("Data/Raw_data/net_calc.csv")
 #ncalc_a <- subset(ncalc_a, species != "T")
 ncalc_a$ftemp <- as.factor(ncalc_a$ftemp)
 ncalc_a$fpco2 <- as.factor(ncalc_a$fpco2)
@@ -729,7 +729,7 @@ calc_model_fig
 fig1 <- plot_grid(corals, host_model_fig, den_model_fig, chla_model_fig, labels = c("A", "B", "C", "D"), ncol = 1, align = "v", axis = 'lb')
 fig1
 
-ggsave("Fig1_physiology_18Dec19.pdf")
+ggsave("Figures/Final_Figures/Figure1_physiology_20Nov20.pdf")
 
 ```
 <br/>
@@ -843,7 +843,7 @@ corrplot.mixed(por_corr_df2$r, upper = "ellipse", lower.col = "darkslategrey", u
 ```{r save correlation plot, message=FALSE, warning=FALSE, include=FALSE}
 
 # below saves the figure
-pdf(file = "Figures/CorrelationPlot.pdf", width = 10, height = 8)  
+pdf(file = "Figures/Supplemental_Figures/CorrelationPlot.pdf", width = 10, height = 8)  
 
 par(mfrow=c(2,2))
 corrplot.mixed(sid_corr_df2$r, upper = "ellipse", lower.col = "darkslategrey", upper.col = wes_palette("Zissou1", 7, type = "continuous"), number.cex = 0.8, p.mat = sid_corr_df2$P, sig.level = c(.001, .01, .05), insig = "blank", tl.col = "#0072B2", tl.cex = 1.1, title = expression(italic("S. siderea")), cl.lim = c(0,1), mar=c(0,0,1,0), cl.align.text = "l")
@@ -1567,7 +1567,7 @@ PAST_plot <- plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 3, scale = 0.8
 ```{r PCA plot, fig.height=12, fig.width=11}
 
 plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), rel_heights = c(0.82, 0.75, 1)) +
-  ggsave("Figure2_PhysPCA.pdf", width = 11.5, height = 12)
+  ggsave("Figures/Final_Figures/Figure2_PhysPCA_20Nov20.pdf", width = 11.5, height = 12)
 
 ```
 
@@ -2423,7 +2423,7 @@ writeData(wb, sheet = 6, x = host_tab)
 setColWidths(wb, sheet = 6, cols = 1:5, widths = "auto")
 
 # save workbook
-saveWorkbook(wb, file="Supplemental_Tables.xlsx", overwrite = TRUE)
+saveWorkbook(wb, file="Data/Supplemental/Supplemental_Tables.xlsx", overwrite = TRUE)
 
 
 ```
