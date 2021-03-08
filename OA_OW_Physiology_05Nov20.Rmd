@@ -760,12 +760,29 @@ a_df <- subset(df_90, species == "A")
 
 ```
 
+```{r add in the SSID dominant symbionts}
+
+symbs <- read.csv("Data/Raw_data/domSSID_symbiont.csv")[,c(2,3,5)]
+
+symbs <- symbs %>% 
+  mutate(domSymb = ifelse(percent > 70, "C", ifelse((percent < 70 & percent > 30), "mix", "D")))
+
+s_df <- s_df %>% 
+  left_join(symbs, by = c("coral" = "Sample"))
+
+df_90 <- df_90 %>% 
+  left_join(symbs, by = c("coral" = "Sample"))
+
+```
+
+
 ```{r correlation df setup}
 
 ## dataframe updates
 df_90$ID <- paste(df_90$coral, df_90$treat2, sep = "_") # add coral name to treatment
 
-df_subset <- as.data.frame(df_90[,c(26,8,14:18,21:23)]) # subset the df for desired columns
+#df_subset <- as.data.frame(df_90[,c(26,8,14:18,21:23,28)]) # subset the df for desired columns
+df_subset <- as.data.frame(df_90[,c(29,8,14:18,21:24,25,27:29)]) # subset the df for desired columns - with dominant symbionts data
 df_subset <- df_subset[!duplicated(df_subset$ID), ] # remove any duplicated values
 rownames(df_subset) <- df_subset$ID # rename rows with ID
 
@@ -857,6 +874,51 @@ dev.off()
 par(mfrow = c(1, 1))
 
 ```
+
+```{r SSID subset corr plot}
+
+## Subset for SSID GE samples only (with symb genus data)
+sid_df_sub <- sid_df[(!is.na(sid_df$percent)),] 
+
+## create a C dom and D dom dataframe
+sid_corr_D <- sid_df_sub[sid_df_sub$domSymb == "D",] 
+sid_corr_C <- sid_df_sub[sid_df_sub$domSymb == "C",]
+
+## create matrix for correlations 
+sid_corr_df_sub <- rcorr(as.matrix(sid_df_sub[, c(4,9,10,3,5,6,8,13)])) # from these correlations, going to stick with red channel for corr/PCA input
+sid_corr_df_sub$r[sid_corr_df_sub$r < 0] <- 0 # this just makes negative correlations 0 since none are significant (easier for plotting)
+
+sid_corr_df_C <- rcorr(as.matrix(sid_corr_C[, c(4,9,10,3,5,6,8,13)])) # from these correlations, going to stick with red channel for corr/PCA input
+sid_corr_df_C$r[sid_corr_df_C$r < 0] <- 0 # this just makes negative correlations 0 since none are significant (easier for plotting)
+
+sid_corr_df_D <- rcorr(as.matrix(sid_corr_D[, c(4,9,10,3,5,6,8,13)])) # from these correlations, going to stick with red channel for corr/PCA input
+sid_corr_df_D$r[sid_corr_df_D$r < 0] <- 0 # this just makes negative correlations 0 since none are significant (easier for plotting)
+
+## Rmarkdown plotting version
+par(mfrow=c(1,3))
+corrplot.mixed(sid_corr_df_sub$r, upper = "ellipse", lower.col = "darkslategrey", upper.col = wes_palette("Zissou1", 7, type = "continuous"), number.cex = 0.8, p.mat = sid_corr_df_sub$P, sig.level = c(.001, .01, .05), insig = "blank", tl.col = "#0072B2", tl.cex = 1.1, title = expression(italic("S. siderea")), cl.lim = c(0,1), mar=c(0,0,1,0), cl.align.text = "l")
+
+corrplot.mixed(sid_corr_df_C$r, upper = "ellipse", lower.col = "darkslategrey", upper.col = wes_palette("Zissou1", 7, type = "continuous"), number.cex = 0.8, p.mat = sid_corr_df_C$P, sig.level = c(.001, .01, .05), insig = "blank", tl.col = "#0072B2", tl.cex = 1.1, title = expression(italic("S. siderea - Cladocopium")), cl.lim = c(0,1), mar=c(0,0,1,0), cl.align.text = "l")
+
+corrplot.mixed(sid_corr_df_D$r, upper = "ellipse", lower.col = "darkslategrey", upper.col = wes_palette("Zissou1", 7, type = "continuous"), number.cex = 0.8, p.mat = sid_corr_df_D$P, sig.level = c(.001, .01, .05), insig = "blank", tl.col = "#0072B2", tl.cex = 1.1, title = expression(italic("S. siderea - Durusdinium")), cl.lim = c(0,1), mar=c(0,0,1,0), cl.align.text = "l")
+
+## save the symb sample corr plot
+pdf(file = "Figures/Supplemental_Figures/CorrelationPlot_SSID_symbs.pdf", width = 12, height = 3)  
+
+par(mfrow=c(1,3))
+corrplot.mixed(sid_corr_df_sub$r, upper = "ellipse", lower.col = "darkslategrey", upper.col = wes_palette("Zissou1", 7, type = "continuous"), number.cex = 0.8, p.mat = sid_corr_df_sub$P, sig.level = c(.001, .01, .05), insig = "blank", tl.col = "#0072B2", tl.cex = 1.1, title = expression(italic("S. siderea")), cl.lim = c(0,1), mar=c(0,0,1,0), cl.align.text = "l")
+
+corrplot.mixed(sid_corr_df_C$r, upper = "ellipse", lower.col = "darkslategrey", upper.col = wes_palette("Zissou1", 7, type = "continuous"), number.cex = 0.8, p.mat = sid_corr_df_C$P, sig.level = c(.001, .01, .05), insig = "blank", tl.col = "#0072B2", tl.cex = 1.1, title = expression(italic("S. siderea - Cladocopium")), cl.lim = c(0,1), mar=c(0,0,1,0), cl.align.text = "l")
+
+corrplot.mixed(sid_corr_df_D$r, upper = "ellipse", lower.col = "darkslategrey", upper.col = wes_palette("Zissou1", 7, type = "continuous"), number.cex = 0.8, p.mat = sid_corr_df_D$P, sig.level = c(.001, .01, .05), insig = "blank", tl.col = "#0072B2", tl.cex = 1.1, title = expression(italic("S. siderea - Durusdinium")), cl.lim = c(0,1), mar=c(0,0,1,0), cl.align.text = "l")
+
+dev.off() 
+
+par(mfrow = c(1, 1))
+
+```
+
+
 
 
 ### *Siderastrea siderea*
@@ -955,9 +1017,31 @@ sid_carbVpro <- ggplot(data = s_df, aes(x = pro, y = carb, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 150) +
   geom_point()
 
+sid_hostVchla <- ggplot(data = s_df, aes(x = chla, y = host, colour = fpco2, shape = ftemp, group = species)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  ylab("Total Host") + 
+  xlab(clab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  #stat_cor(label.y = -0.5, label.x = 150) +
+  #stat_regline_equation(label.y = -0.7, label.x = 150) +
+  geom_point()
+
+sid_hostVden <- ggplot(data = s_df, aes(x = den, y = host, colour = fpco2, shape = ftemp, group = species)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  ylab("Total Host") + 
+  xlab(dlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  #stat_cor(label.y = -0.5, label.x = 150) +
+  #stat_regline_equation(label.y = -0.7, label.x = 150) +
+  geom_point()
 
 
-plot_grid(sid_denVrate, sid_chlaVrate, sid_sumVrate, sid_denVsum, sid_denVchla, sid_denVpro, sid_chlaVpro, sid_carbVpro, labels = "AUTO", ncol = 2, scale = 0.9)
+
+plot_grid(sid_denVrate, sid_chlaVrate, sid_sumVrate, sid_denVsum, sid_denVchla, sid_denVpro, sid_chlaVpro, sid_carbVpro, sid_hostVchla, sid_hostVden, labels = "AUTO", ncol = 2, scale = 0.9)
 
 #ggsave("Ch3_appFig_SSIDscatter_29Jan20.pdf", width = 10, height = 14, units = "in")
 
@@ -971,7 +1055,7 @@ plot_grid(sid_denVrate, sid_chlaVrate, sid_sumVrate, sid_denVsum, sid_denVchla, 
 
 #p_df <- subset(p_df, T0_T90 == "T90")
 
-dip_proVlipid <- ggplot(data = s_df, aes(x = pro, y = lipid, colour = fpco2, shape = ftemp, group = species)) +
+dip_proVlipid <- ggplot(data = p_df, aes(x = pro, y = lipid, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(plab) + 
@@ -983,7 +1067,7 @@ dip_proVlipid <- ggplot(data = s_df, aes(x = pro, y = lipid, colour = fpco2, sha
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_proVcarb <- ggplot(data = s_df, aes(x = pro, y = carb, colour = fpco2, shape = ftemp, group = species)) +
+dip_proVcarb <- ggplot(data = p_df, aes(x = pro, y = carb, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(plab) + 
@@ -995,7 +1079,7 @@ dip_proVcarb <- ggplot(data = s_df, aes(x = pro, y = carb, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_proVden <- ggplot(data = s_df, aes(x = pro, y = den, colour = fpco2, shape = ftemp, group = species)) +
+dip_proVden <- ggplot(data = p_df, aes(x = pro, y = den, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(plab) + 
@@ -1007,7 +1091,7 @@ dip_proVden <- ggplot(data = s_df, aes(x = pro, y = den, colour = fpco2, shape =
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_proVchla <- ggplot(data = s_df, aes(x = pro, y = chla, colour = fpco2, shape = ftemp, group = species)) +
+dip_proVchla <- ggplot(data = p_df, aes(x = pro, y = chla, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(plab) + 
@@ -1019,7 +1103,7 @@ dip_proVchla <- ggplot(data = s_df, aes(x = pro, y = chla, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_proVsum <- ggplot(data = s_df, aes(x = pro, y = sum, colour = fpco2, shape = ftemp, group = species)) +
+dip_proVsum <- ggplot(data = p_df, aes(x = pro, y = sum, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(plab) + 
@@ -1031,7 +1115,7 @@ dip_proVsum <- ggplot(data = s_df, aes(x = pro, y = sum, colour = fpco2, shape =
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_proVrate <- ggplot(data = s_df, aes(x = pro, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+dip_proVrate <- ggplot(data = p_df, aes(x = pro, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(plab) + 
@@ -1043,7 +1127,7 @@ dip_proVrate <- ggplot(data = s_df, aes(x = pro, y = rate, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_carbVlipid <- ggplot(data = s_df, aes(x = carb, y = lipid, colour = fpco2, shape = ftemp, group = species)) +
+dip_carbVlipid <- ggplot(data = p_df, aes(x = carb, y = lipid, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(calab) + 
@@ -1055,7 +1139,7 @@ dip_carbVlipid <- ggplot(data = s_df, aes(x = carb, y = lipid, colour = fpco2, s
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_carbVden <- ggplot(data = s_df, aes(x = carb, y = den, colour = fpco2, shape = ftemp, group = species)) +
+dip_carbVden <- ggplot(data = p_df, aes(x = carb, y = den, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(calab) + 
@@ -1067,7 +1151,7 @@ dip_carbVden <- ggplot(data = s_df, aes(x = carb, y = den, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_carbVchla <- ggplot(data = s_df, aes(x = carb, y = chla, colour = fpco2, shape = ftemp, group = species)) +
+dip_carbVchla <- ggplot(data = p_df, aes(x = carb, y = chla, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(calab) + 
@@ -1079,7 +1163,7 @@ dip_carbVchla <- ggplot(data = s_df, aes(x = carb, y = chla, colour = fpco2, sha
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_carbVsum <- ggplot(data = s_df, aes(x = carb, y = sum, colour = fpco2, shape = ftemp, group = species)) +
+dip_carbVsum <- ggplot(data = p_df, aes(x = carb, y = sum, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(calab) + 
@@ -1091,7 +1175,7 @@ dip_carbVsum <- ggplot(data = s_df, aes(x = carb, y = sum, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_carbVrate <- ggplot(data = s_df, aes(x = carb, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+dip_carbVrate <- ggplot(data = p_df, aes(x = carb, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(calab) + 
@@ -1103,7 +1187,7 @@ dip_carbVrate <- ggplot(data = s_df, aes(x = carb, y = rate, colour = fpco2, sha
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_denVchla <- ggplot(data = s_df, aes(x = den, y = chla, colour = fpco2, shape = ftemp, group = species)) +
+dip_denVchla <- ggplot(data = p_df, aes(x = den, y = chla, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(dlab) + 
@@ -1115,7 +1199,7 @@ dip_denVchla <- ggplot(data = s_df, aes(x = den, y = chla, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_denVsum <- ggplot(data = s_df, aes(x = den, y = sum, colour = fpco2, shape = ftemp, group = species)) +
+dip_denVsum <- ggplot(data = p_df, aes(x = den, y = sum, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(dlab) + 
@@ -1127,7 +1211,7 @@ dip_denVsum <- ggplot(data = s_df, aes(x = den, y = sum, colour = fpco2, shape =
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_denVrate <- ggplot(data = s_df, aes(x = den, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+dip_denVrate <- ggplot(data = p_df, aes(x = den, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(dlab) + 
@@ -1139,7 +1223,7 @@ dip_denVrate <- ggplot(data = s_df, aes(x = den, y = rate, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_chlaVsum <- ggplot(data = s_df, aes(x = chla, y = sum, colour = fpco2, shape = ftemp, group = species)) +
+dip_chlaVsum <- ggplot(data = p_df, aes(x = chla, y = sum, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(dlab) + 
@@ -1151,7 +1235,7 @@ dip_chlaVsum <- ggplot(data = s_df, aes(x = chla, y = sum, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_chlaVrate <- ggplot(data = s_df, aes(x = chla, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+dip_chlaVrate <- ggplot(data = p_df, aes(x = chla, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(clab) + 
@@ -1163,7 +1247,7 @@ dip_chlaVrate <- ggplot(data = s_df, aes(x = chla, y = rate, colour = fpco2, sha
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
-dip_sumVrate <- ggplot(data = s_df, aes(x = sum, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+dip_sumVrate <- ggplot(data = p_df, aes(x = sum, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab("Sum colour intensity") + 
@@ -1175,8 +1259,56 @@ dip_sumVrate <- ggplot(data = s_df, aes(x = sum, y = rate, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
   geom_point()
 
+dip_hostVrate <- ggplot(data = p_df, aes(x = host, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  xlab("Total Host") + 
+  ylab(rlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  #geom_smooth(method = "lm", aes(group = fpco2), se = FALSE) +
+  #stat_cor(label.y = -0.5, label.x = 3.9) +
+  #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
+  geom_point()
 
-plot_grid(dip_proVcarb, dip_proVlipid, dip_proVden, dip_proVchla, dip_proVsum, dip_proVrate, dip_carbVlipid, dip_carbVden, dip_carbVchla, dip_carbVsum, dip_carbVrate, dip_denVchla, dip_denVsum, dip_denVrate, dip_chlaVsum, dip_chlaVrate, dip_sumVrate, labels = "AUTO", ncol = 2, scale = 0.9)
+dip_hostVsum <- ggplot(data = p_df, aes(x = host, y = sum, colour = fpco2, shape = ftemp, group = species)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  xlab("Total Host") + 
+  ylab("Sum colour intensity") +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  #geom_smooth(method = "lm", aes(group = fpco2), se = FALSE) +
+  #stat_cor(label.y = -0.5, label.x = 3.9) +
+  #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
+  geom_point()
+
+dip_hostVchla <- ggplot(data = p_df, aes(x = host, y = chla, colour = fpco2, shape = ftemp, group = species)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  xlab("Total Host") + 
+  ylab(clab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  #geom_smooth(method = "lm", aes(group = fpco2), se = FALSE) +
+  #stat_cor(label.y = -0.5, label.x = 3.9) +
+  #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
+  geom_point()
+  
+dip_hostVden <- ggplot(data = p_df, aes(x = host, y = den, colour = fpco2, shape = ftemp, group = species)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  xlab("Total Host") + 
+  ylab(dlab) +
+  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(19,1)) +
+  #geom_smooth(method = "lm", aes(group = fpco2), se = FALSE) +
+  #stat_cor(label.y = -0.5, label.x = 3.9) +
+  #stat_regline_equation(label.y = -0.7, label.x = 3.9) +
+  geom_point()
+
+#quartz()
+plot_grid(dip_proVcarb, dip_proVlipid, dip_proVden, dip_proVchla, dip_proVsum, dip_proVrate, dip_carbVlipid, dip_carbVden, dip_carbVchla, dip_carbVsum, dip_carbVrate, dip_denVchla, dip_denVsum, dip_denVrate, dip_chlaVsum, dip_chlaVrate, dip_sumVrate, dip_hostVrate, dip_hostVsum, dip_hostVchla, dip_hostVden, labels = "AUTO", ncol = 4, scale = 0.9)
 
 
 #ggsave("Ch3_appFig_PSTRscatter_29Jan20.pdf", width = 10, height = 14, units = "in")
@@ -1191,7 +1323,7 @@ plot_grid(dip_proVcarb, dip_proVlipid, dip_proVden, dip_proVchla, dip_proVsum, d
 
 #a_df <- subset(a_df, T0_T90 == "T90")
 
-por_chlaVrate <- ggplot(data = s_df, aes(x = chla, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+por_chlaVrate <- ggplot(data = a_df, aes(x = chla, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   xlab(clab) + 
@@ -1203,7 +1335,7 @@ por_chlaVrate <- ggplot(data = s_df, aes(x = chla, y = rate, colour = fpco2, sha
   #stat_regline_equation(label.y = -0.7, label.x = 150) +
   geom_point()
 
-por_redVchla <- ggplot(data = s_df, aes(x = chla, y = red, colour = fpco2, shape = ftemp, group = species)) +
+por_redVchla <- ggplot(data = a_df, aes(x = chla, y = red, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   ylab("Red colour intensity") + 
@@ -1214,7 +1346,7 @@ por_redVchla <- ggplot(data = s_df, aes(x = chla, y = red, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 150) +
   geom_point()
 
-por_rateVpro <- ggplot(data = s_df, aes(x = pro, y = rate, colour = fpco2, shape = ftemp, group = species)) +
+por_rateVpro <- ggplot(data = a_df, aes(x = pro, y = rate, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   ylab(rlab) + 
@@ -1225,7 +1357,7 @@ por_rateVpro <- ggplot(data = s_df, aes(x = pro, y = rate, colour = fpco2, shape
   #stat_regline_equation(label.y = -0.7, label.x = 150) +
   geom_point()
 
-por_carbVlipid <- ggplot(data = s_df, aes(x = carb, y = lipid, colour = fpco2, shape = ftemp, group = species)) +
+por_carbVlipid <- ggplot(data = a_df, aes(x = carb, y = lipid, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   ylab(calab) + 
@@ -1236,7 +1368,7 @@ por_carbVlipid <- ggplot(data = s_df, aes(x = carb, y = lipid, colour = fpco2, s
   #stat_regline_equation(label.y = -0.7, label.x = 150) +
   geom_point()
 
-por_carbVpro <- ggplot(data = s_df, aes(x = pro, y = carb, colour = fpco2, shape = ftemp, group = species)) +
+por_carbVpro <- ggplot(data = a_df, aes(x = pro, y = carb, colour = fpco2, shape = ftemp, group = species)) +
   theme_classic() +
   theme(legend.position = "none") +
   ylab(calab) + 
@@ -1567,7 +1699,111 @@ PAST_plot <- plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 3, scale = 0.8
 ```{r PCA plot, fig.height=12, fig.width=11}
 
 plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), rel_heights = c(0.82, 0.75, 1)) +
-  ggsave("Figures/Final_Figures/Figure2_PhysPCA_20Nov20.pdf", width = 11.5, height = 12)
+  ggsave("Figures/Final_Figures/Figure2_PhysPCA_04March21.pdf", width = 11.5, height = 12)
+
+```
+
+### *SSID subset PCA*
+
+```{r SSID subset PCA}
+
+# set up the dataframe
+s_df_sub <- s_df[!is.na(s_df$percent), ]
+s_df_sub_l <- gather(s_df_sub, param, value, c(14:17,21:23,27))
+
+
+
+# run the adonis
+#s_pca_mod <- adonis(value ~ reef * ftemp * fpco2 * domSymb, data = s_df_sub_l, method='eu') # below is the model with non sig interactions removed:
+s_pca_sub_mod <- adonis(value ~ ftemp + fpco2 + domSymb, data = s_df_sub_l, method='eu')
+s_pca_sub_mod # view SSID adonis output
+
+# extract pvalues
+s_sub_pval <- s_pca_sub_mod[["aov.tab"]][["Pr(>F)"]]
+
+# perform principal component analysis (PCA)
+s_sub_pca <- prcomp(s_df_sub[,c(14:17,21:23,27)], center = TRUE, scale= TRUE)
+
+```
+
+```{r SSID subset PCA plot, fig.height=8, fig.width=8}
+
+# create labels for p values calculated above
+s_sub_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_sub_pval[1], digits = 2)))
+s_sub_temp_pval <-substitute(italic(P[temp])==p, list(p = format(s_sub_pval[2], digits = 3)))
+s_sub_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(s_sub_pval[3], digits = 2)))
+
+# reef environment
+s_sub_reef_pca <- autoplot(s_sub_pca, data = s_df_sub, 
+         colour = "domSymb",
+         frame = TRUE, 
+         frame.type = "norm",
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 3, 
+         loadings.label.vjust = 1,
+         loadings.label.repel = TRUE) +
+  #scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  #scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA)) +  
+  #lims(x = c(-0.5,0.4), y = c(-0.6,0.5)) +
+  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
+  annotate("text", x = -0.39, y = -0.38, label = deparse(s_sub_reef_pval), parse = TRUE, size = 3) +
+  ggtitle("Dominant symbiont")
+
+# temperature
+s_sub_temp_pca <- autoplot(s_sub_pca, data = s_df_sub, 
+         colour = "ftemp",
+         shape = "treat2",
+         frame = TRUE, 
+         frame.type = "norm",
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 3, 
+         loadings.label.vjust = 1,
+         loadings.label.repel = TRUE) +
+  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
+  lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
+  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
+  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
+  annotate("text", x = -0.34, y = -0.38, label = deparse(s_sub_temp_pval), parse = TRUE, size = 3) +  
+  ggtitle("Temperature")
+
+# pco2
+s_sub_pco2_pca <- autoplot(s_sub_pca, data = s_df_sub, 
+         colour = "fpco2",
+         shape = "treat2",
+         frame = TRUE, 
+         frame.type = "norm",
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 3, 
+         loadings.label.vjust = 1,
+         loadings.label.repel = TRUE) +
+    scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
+    lims(x = c(-0.5,0.5), y = c(-0.6,0.6)) +   
+    scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
+    guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
+  annotate("text", x = -0.365, y = -0.38, label = deparse(s_sub_pco2_pval), parse = TRUE, size = 3) +   
+  ggtitle("Acidification")
+
+
+plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 2, scale = 0.8) # markdown figure
+
+SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8) # for final figure
 
 ```
 
