@@ -1751,7 +1751,7 @@ s_sub_reef_pca <- autoplot(s_sub_pca, data = s_df_sub,
   #lims(x = c(-0.5,0.4), y = c(-0.6,0.5)) +
   guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  annotate("text", x = -0.39, y = -0.38, label = deparse(s_sub_reef_pval), parse = TRUE, size = 3) +
+  #annotate("text", x = -0.39, y = -0.38, label = deparse(s_sub_reef_pval), parse = TRUE, size = 3) +
   ggtitle("Dominant symbiont")
 
 # temperature
@@ -1770,11 +1770,11 @@ s_sub_temp_pca <- autoplot(s_sub_pca, data = s_df_sub,
          loadings.label.repel = TRUE) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
-  lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
+  lims(x = c(-0.5,0.4), y = c(-0.4,0.5)) +
   scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  annotate("text", x = -0.34, y = -0.38, label = deparse(s_sub_temp_pval), parse = TRUE, size = 3) +  
+  #annotate("text", x = -0.34, y = -0.38, label = deparse(s_sub_temp_pval), parse = TRUE, size = 3) +  
   ggtitle("Temperature")
 
 # pco2
@@ -1797,11 +1797,12 @@ s_sub_pco2_pca <- autoplot(s_sub_pca, data = s_df_sub,
     scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
     guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  annotate("text", x = -0.365, y = -0.38, label = deparse(s_sub_pco2_pval), parse = TRUE, size = 3) +   
+  #annotate("text", x = -0.365, y = -0.38, label = deparse(s_sub_pco2_pval), parse = TRUE, size = 3) +   
   ggtitle("Acidification")
 
 
-plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 2, scale = 0.8) # markdown figure
+plot_grid(s_sub_temp_pca, s_sub_pco2_pca, s_sub_reef_pca, ncol = 3, scale = 0.8) + # markdown figure
+    ggsave("Figures/Supplemental_Figures/SSID_subset_PCA_09Mar21.pdf", width = 18, height = 5)
 
 SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8) # for final figure
 
@@ -1816,66 +1817,47 @@ SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8
 
 #### *S. siderea*
 
-aov(distance ~ *p*CO2 * temperature * reef)
-
 ```{r SSID distance dataframe setup}
 
 s_dis <- s_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+sid_pcWT <- summary(s_pca)$importance[2,1:2]
 
 sid_dist <- cbind(s_df[,c(1,7,10,11,12,9,25)], s_dis) # combine the datasets
 
+# going to also try to weight the PC distance by the overall variation 
 
-sid_dist$cont_pc1[sid_dist$treat2 == "447_28"] <- sid_dist$PC1[sid_dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
-sid_dist$cont_pc2[sid_dist$treat2 == "447_28"] <- sid_dist$PC2[sid_dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+sid_dist$PC1_wt <- sid_dist$PC1 * sid_pcWT[1]
+sid_dist$PC2_wt <- sid_dist$PC2 * sid_pcWT[2]
+
+# adds column with the control value PC1/PC2 per colony
+sid_dist$cont_pc1[sid_dist$treat2 == "447_28"] <- sid_dist$PC1[sid_dist$treat2 == "447_28"]
+sid_dist$cont_pc2[sid_dist$treat2 == "447_28"] <- sid_dist$PC2[sid_dist$treat2 == "447_28"]
+
+sid_dist$cont_pc1_wt[sid_dist$treat2 == "447_28"] <- sid_dist$PC1_wt[sid_dist$treat2 == "447_28"]
+sid_dist$cont_pc2_wt[sid_dist$treat2 == "447_28"] <- sid_dist$PC2_wt[sid_dist$treat2 == "447_28"]
 
 # get the 400_28 PC values
 sid_dist2 <- sid_dist %>%  
   group_by(colony) %>% 
-  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
-sid_dist3 <- sid_dist %>% 
-  group_by(colony) %>% 
-  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
+            con2_pc2 = sum(cont_pc2, na.rm = TRUE),
+            con2_pc1_wt = sum(cont_pc1_wt, na.rm = TRUE),
+            con2_pc2_wt = sum(cont_pc2_wt, na.rm = TRUE))
 
 # Make columns of the 400_28 PC values
 sid_dist <- sid_dist %>% 
   left_join(sid_dist2, by = c("colony" = "colony"))
-sid_dist <- sid_dist %>% 
-  left_join(sid_dist3, by = c("colony" = "colony"))
 
 sid_dist$dist <- sqrt(((sid_dist$PC1 - sid_dist$con2_pc1)^2) + ((sid_dist$PC2 - sid_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+sid_dist$dist_wt <- sqrt(((sid_dist$PC1_wt - sid_dist$con2_pc1_wt)^2) + ((sid_dist$PC2_wt - sid_dist$con2_pc2_wt)^2)) # formula for calculating distance between control (T90) and treatment values
 sid_dist$treat_plot <- paste(sid_dist$fpco2, sid_dist$ftemp, sep = "_")
 
 ```
 
 ```{r SSID distance analysis}
 
-s_dis_aov <- aov(dist ~ fpco2 * ftemp * reef, data = sid_dist)
-summary(s_dis_aov)
-sid_dis_tuk <- TukeyHSD(s_dis_aov)
-
-sid_dis_tab <- as.data.frame(sid_dis_tuk$`treat2:reef`)
-sid_dis_tab$treat <- rownames(sid_dis_tab)
-
-```
-
-Reef environment:
-```{r}
-
-sid_dis_tuk$reef
-
-```
-
-Temperature:
-```{r}
-
-sid_dis_tuk$ftemp
-
-```
-
-*p*CO~2~:
-```{r}
-
-sid_dis_tuk$fpco2
+summary(lm(dist ~ fpco2 * ftemp * reef, data = sid_dist))
+summary(lm(dist_wt ~ fpco2 * ftemp * reef, data = sid_dist))
 
 ```
 
@@ -1890,22 +1872,52 @@ sid_dist$treat_plot <- ordered(sid_dist$treat_plot, levels = c("420_28", "300_28
 
 sid_con_dis_plot <- ggplot(sid_dist_sum2) +
   theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", size= 0.8)) +
   #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
   ylab("Mean distance from control") +
   xlab("") +
-  ylim(0, 7) +
+  #ylim(0, 7) +
   #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = sid_dist) +
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
+  geom_point(aes(x = treat_plot, y = dist, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = sid_dist) +
+  geom_point(position = dodge, aes(x = treat, y = dist, colour = reef), shape = "-", size = 8) +  
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - ci, ymax = dist + ci, colour = reef), width = 0, size = 1.5) +
   geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
   annotate("text", x = 0.8, y = 7, label = "control") +  
   annotate("text", x = 2, y = 7, label = "pre-industrial") +
   annotate("text", x = 4, y = 7, label = "present-day") +
   annotate("text", x = 5.1, y = 7, label = "end-of-century") +
   annotate("text", x = 6.9, y = 7, label = "extreme") +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
-sid_con_dis_plot
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  ggtitle("Unweighted")
+
+
+# just treatment (weighted)
+sid_dist_sum2_wt <- summarySE(measurevar = "dist_wt", groupvars = c("fpco2", "ftemp", "reef"), data = sid_dist)
+sid_dist_sum2_wt$treat <- paste(sid_dist_sum2_wt$fpco2, sid_dist_sum2_wt$ftemp, sep = "_")
+
+sid_con_dis_wt_plot <- ggplot(sid_dist_sum2_wt) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
+  ylab("Mean distance from control") +
+  xlab("") +
+  #ylim(0, 7) +
+  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
+  geom_point(aes(x = treat_plot, y = dist_wt, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = sid_dist) +
+  geom_point(position = dodge, aes(x = treat, y = dist_wt, colour = reef), shape = "-", size = 8) +    
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist_wt - se, ymax = dist_wt + se, colour = reef), width = 0, size = 1.5) +
+  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
+  annotate("text", x = 0.8, y = 7, label = "control") +  
+  annotate("text", x = 2, y = 7, label = "pre-industrial") +
+  annotate("text", x = 4, y = 7, label = "present-day") +
+  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 7, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  ggtitle("Weighted")
+
+
+plot_grid(sid_con_dis_wt_plot, sid_con_dis_plot, ncol = 1, rel_heights = c(1,1.3)) +
+  ggsave("Figures/Supplemental_Figures/SSID_plasticity_09Mar21.pdf", width = 10, height = 7)
 
 ```
 
@@ -1916,65 +1928,47 @@ sid_con_dis_plot
 
 #### *P. strigosa*
 
-aov(distance ~ *p*CO2 + temperature + reef + *p*CO2:temperature)
-
 ```{r PSTR distance dataframe setup}
 
 p_dis <- p_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+dip_pcWT <- summary(p_pca)$importance[2,1:2]
 
 dip_dist <- cbind(p_df[,c(1,7,10,11,12,9,25)], p_dis) # combine the datasets
 
-dip_dist$cont_pc1[dip_dist$treat2 == "447_28"] <- dip_dist$PC1[dip_dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
-dip_dist$cont_pc2[dip_dist$treat2 == "447_28"] <- dip_dist$PC2[dip_dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+# going to also try to weight the PC distance by the overall variation 
+
+dip_dist$PC1_wt <- dip_dist$PC1 * dip_pcWT[1]
+dip_dist$PC2_wt <- dip_dist$PC2 * dip_pcWT[2]
+
+# adds column with the control value PC1/PC2 per colony
+dip_dist$cont_pc1[dip_dist$treat2 == "447_28"] <- dip_dist$PC1[dip_dist$treat2 == "447_28"]
+dip_dist$cont_pc2[dip_dist$treat2 == "447_28"] <- dip_dist$PC2[dip_dist$treat2 == "447_28"]
+
+dip_dist$cont_pc1_wt[dip_dist$treat2 == "447_28"] <- dip_dist$PC1_wt[dip_dist$treat2 == "447_28"]
+dip_dist$cont_pc2_wt[dip_dist$treat2 == "447_28"] <- dip_dist$PC2_wt[dip_dist$treat2 == "447_28"]
 
 # get the 400_28 PC values
 dip_dist2 <- dip_dist %>%  
   group_by(colony) %>% 
-  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
-dip_dist3 <- dip_dist %>% 
-  group_by(colony) %>% 
-  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
+            con2_pc2 = sum(cont_pc2, na.rm = TRUE),
+            con2_pc1_wt = sum(cont_pc1_wt, na.rm = TRUE),
+            con2_pc2_wt = sum(cont_pc2_wt, na.rm = TRUE))
 
 # Make columns of the 400_28 PC values
 dip_dist <- dip_dist %>% 
   left_join(dip_dist2, by = c("colony" = "colony"))
-dip_dist <- dip_dist %>% 
-  left_join(dip_dist3, by = c("colony" = "colony"))
 
 dip_dist$dist <- sqrt(((dip_dist$PC1 - dip_dist$con2_pc1)^2) + ((dip_dist$PC2 - dip_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+dip_dist$dist_wt <- sqrt(((dip_dist$PC1_wt - dip_dist$con2_pc1_wt)^2) + ((dip_dist$PC2_wt - dip_dist$con2_pc2_wt)^2)) # formula for calculating distance between control (T90) and treatment values
 dip_dist$treat_plot <- paste(dip_dist$fpco2, dip_dist$ftemp, sep = "_")
 
 ```
 
 ```{r PSTR distance analysis}
 
-p_dip_aov <- aov(dist ~ fpco2 + ftemp + reef + fpco2:ftemp, data = dip_dist)
-summary(p_dip_aov)
-dip_dip_tuk <- TukeyHSD(p_dip_aov)
-
-dip_dip_tab <- as.data.frame(dip_dip_tuk$`treat2:reef`)
-dip_dip_tab$treat <- rownames(dip_dip_tab)
-
-```
-
-Reef environment:
-```{r}
-
-dip_dip_tuk$reef
-
-```
-
-Temperature:
-```{r}
-
-dip_dip_tuk$ftemp
-
-```
-
-*p*CO~2~:
-```{r}
-
-dip_dip_tuk$fpco2
+summary(lm(dist ~ fpco2 * ftemp * reef, data = dip_dist))
+summary(lm(dist_wt ~ fpco2 * ftemp * reef, data = dip_dist))
 
 ```
 
@@ -1989,22 +1983,53 @@ dip_dist$treat_plot <- ordered(dip_dist$treat_plot, levels = c("420_28", "300_28
 
 dip_con_dis_plot <- ggplot(dip_dist_sum2) +
   theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", size= 0.8)) +
   #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
   ylab("Mean distance from control") +
   xlab("") +
-  ylim(0, 7) +
+  #ylim(0, 7) +
   #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = dip_dist) +
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
+  geom_point(aes(x = treat_plot, y = dist, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = dip_dist) +
+  geom_point(position = dodge, aes(x = treat, y = dist, colour = reef), shape = "-", size = 8) +  
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - ci, ymax = dist + ci, colour = reef), width = 0, size = 1.5) +
   geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 7, label = "control") +  
-  annotate("text", x = 2, y = 7, label = "pre-industrial") +
-  annotate("text", x = 4, y = 7, label = "present-day") +
-  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 7, label = "extreme") +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
-dip_con_dis_plot
+  annotate("text", x = 0.8, y = 5, label = "control") +  
+  annotate("text", x = 2, y = 5, label = "pre-industrial") +
+  annotate("text", x = 4, y = 5, label = "present-day") +
+  annotate("text", x = 5.1, y = 5, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 5, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  ggtitle("Unweighted")
+
+
+# just treatment (weighted)
+dip_dist_sum2_wt <- summarySE(measurevar = "dist_wt", groupvars = c("fpco2", "ftemp", "reef"), data = dip_dist)
+dip_dist_sum2_wt$treat <- paste(dip_dist_sum2_wt$fpco2, dip_dist_sum2_wt$ftemp, sep = "_")
+
+dip_con_dis_wt_plot <- ggplot(dip_dist_sum2_wt) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
+  ylab("Mean distance from control") +
+  xlab("") +
+  #ylim(0, 7) +
+  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
+  geom_point(aes(x = treat_plot, y = dist_wt, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = dip_dist) +
+  geom_point(position = dodge, aes(x = treat, y = dist_wt, colour = reef), shape = "-", size = 8) +    
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist_wt - se, ymax = dist_wt + se, colour = reef), width = 0, size = 1.5) +
+  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
+  annotate("text", x = 0.8, y = 5, label = "control") +  
+  annotate("text", x = 2, y = 5, label = "pre-industrial") +
+  annotate("text", x = 4, y = 5, label = "present-day") +
+  annotate("text", x = 5.1, y = 5, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 5, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  ggtitle("Weighted")
+
+
+## Save combined plot
+plot_grid(dip_con_dis_wt_plot, dip_con_dis_plot, ncol = 1, rel_heights = c(1,1.3)) +
+  ggsave("Figures/Supplemental_Figures/PSTR_plasticity_09Mar21.pdf", width = 10, height = 7)
 
 ```
 
@@ -2015,65 +2040,47 @@ dip_con_dis_plot
 
 #### *P. astreoides*
 
-aov(distance ~ *p*CO2 + temperature + reef)
-
 ```{r PAST distance dataframe setup}
 
 a_dis <- a_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+por_pcWT <- summary(a_pca)$importance[2,1:2]
 
 por_dist <- cbind(a_df[,c(1,7,10,11,12,9,25)], a_dis) # combine the datasets
 
-por_dist$cont_pc1[por_dist$treat2 == "447_28"] <- por_dist$PC1[por_dist$treat2 == "447_28"] # this adds column with the control value PC1 per colony
-por_dist$cont_pc2[por_dist$treat2 == "447_28"] <- por_dist$PC2[por_dist$treat2 == "447_28"] # this adds column with the control value PC2 per colony
+# going to also try to weight the PC distance by the overall variation 
+
+por_dist$PC1_wt <- por_dist$PC1 * por_pcWT[1]
+por_dist$PC2_wt <- por_dist$PC2 * por_pcWT[2]
+
+# adds column with the control value PC1/PC2 per colony
+por_dist$cont_pc1[por_dist$treat2 == "447_28"] <- por_dist$PC1[por_dist$treat2 == "447_28"]
+por_dist$cont_pc2[por_dist$treat2 == "447_28"] <- por_dist$PC2[por_dist$treat2 == "447_28"]
+
+por_dist$cont_pc1_wt[por_dist$treat2 == "447_28"] <- por_dist$PC1_wt[por_dist$treat2 == "447_28"]
+por_dist$cont_pc2_wt[por_dist$treat2 == "447_28"] <- por_dist$PC2_wt[por_dist$treat2 == "447_28"]
 
 # get the 400_28 PC values
 por_dist2 <- por_dist %>%  
   group_by(colony) %>% 
-  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE))
-por_dist3 <- por_dist %>% 
-  group_by(colony) %>% 
-  summarise(con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
+            con2_pc2 = sum(cont_pc2, na.rm = TRUE),
+            con2_pc1_wt = sum(cont_pc1_wt, na.rm = TRUE),
+            con2_pc2_wt = sum(cont_pc2_wt, na.rm = TRUE))
 
 # Make columns of the 400_28 PC values
 por_dist <- por_dist %>% 
   left_join(por_dist2, by = c("colony" = "colony"))
-por_dist <- por_dist %>% 
-  left_join(por_dist3, by = c("colony" = "colony"))
 
 por_dist$dist <- sqrt(((por_dist$PC1 - por_dist$con2_pc1)^2) + ((por_dist$PC2 - por_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+por_dist$dist_wt <- sqrt(((por_dist$PC1_wt - por_dist$con2_pc1_wt)^2) + ((por_dist$PC2_wt - por_dist$con2_pc2_wt)^2)) # formula for calculating distance between control (T90) and treatment values
 por_dist$treat_plot <- paste(por_dist$fpco2, por_dist$ftemp, sep = "_")
 
 ```
 
 ```{r PAST distance analysis}
 
-a_por_aov <- aov(dist ~ fpco2 + ftemp + reef, data = por_dist)
-summary(a_por_aov)
-por_por_tuk <- TukeyHSD(a_por_aov)
-
-por_por_tab <- as.data.frame(por_por_tuk$`treat2:reef`)
-por_por_tab$treat <- rownames(por_por_tab)
-
-```
-
-Reef environment:
-```{r}
-
-por_por_tuk$reef
-
-```
-
-Temperature:
-```{r}
-
-por_por_tuk$ftemp
-
-```
-
-*p*CO~2~:
-```{r}
-
-por_por_tuk$fpco2
+summary(lm(dist ~ fpco2 * ftemp * reef, data = por_dist))
+summary(lm(dist_wt ~ fpco2 * ftemp * reef, data = por_dist))
 
 ```
 
@@ -2088,24 +2095,55 @@ por_dist$treat_plot <- ordered(por_dist$treat_plot, levels = c("420_28", "300_28
 
 por_con_dis_plot <- ggplot(por_dist_sum2) +
   theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), axis.line=element_line(color="black"), legend.key=element_blank(), strip.background = element_blank(), legend.position="right", panel.border = element_rect(colour = "black", size= 0.8)) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", size= 0.8)) +
   #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
   ylab("Mean distance from control") +
   xlab("") +
-  ylim(0, 7) +
+  #ylim(0, 7) +
   #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist, colour = reef), position = dodge, alpha = 0.3, size = 2.5, data = por_dist) +
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - se, ymax = dist + se, colour = reef), width = 0, size = 1.5) +
+  geom_point(aes(x = treat_plot, y = dist, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = por_dist) +
+  geom_point(position = dodge, aes(x = treat, y = dist, colour = reef), shape = "-", size = 8) +  
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - ci, ymax = dist + ci, colour = reef), width = 0, size = 1.5) +
   geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 7, label = "control") +  
-  annotate("text", x = 2, y = 7, label = "pre-industrial") +
-  annotate("text", x = 4, y = 7, label = "present-day") +
-  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 7, label = "extreme") +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))
-por_con_dis_plot
+  annotate("text", x = 0.8, y = 4, label = "control") +  
+  annotate("text", x = 2, y = 4, label = "pre-industrial") +
+  annotate("text", x = 4, y = 4, label = "present-day") +
+  annotate("text", x = 5.1, y = 4, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 4, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  ggtitle("Unweighted")
+
+
+# just treatment (weighted)
+por_dist_sum2_wt <- summarySE(measurevar = "dist_wt", groupvars = c("fpco2", "ftemp", "reef"), data = por_dist)
+por_dist_sum2_wt$treat <- paste(por_dist_sum2_wt$fpco2, por_dist_sum2_wt$ftemp, sep = "_")
+
+por_con_dis_wt_plot <- ggplot(por_dist_sum2_wt) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", size= 0.8)) +
+  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
+  ylab("Mean distance from control") +
+  xlab("") +
+  #ylim(0, 7) +
+  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
+  geom_point(aes(x = treat_plot, y = dist_wt, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = por_dist) +
+  geom_point(position = dodge, aes(x = treat, y = dist_wt, colour = reef), shape = "-", size = 8) +    
+  geom_errorbar(position = dodge, aes(x = treat, ymin = dist_wt - se, ymax = dist_wt + se, colour = reef), width = 0, size = 1.5) +
+  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
+  annotate("text", x = 0.8, y = 4, label = "control") +  
+  annotate("text", x = 2, y = 4, label = "pre-industrial") +
+  annotate("text", x = 4, y = 4, label = "present-day") +
+  annotate("text", x = 5.1, y = 4, label = "end-of-century") +
+  annotate("text", x = 6.9, y = 4, label = "extreme") +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  ggtitle("Weighted")
+
+
+plot_grid(por_con_dis_wt_plot, por_con_dis_plot, ncol = 1, rel_heights = c(1,1.3)) +
+  ggsave("Figures/Supplemental_Figures/PAST_plasticity_09Mar21.pdf", width = 10, height = 7)
 
 ```
+
 
 ---
 
