@@ -1421,77 +1421,52 @@ s_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[1], digits =
 s_temp_pval <-substitute(italic(P[temp])==p, list(p = format(s_pval[2], digits = 3)))
 s_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(s_pval[3], digits = 2)))
 
-# reef environment
-s_reef_pca <- autoplot(s_pca, data = s_df, 
-         colour = "reef",
-         frame = TRUE, 
-         frame.type = "norm",
-         loadings = TRUE, 
-         loadings.colour = "black", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 3, 
-         loadings.label.vjust = 1,
-         loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA)) +  
-  lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
-  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  annotate("text", x = -0.39, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3) +
-  ggtitle("Reef Environment")
 
 # temperature
 s_temp_pca <- autoplot(s_pca, data = s_df, 
          colour = "ftemp",
-         shape = "treat2",
+         shape = "fpco2",
+         fill = "ftemp",               
          frame = TRUE, 
          frame.type = "norm",
+         frame.alpha = 0.01,
          loadings = TRUE, 
          loadings.colour = "black", 
          loadings.label = TRUE,
          loadings.label.colour = "black",         
          loadings.label.size = 4, 
-         loadings.label.hjust = 3, 
-         loadings.label.vjust = 1,
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
+  scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
-  lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +
-  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
-  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  annotate("text", x = -0.34, y = -0.38, label = deparse(s_temp_pval), parse = TRUE, size = 3) +  
-  ggtitle("Temperature")
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.345, y = -0.38, label = deparse(s_temp_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste("A)   ", italic("S. siderea"))))
 
 # pco2
 s_pco2_pca <- autoplot(s_pca, data = s_df, 
          colour = "fpco2",
-         shape = "treat2",
+         shape = "ftemp",
          frame = TRUE, 
          frame.type = "norm",
+         frame.alpha = 0.01,
          loadings = TRUE, 
          loadings.colour = "black", 
          loadings.label = TRUE,
          loadings.label.colour = "black",         
          loadings.label.size = 4, 
-         loadings.label.hjust = 3, 
-         loadings.label.vjust = 1,
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-    scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
     scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
-    lims(x = c(-0.5,0.4), y = c(-0.4,0.4)) +   
-    scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
-    guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
-  annotate("text", x = -0.365, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3) +   
-  ggtitle("Acidification")
-
-
-plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 2, scale = 0.8) # markdown figure
-
-SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8) # for final figure
+    scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0)))) +
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.345, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3)
 
 ```
 
@@ -1524,73 +1499,52 @@ p_reef_pval <-substitute(italic(P[reef])==p, list(p = format(p_pval[1], digits =
 p_temp_pval <-substitute(italic(P[temp])==p, list(p = format(p_pval[2], digits = 3)))
 p_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3], digits = 2)))
 
-# reef environment
-p_reef_pca <- autoplot(p_pca, data = p_df, 
-         colour = "reef",
-         frame = TRUE, 
-         frame.type = "norm",
-         loadings = TRUE, 
-         loadings.colour = "black", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = -1, 
-         loadings.label.vjust = 2,
-         loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))+
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA))+
-  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top")) +  
-  lims(x = c(-0.5,0.5), y = c(-0.5,0.7)) +   
-  annotate("text", x = -0.36, y = -0.48, label = deparse(p_reef_pval), parse = TRUE, size = 3) +     
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
 
 # temperature
 p_temp_pca <- autoplot(p_pca, data = p_df, 
          colour = "ftemp",
-         shape = "treat2",
+         shape = "fpco2",
+         fill = "ftemp",               
          frame = TRUE, 
          frame.type = "norm",
+         frame.alpha = 0.01,
          loadings = TRUE, 
          loadings.colour = "black", 
          loadings.label = TRUE,
          loadings.label.colour = "black",         
          loadings.label.size = 4, 
-         loadings.label.hjust = -1, 
-         loadings.label.vjust = 2,
+         loadings.label.hjust = 1, 
+         loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
+  scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
-  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
-  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+ 
-  lims(x = c(-0.5,0.5), y = c(-0.5,0.7)) +   
-  annotate("text", x = -0.345, y = -0.48, label = deparse(p_temp_pval), parse = TRUE, size = 3) + 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.175, y = -0.38, label = deparse(p_temp_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste("B)   ", italic("P. strigosa"))))
 
 # pco2
 p_pco2_pca <- autoplot(p_pca, data = p_df, 
          colour = "fpco2",
-         shape = "treat2",
+         shape = "ftemp",
          frame = TRUE, 
          frame.type = "norm",
+         frame.alpha = 0.01,
          loadings = TRUE, 
          loadings.colour = "black", 
          loadings.label = TRUE,
          loadings.label.colour = "black",         
          loadings.label.size = 4, 
-         loadings.label.hjust = -1, 
-         loadings.label.vjust = 2,
+         loadings.label.hjust = 1, 
+         loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
-  scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
-  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
-  lims(x = c(-0.5,0.5), y = c(-0.5,0.7)) +   
-  annotate("text", x = -0.345, y = -0.48, label = deparse(p_pco2_pval), parse = TRUE, size = 3) + 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none")
-
-plot_grid(p_temp_pca, p_pco2_pca, p_reef_pca, ncol = 2, scale = 0.8) # markdown figure
-
-PSTR_plot <- plot_grid(p_temp_pca, p_pco2_pca, p_reef_pca, ncol = 3, scale = 0.8) # for plotting final figure
+    scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
+    scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
+    scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0)))) +
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.285, y = -0.38, label = deparse(p_pco2_pval), parse = TRUE, size = 3)
 
 ```
 
@@ -1624,73 +1578,52 @@ a_reef_pval <-substitute(italic(P[reef])==p, list(p = format(a_pval[1], digits =
 a_temp_pval <-substitute(italic(P[temp])==p, list(p = format(a_pval[2], digits = 3)))
 a_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(a_pval[3], digits = 2)))
 
-# reef environment
-a_reef_pca <- autoplot(a_pca, data = a_df, 
-         colour = "reef",
-         frame = TRUE, 
-         frame.type = "norm",
-         loadings = TRUE, 
-         loadings.colour = "black", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = -1, 
-         loadings.label.vjust = 1,
-         loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b"))+
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c(NA, NA))+
-  guides(col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  lims(x = c(-0.5,0.5), y = c(-0.5,0.5)) +  
-  annotate("text", x = -0.37, y = -0.49, label = deparse(a_reef_pval), parse = TRUE, size = 3) + 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
 
 # temperature
-a_tema_pca <- autoplot(a_pca, data = a_df, 
+a_temp_pca <- autoplot(a_pca, data = a_df, 
          colour = "ftemp",
-         shape = "treat2",
+         shape = "fpco2",
+         fill = "ftemp",               
          frame = TRUE, 
          frame.type = "norm",
+         frame.alpha = 0.01,
          loadings = TRUE, 
          loadings.colour = "black", 
          loadings.label = TRUE,
          loadings.label.colour = "black",         
          loadings.label.size = 4, 
-         loadings.label.hjust = -1, 
-         loadings.label.vjust = 1,
+         loadings.label.hjust = -0.6, 
+         loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
+  scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
-  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
-  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
-  lims(x = c(-0.5,0.5), y = c(-0.5,0.5)) +   
-  annotate("text", x = -0.36, y = -0.49, label = deparse(a_temp_pval), parse = TRUE, size = 3) + 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.295, y = -0.40, label = deparse(a_temp_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste("C)   ", italic("P. astreoides"))))
 
 # pco2
 a_pco2_pca <- autoplot(a_pca, data = a_df, 
          colour = "fpco2",
-         shape = "treat2",
+         shape = "ftemp",
          frame = TRUE, 
          frame.type = "norm",
+         frame.alpha = 0.01,
          loadings = TRUE, 
          loadings.colour = "black", 
          loadings.label = TRUE,
          loadings.label.colour = "black",         
          loadings.label.size = 4, 
-         loadings.label.hjust = -1, 
-         loadings.label.vjust = 1,
+         loadings.label.hjust = -0.6, 
+         loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
-  scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
-  guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
-  lims(x = c(-0.5,0.5), y = c(-0.5,0.5)) +   
-  annotate("text", x = -0.35, y = -0.49, label = deparse(a_pco2_pval), parse = TRUE, size = 3) + 
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "bottom", legend.title = element_blank())
-
-plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 2, scale = 0.8) # markdown figure
-
-PAST_plot <- plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 3, scale = 0.8) # for plotting final figure
+    scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
+    scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
+    scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0)))) +
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.205, y = -0.5, label = deparse(a_pco2_pval), parse = TRUE, size = 3)
 
 ```
 
@@ -1698,8 +1631,11 @@ PAST_plot <- plot_grid(a_tema_pca, a_pco2_pca, a_reef_pca, ncol = 3, scale = 0.8
 
 ```{r PCA plot, fig.height=12, fig.width=11}
 
-plot_grid(SSID_plot, PSTR_plot, PAST_plot, ncol = 1, labels = c("A", "B", "C"), rel_heights = c(0.82, 0.75, 1)) +
-  ggsave("Figures/Final_Figures/Figure2_PhysPCA_04March21.pdf", width = 11.5, height = 12)
+temp_PCA <- ggarrange(s_temp_pca, p_temp_pca, a_temp_pca, ncol = 3, common.legend = TRUE, legend = "right")
+pCO2_PCA <- ggarrange(s_pco2_pca, p_pco2_pca, a_pco2_pca, ncol = 3, common.legend = TRUE, legend = "right")
+
+ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
+  ggsave("Figures/Final_Figures/Figure2_PhysPCA_23March21.pdf", width = 13, height = 8)
 
 ```
 
@@ -1771,7 +1707,7 @@ s_sub_temp_pca <- autoplot(s_sub_pca, data = s_df_sub,
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c(NA, NA))+
   lims(x = c(-0.5,0.4), y = c(-0.4,0.5)) +
-  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,16,2,17,5,18))+
+  scale_shape_manual("pCO2", labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century","end-of-century", "extreme", "extreme"), values = c(0,15,1,19,2,17,5,18))+
   guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+  
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
   #annotate("text", x = -0.34, y = -0.38, label = deparse(s_sub_temp_pval), parse = TRUE, size = 3) +  
@@ -1794,7 +1730,7 @@ s_sub_pco2_pca <- autoplot(s_sub_pca, data = s_df_sub,
     scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
     lims(x = c(-0.5,0.5), y = c(-0.6,0.6)) +   
-    scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,16,2,17,5,18))+
+    scale_shape_manual("temperature", labels = c("28C", "31C", "28C", "31C", "28C", "31C", "28C", "31C"), values = c(0,15,1,19,2,17,5,18))+
     guides(shape = FALSE, col = guide_legend(nrow = 2, byrow = TRUE, title.position = "top"))+
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = "none") +
   #annotate("text", x = -0.365, y = -0.38, label = deparse(s_sub_pco2_pval), parse = TRUE, size = 3) +   
