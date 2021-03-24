@@ -54,6 +54,9 @@ library(gridGraphics)
 library(grid)
 library(RColorBrewer)
 library(wesanderson)
+library(performance)
+library(MASS)
+
 
 ```
 
@@ -87,11 +90,17 @@ date <- Sys.Date()
 
 ```{r original dataframe adjustment, include=FALSE}
 
-df <- read_csv("Data/Raw_data/phys_all_21Oct19.csv") # read in full dataframe
+#df <- read_csv("Data/Raw_data/phys_all_21Oct19.csv") # read in full dataframe
+#den_count <- read_csv("/Users/colleen/Dropbox/Grad school/UNC_PhD_Folders/Boston_Experiment/Physiology/Symbiont #Density/density_ForAddition_23Mar21.csv")
+#
+#test <- merge(df, den_count, by = "coral")
+#test$X1 <- NULL
+#test$X1_1 <- NULL 
+#
+#write.csv(test, "Data/Raw_data/phys_all_23March2021.csv")
 
-# remove unnecessary column
+df <- read_csv("Data/Raw_data/phys_all_23March2021.csv") # read in full dataframe
 df$X1 <- NULL
-df$X1_1 <- NULL 
 
 # rename a couple columns
 names(df)[38]<-"carb"
@@ -141,9 +150,9 @@ df$blue_bw5 <- (df$blue_bw5 * -1)
 df$green_bw5 <- (df$green_bw5 * -1)
 
 ## modify dataframe for simplified version
-df2 <- df[,c(1:16, 38:40, 17, 34:36, 41)] # select columns of interest only
-df2 <- gather(df2, param, value, den:blue_bw5) # make column of parameter and value
-df2$param <- factor(df2$param, levels = c("pro", "carb", "lipid", "den", "chla", "host", "red", "green_bw5", "blue_bw5", "sum")) # reorder parameters
+df2 <- df[,c(1:13, 41, 14:16, 37:40, 42:43, 17)] # select columns of interest only
+df2 <- gather(df2, param, value, den:sum) # make column of parameter and value
+df2$param <- factor(df2$param, levels = c("pro", "carb", "lipid", "den", "chla", "host", "count")) # reorder parameters
 df2$species <- revalue(x = df2$species, c("S" = "SSID", "P" = "PSTR", "A" = "PAST", "T" = "UTEN")) # rename the species codes
 df2 <- subset(df2, species != "UTEN") # remove UTEN (omitted due to high mortality in some treatments)
 
@@ -223,6 +232,67 @@ for (p in 1:length(param_list)) {
 files <- fs::dir_ls(glob = "*csv", path = "LMER_model_outputs/T0_models/")
 mergedT0 <- vroom(files)
 write.csv(mergedT0, file = paste("LMER_model_outputs/T0_combined_out_", date, ".csv", sep=""))  # last saved model was: 2020-11-11
+
+```
+
+### Model selection per parameter
+
+```{r create dataframe per parameter}
+
+## Create a forloop to subset the data by each parameter and save as individual dataframes
+
+# make a list of parameter names
+param_list <- levels(df2_T90$param)[-4]
+
+# forloop for dataframes
+for (p in 1:length(param_list)) {
+  param_select <- param_list[p]
+  df_subset <- subset(df2_T90, param == param_select) # subset the dataframe for only one parameter
+  df_subset <- completeFun(df_subset, "value") # run function to remove any missing values
+  df_subset$value <- as.numeric(df_subset$value)
+  assign(paste(param_select, "mod_df", sep = "_"), df_subset) # assign the data to dataframe named for each parameter 
+}
+
+```
+
+
+```{rmodel fitting: protein}
+
+param_df_list <- lapply(ls(pattern = "mod_df"), function(x) get(x))
+model_plot_list <- NULL
+
+for (p in 1:length(param_list)) {
+  
+  df <- param_df_list[[p]]
+  param_list <- sort(param_list)
+  param_select <- param_list[p]
+
+  if (df[1,15] == "count") {
+    glm_full <- lme4::glmer.nb(value ~ species * fpco2 * ftemp * reef + offset(log(offset)) + (1 | colony), data = df)
+    glm_add <- glmer.nb(value ~ species + fpco2 + ftemp + reef + offset(log(offset)) + (1 | colony), data = df)
+    glm_base <- glmer.nb(value ~ species * (fpco2 + ftemp) + reef + offset(log(offset)) + (1 | colony), data = df)
+  } else if (df[1,15] == "chla") {
+    glm_full <- glmer(value ~ species * fpco2 * ftemp * reef + (1 | colony), family = Gamma(link = "log"), data = df)
+    glm_add <- glmer(value ~ species + fpco2 + ftemp + reef + (1 | colony), family = Gamma(link = "log"), data = df)
+    glm_base <- glmer(value ~ species * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = df)
+    } else {
+    glm_full <- glmer(value ~ species * fpco2 * ftemp * reef + (1 | colony), family = Gamma, data = df)
+    glm_add <- glmer(value ~ species + fpco2 + ftemp + reef + (1 | colony), family = Gamma, data = df)
+    glm_base <- glmer(value ~ species * (fpco2 + ftemp) + (1 | colony), family = Gamma, data = df)
+  }
+  
+  model_compare_table <- compare_performance(glm_full, glm_add, glm_base, rank = TRUE)
+  assign(paste(param_select, "mod_table", sep = "_"), model_compare_table) # assign the data to dataframe named for each parameter 
+  model_plot_list[[p]] <- plot(model_compare_table)
+  
+}
+
+
+
+
+  
+
+# Protein: proceeding with the base model with a gamma distribution
 
 ```
 
