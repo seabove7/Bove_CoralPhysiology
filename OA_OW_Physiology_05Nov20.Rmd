@@ -56,7 +56,7 @@ library(RColorBrewer)
 library(wesanderson)
 library(performance)
 library(MASS)
-
+library(png)
 
 ```
 
@@ -173,6 +173,11 @@ completeFun <- function(data, desiredCols) {
 bootnum = 2000 # set number of iterations (we used 2000) between 999 and 9999
 seed = 7 #seed to make results replicatable (our seed was 7)
 
+## create function for adding pngs to plots
+get_png <- function(filename) {
+  grid::rasterGrob(png::readPNG(filename), interpolate = TRUE)
+}
+
 ```
 
 ```{r coral images}
@@ -235,14 +240,33 @@ write.csv(mergedT0, file = paste("LMER_model_outputs/T0_combined_out_", date, ".
 
 ```
 
+```{r T0 dataframe subsetting}
+
+df_T0 <- read.csv("LMER_model_outputs/T0_combined_out_2020-11-12.csv", head = TRUE)
+
+# make a list of parameter names
+param_list <- levels(df_T0$param)
+
+# forloop for dataframes
+for (p in 1:length(param_list)) {
+  param_select <- param_list[p]
+  df_subset <- subset(df_T0, param == param_select) # subset the dataframe for only one parameter
+  df_subset <- completeFun(df_subset, "value") # run function to remove any missing values
+  df_subset$value <- as.numeric(df_subset$value)
+  assign(paste("df_T0", param_select, sep = "_"), df_subset) # assign the data to dataframe named for each parameter 
+}
+
+```
+
+
 ### Model selection per parameter
 
 ```{r create dataframe per parameter}
 
-## Create a forloop to subset the data by each parameter and save as individual dataframes
+## Create a forloop to subset the data by each parameter and save as individual dataframes 
 
 # make a list of parameter names
-param_list <- levels(df2_T90$param)[-4]
+param_list <- levels(df2_T90$param)
 
 # forloop for dataframes
 for (p in 1:length(param_list)) {
@@ -250,13 +274,17 @@ for (p in 1:length(param_list)) {
   df_subset <- subset(df2_T90, param == param_select) # subset the dataframe for only one parameter
   df_subset <- completeFun(df_subset, "value") # run function to remove any missing values
   df_subset$value <- as.numeric(df_subset$value)
+  df_subset$ftemp <- droplevels(df_subset$ftemp)
+  df_subset$fpco2 <- droplevels(df_subset$fpco2)
+  df_subset$colony <- droplevels(df_subset$colony)
+  df_subset$species <- droplevels(df_subset$species)
   assign(paste(param_select, "mod_df", sep = "_"), df_subset) # assign the data to dataframe named for each parameter 
 }
 
 ```
 
 
-```{rmodel fitting: protein}
+```{r model fitting, eval=FALSE, include=FALSE}
 
 param_df_list <- lapply(ls(pattern = "mod_df"), function(x) get(x))
 model_plot_list <- NULL
@@ -268,7 +296,7 @@ for (p in 1:length(param_list)) {
   param_select <- param_list[p]
 
   if (df[1,15] == "count") {
-    glm_full <- lme4::glmer.nb(value ~ species * fpco2 * ftemp * reef + offset(log(offset)) + (1 | colony), data = df)
+    glm_full <- glmer.nb(value ~ species * fpco2 * ftemp * reef + offset(log(offset)) + (1 | colony), data = df)
     glm_add <- glmer.nb(value ~ species + fpco2 + ftemp + reef + offset(log(offset)) + (1 | colony), data = df)
     glm_base <- glmer.nb(value ~ species * (fpco2 + ftemp) + reef + offset(log(offset)) + (1 | colony), data = df)
   } else if (df[1,15] == "chla") {
@@ -289,7 +317,7 @@ for (p in 1:length(param_list)) {
 
 
 
-
+summary(g1 <- glmer.nb(value ~ species * fpco2 * ftemp * reef + offset(log(offset)) + (1 | colony), data = df))
   
 
 # Protein: proceeding with the base model with a gamma distribution
@@ -301,12 +329,8 @@ for (p in 1:length(param_list)) {
 
 ```{r protein model selection, include=FALSE}
 
-## subsetting for protein only
-df_pro <- subset(df2_T90, param=="pro") # subset the dataframe for only protein values
-df_pro <- completeFun(df_pro, "value") # run function to remove any missing values
-
 ## run the full mixed-effects model for backwards removal of non-significant effects (using lmerTest version 3.1-3)
-pro_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony), data = df_pro) # full model
+pro_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony), data = pro_mod_df) # full model
 pro_step <- step(pro_full_model) # run removal for best-fit model
 pro_mod <- get_model(pro_step) # pull the final model
 pro_mod_bestfit <- pro_mod@call[["formula"]] # pulls the model output
@@ -322,21 +346,17 @@ While *`r pro_mod_bestfit`* was the best-fit model structure identified, we want
 
 ```{r protein bootstrapping, eval=FALSE}
 
-## subsetting (if you did not already do this in running the AIC selection script)
-df_pro <- subset(df2_T90, param=="pro") # subset the dataframe for only protein values
-df_pro <- completeFun(df_pro, "value") # run function to remove any missing protein values
-
 ## mixed effect model run using lmer() (lmerTest version 3.1-3)
-T90_df_model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML = TRUE, data = df_pro)
+T90_df_model <- lmer(value ~ species + fpco2 + ftemp + (1 | colony) + species:ftemp, REML = TRUE, data = pro_mod_df)
 out <- simulate(T90_df_model, nsim = bootnum, seed = seed, re.form = NULL) # simulate model protein response 2000 (bootnum) times (using random effects)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML = TRUE, data = df_pro), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species + fpco2 + ftemp + (1 | colony) + species:ftemp, REML = TRUE, data = pro_mod_df), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
 boots <- cbind(predict(T90_df_model, re.form = NA), boots) # adds column to above df of predicted protein values without random effects
-df_pro_a <- (cbind(df_pro, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
-colnames(df_pro_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
+pro_mod_df_a <- (cbind(pro_mod_df, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
+colnames(pro_mod_df_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
 
 pro_df <- paste("LMER_model_outputs/Protein_model", date, sep="_") 
 pro_df <- paste(pro_df, ".csv", sep="") 
-write.csv(df_pro_a, file = pro_df)  # last saved model was: 2020-11-12
+write.csv(pro_mod_df_a, file = pro_mod_df_a)  # last saved model was: 2020-11-12
 
 ```
 
@@ -345,12 +365,8 @@ Figure:
 
 ```{r protein figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-## need to add T0 samples to the plot (but these are modeled in different bootstrapping)
-df_T0_all <- read.csv("LMER_model_outputs/T0_combined_out_2020-11-12.csv", header = TRUE)
-df_T0_pro <- subset(df_T0_all, param == "pro")
-
 ## load the protein bootstrapped model output
-df_pro_a <- read.csv("LMER_model_outputs/Protein_model_2020-11-12.csv", head = TRUE)
+df_pro_a <- read.csv("LMER_model_outputs/Protein_model_2021-03-24.csv", head = TRUE)
 df_pro_a$ftemp <- as.factor(df_pro_a$ftemp)
 df_pro_a$fpco2 <- as.factor(df_pro_a$fpco2)
 df_pro_a$species <- factor(df_pro_a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
@@ -378,12 +394,8 @@ pro_model_fig
 
 ```{r carbohydrate model selection, include=FALSE}
 
-## subsetting for carbohydrate only
-df_carb <- subset(df2_T90, param=="carb") # subset the dataframe for only carbohydrate values
-df_carb <- completeFun(df_carb, "value") # run function to remove any missing values
-
 ## run the full mixed-effects model for backwards removal of non-significant effects (using lmerTest version 3.1-3)
-carb_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = df_carb) # full model
+carb_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = carb_mod_df) # full model
 carb_step <- step(carb_full_model) # run removal for best-fit model
 carb_mod <- get_model(carb_step) # pull the final model
 carb_mod_bestfit <- carb_mod[["call"]][["formula"]] # pulls the model output
@@ -400,21 +412,17 @@ While *`r carb_mod_bestfit`* was the best-fit model structure identified, we wan
 
 ```{r carbohydrate bootstrapping, eval=FALSE}
 
-## subsetting (if you did not already do this in running the AIC selection script)
-df_carb <- subset(df2_T90, param=="carb") # subset the T90 dataframe for only carbohydrate values
-df_carb <- completeFun(df_carb, "value") # run function to remove any missing carbohydrate values
-
 ## mixed effect model run using lmer() (lmerTest version 3.1-3)
-T90_df_model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML = TRUE, data = df_carb)
+T90_df_model <- lmer(value ~ species * (fpco2 + ftemp) + (1 | colony), REML = TRUE, data = carb_mod_df)
 out <- simulate(T90_df_model, nsim = bootnum, seed = seed, re.form = NULL) # simulate model carbohydrate response 2000 (bootnum) times (using random effects)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML = TRUE, data = df_carb), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + (1 | colony), REML = TRUE, data = carb_mod_df), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
 boots <- cbind(predict(T90_df_model, re.form = NA), boots) # adds column to above df of predicted carbohydrate values without random effects
-df_carb_a <- (cbind(df_carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
-colnames(df_carb_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
+carb_mod_df_a <- (cbind(df_carb, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
+colnames(carb_mod_df_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
 
 carb_df <- paste("LMER_model_outputs/Carbohydrate_model", date, sep="_") 
 carb_df <- paste(carb_df, ".csv", sep="") 
-write.csv(df_carb_a, file = carb_df)  # last saved model was: 020-11-12
+write.csv(carb_mod_df_a, file = carb_df)  # last saved model was: 020-11-12
 
 ```
 
@@ -422,10 +430,6 @@ write.csv(df_carb_a, file = carb_df)  # last saved model was: 020-11-12
 Figure:
 
 ```{r carbohydrate figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
-
-## need to add T0 samples to the plot (but these are modeled in different bootstrapping)
-df_T0_all <- read.csv("LMER_model_outputs/T0_combined_out_2020-11-12.csv", header = TRUE)
-df_T0_carb <- subset(df_T0_all, param == "carb")
 
 ## load the carbohydrate bootstrapped model output
 df_carb_a <- read.csv("LMER_model_outputs/Carbohydrate_model_2020-11-12.csv", head=T)
@@ -456,12 +460,8 @@ carb_model_fig
 
 ```{r lipid model selection, include=FALSE}
 
-## subsetting for lipid only
-df_lipid <- subset(df2_T90, param=="lipid") # subset the dataframe for only lipid values
-df_lipid <- completeFun(df_lipid, "value") # run function to remove any missing values
-
 ## run the full mixed-effects model for backwards removal of non-significant effects (using lmerTest version 3.1-3)
-lipid_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = df_lipid) # full model
+lipid_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = lipid_mod_df) # full model
 lipid_step <- step(lipid_full_model) # run removal for best-fit model
 lipid_mod <- get_model(lipid_step) # pull the final model
 lipid_mod_bestfit <- lipid_mod[["call"]][["formula"]] # pulls the model output 
@@ -476,21 +476,17 @@ While *`r lipid_mod_bestfit`* was the best-fit model structure identified, we wa
 
 ```{r lipid bootstrapping, eval=FALSE}
 
-## subsetting (if you did not already do this in running the AIC selection script)
-df_lipid <- subset(df2_T90, param=="lipid") # subset the T90 dataframe for only lipid values
-df_lipid <- completeFun(df_lipid, "value") # run function to remove any missing lipid values
-
 ## mixed effect model run using lmer() (lmerTest version 3.1-3)
-T90_df_model <- lmer(value ~ species * (fpco2 + ftemp) + reef + species:reef + (1 | colony), REML = TRUE, data = df_lipid)
+T90_df_model <- lmer(value ~ species + ftemp + reef + species:ftemp + species:reef + (1|colony), REML = TRUE, data = lipid_mod_df)
 out <- simulate(T90_df_model, nsim = bootnum, seed = seed, re.form = NULL) # simulate model lipid response 2000 (bootnum) times (using random effects)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + reef + species:reef + (1 | colony), REML = TRUE, data = df_lipid), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species + ftemp + reef + species:ftemp + species:reef + (1|colony), REML = TRUE, data = lipid_mod_df), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
 boots <- cbind(predict(T90_df_model, re.form = NA), boots) # adds column to above df of predicted lipid values without random effects
-df_lipid_a <- (cbind(df_lipid, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
-colnames(df_lipid_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
+lipid_mod_df_a <- (cbind(lipid_mod_df, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
+colnames(lipid_mod_df_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
 
 lipid_df <- paste("LMER_model_outputs/Lipid_model", date, sep="_") 
 lipid_df <- paste(lipid_df, ".csv", sep="") 
-write.csv(df_lipid_a, file = lipid_df)  # last saved model was: 2020-11-12
+write.csv(lipid_mod_df_a, file = lipid_df)  # last saved model was: 2020-11-12
 
 ```
 
@@ -499,12 +495,8 @@ Figure:
 
 ```{r lipid figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-## need to add T0 samples to the plot (but these are modeled in different bootstrapping)
-df_T0_all <- read.csv("LMER_model_outputs/T0_combined_out_2020-11-12.csv", header = TRUE)
-df_T0_lipid <- subset(df_T0_all, param == "lipid")
-
 ## load the lipid bootstrapped model output
-df_lipid_a <- read.csv("LMER_model_outputs/Lipid_model_2020-11-12.csv", head=T)
+df_lipid_a <- read.csv("LMER_model_outputs/Lipid_model_2021-03-24.csv", head=T)
 df_lipid_a$ftemp <- as.factor(df_lipid_a$ftemp)
 df_lipid_a$fpco2 <- as.factor(df_lipid_a$fpco2)
 df_lipid_a$species <- factor(df_lipid_a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
@@ -532,12 +524,8 @@ lipid_model_fig
 
 ```{r density model selection, include=FALSE}
 
-## subsetting for density only
-df_den <- subset(df2_T90, param=="den") # subset the dataframe for only density values
-df_den <- completeFun(df_den, "value") # run function to remove any missing values
-
 ## run the full mixed-effects model for backwards removal of non-significant effects (using lmerTest version 3.1-3)
-den_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = df_den) # full model
+den_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = den_mod_df) # full model
 den_step <- step(den_full_model) # run removal for best-fit model
 den_mod <- get_model(den_step) # pull the final model
 den_mod_bestfit <- den_mod@call[["formula"]] # pulls the model output
@@ -554,21 +542,17 @@ While *`r den_mod_bestfit`* was the best-fit model structure identified, we want
 
 ```{r density bootstrapping, eval=FALSE}
 
-## subsetting (if you did not already do this in running the AIC selection script)
-df_den <- subset(df2_T90, param=="den") # subset the T90 dataframe for only density values
-df_den <- completeFun(df_den, "value") # run function to remove any missing density values
-
 ## mixed effect model run using lmer() (lmerTest version 3.1-3)
-T90_df_model <- lmer(value ~ species * (fpco2 + ftemp) + reef + species:reef + (1 | colony), REML = TRUE, data = df_den)
+T90_df_model <- lmer(value ~ species + fpco2 + ftemp + reef + (1 | colony) + species:fpco2 + species:ftemp + fpco2:ftemp + species:reef + fpco2:reef + ftemp:reef + species:fpco2:ftemp + species:fpco2:reef + species:ftemp:reef + fpco2:ftemp:reef + species:fpco2:ftemp:reef, REML = TRUE, data = den_mod_df)
 out <- simulate(T90_df_model, nsim = bootnum, seed = seed, re.form = NULL) # simulate model density response 2000 (bootnum) times (using random effects)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species * (fpco2 + ftemp) + reef + species:reef + (1 | colony), REML = TRUE, data = df_den), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species + fpco2 + ftemp + reef + (1 | colony) + species:fpco2 + species:ftemp + fpco2:ftemp + species:reef + fpco2:reef + ftemp:reef + species:fpco2:ftemp + species:fpco2:reef + species:ftemp:reef + fpco2:ftemp:reef + species:fpco2:ftemp:reef, REML = TRUE, data = den_mod_df), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
 boots <- cbind(predict(T90_df_model, re.form = NA), boots) # adds column to above df of predicted density values without random effects
-df_den_a <- (cbind(df_den, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
-colnames(df_den_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
+den_mod_df_a <- (cbind(den_mod_df, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
+colnames(den_mod_df_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
 
 den_df <- paste("LMER_model_outputs/Density_model", date, sep="_") 
 den_df <- paste(den_df, ".csv", sep="") 
-write.csv(df_den_a, file = den_df)  # last saved model was: Density_model_2020-11-05.csv
+write.csv(den_mod_df_a, file = den_df)  # last saved model was: Density_model_2020-11-05.csv
 
 ```
 
@@ -576,10 +560,6 @@ write.csv(df_den_a, file = den_df)  # last saved model was: Density_model_2020-1
 Figure:
 
 ```{r density figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
-
-## need to add T0 samples to the plot (but these are modeled in different bootstrapping)
-df_T0_all <- read.csv("LMER_model_outputs/T0_combined_out_2020-11-12.csv", header = TRUE)
-df_T0_den <- subset(df_T0_all, param == "den")
 
 ## load the density bootstrapped model output
 df_den_a <- read.csv("LMER_model_outputs/Density_model_2020-11-12.csv", head=T)
@@ -610,12 +590,8 @@ den_model_fig
 
 ```{r chlorophyll model selection, include=FALSE}
 
-## subsetting for chlorophyll only
-df_chla <- subset(df2_T90, param=="chla") # subset the dataframe for only chlorophyll values
-df_chla <- completeFun(df_chla, "value") # run function to remove any missing values
-
 ## run the full mixed-effects model for backwards removal of non-significant effects (using lmerTest version 3.1-3)
-chla_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = df_chla) # full model
+chla_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = chla_mod_df) # full model
 chla_step <- step(chla_full_model) # run removal for best-fit model
 chla_mod <- get_model(chla_step) # pull the final model
 chla_mod_bestfit <- chla_mod@call[["formula"]] # pulls the model output
@@ -631,21 +607,17 @@ Since the best-fit model fits our design, we will proceed with the following mod
 
 ```{r chlorophyll bootstrapping, eval=FALSE}
 
-## subsetting (if you did not already do this in running the AIC selection script)
-df_chla <- subset(df2_T90, param=="chla") # subset the T90 dataframe for only chlorophyll values
-df_chla <- completeFun(df_chla, "value") # run function to remove any missing chlorophyll values
-
 ## mixed effect model run using lmer() (lmerTest version 3.1-3)
-T90_df_model <- lmer(value ~ species + fpco2 + ftemp + reef + species:fpco2 + species:ftemp + fpco2:ftemp + species:reef + (1 | colony), REML = TRUE, data = df_chla)
+T90_df_model <- lmer(value ~ species + fpco2 + ftemp + reef + (1 | colony) + species:fpco2 + species:ftemp + fpco2:ftemp + species:reef, REML = TRUE, data = chla_mod_df)
 out <- simulate(T90_df_model, nsim = bootnum, seed = seed, re.form = NULL) # simulate model chlorophyll response 2000 (bootnum) times (using random effects)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species + fpco2 + ftemp + reef + species:fpco2 + species:ftemp + fpco2:ftemp + species:reef + (1 | colony), REML = TRUE, data = df_chla), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species + fpco2 + ftemp + reef + (1 | colony) + species:fpco2 + species:ftemp + fpco2:ftemp + species:reef, REML = TRUE, data = chla_mod_df), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
 boots <- cbind(predict(T90_df_model, re.form = NA), boots) # adds column to above df of predicted chlorophyll values without random effects
-df_chla_a <- (cbind(df_chla, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
-colnames(df_chla_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
+chla_mod_df_a <- (cbind(chla_mod_df, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
+colnames(chla_mod_df_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
 
 chla_df <- paste("LMER_model_outputs/Chlorophyll_model", date, sep="_") 
 chla_df <- paste(chla_df, ".csv", sep="") 
-write.csv(df_chla_a, file = chla_df)  # last saved model was: Chlorophyll_model_2020-11-05.csv
+write.csv(chla_mod_df_a, file = chla_df)  # last saved model was: Chlorophyll_model_2020-11-05.csv
 
 ```
 
@@ -654,12 +626,8 @@ Figure:
 
 ```{r chlorophyll figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-## need to add T0 samples to the plot (but these are modeled in different bootstrapping)
-df_T0_all <- read.csv("LMER_model_outputs/T0_combined_out_2020-11-12.csv", header = TRUE)
-df_T0_chla <- subset(df_T0_all, param == "chla")
-
 ## load the chlorophyll bootstrapped model output
-df_chla_a <- read.csv("LMER_model_outputs/Chlorophyll_model_2020-11-12.csv", head=T)
+df_chla_a <- read.csv("LMER_model_outputs/Chlorophyll_model_2021-03-24.csv", head=T)
 df_chla_a$ftemp <- as.factor(df_chla_a$ftemp)
 df_chla_a$fpco2 <- as.factor(df_chla_a$fpco2)
 df_chla_a$species <- factor(df_chla_a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
@@ -687,12 +655,8 @@ chla_model_fig
 
 ```{r total host model selection, include=FALSE}
 
-## subsetting for total host only
-df_host <- subset(df2_T90, param=="host") # subset the dataframe for only total host values
-df_host <- completeFun(df_host, "value") # run function to remove any missing values
-
 ## run the full mixed-effects model for backwards removal of non-significant effects (using lmerTest version 3.1-3)
-host_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = df_host) # full model
+host_full_model <- lmer(value ~ species * fpco2 * ftemp * reef + (1 | colony) + (1 | reef), data = host_mod_df) # full model
 host_step <- step(host_full_model) # run removal for best-fit model
 host_mod <- get_model(host_step) # pull the final model
 host_mod_bestfit <- host_mod@call[["formula"]] # pulls the model output 
@@ -708,21 +672,17 @@ Since the best-fit model fits our design, we will proceed with the following mod
 
 ```{r total host bootstrapping, eval=FALSE}
 
-## subsetting (if you did not already do this in running the AIC selection script)
-df_host <- subset(df2_T90, param=="host") # subset the T90 dataframe for only total host values
-df_host <- completeFun(df_host, "value") # run function to remove any missing total host values
-
 ## mixed effect model run using lmer() (lmerTest version 3.1-3)
-T90_df_model <- lmer(value ~ species + fpco2 + ftemp + reef + species:fpco2 + species:ftemp + species:reef + fpco2:reef + species:fpco2:reef + (1 | colony), REML = TRUE, data = df_host)
+T90_df_model <- lmer(value ~ species + fpco2 + ftemp + reef + (1 | colony) + species:fpco2 + species:ftemp + species:reef + fpco2:reef + species:fpco2:reef, REML = TRUE, data = host_mod_df)
 out <- simulate(T90_df_model, nsim = bootnum, seed = seed, re.form = NULL) # simulate model total host response 2000 (bootnum) times (using random effects)
-boots <- apply(out, 2, function(x) predict(lmer(x ~ species + fpco2 + ftemp + reef + species:fpco2 + species:ftemp + species:reef + fpco2:reef + species:fpco2:reef + (1 | colony), REML = TRUE, data = df_host), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
+boots <- apply(out, 2, function(x) predict(lmer(x ~ species + fpco2 + ftemp + reef + (1 | colony) + species:fpco2 + species:ftemp + species:reef + fpco2:reef + species:fpco2:reef, REML = TRUE, data = host_mod_df), re.form=NA)) # applies predict function on the columns (2) of the 'out' matrix created above from simulating the model 
 boots <- cbind(predict(T90_df_model, re.form = NA), boots) # adds column to above df of predicted total host values without random effects
-df_host_a <- (cbind(df_host, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
-colnames(df_host_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
+host_mod_df_a <- (cbind(host_mod_df, as.data.frame(t(apply(boots, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))) # apply function to calculate mean and 95% CI per sample based on the bootstrapped values, then add these to the actual values dataframe
+colnames(host_mod_df_a)[17:19] <- c("mean", "lowerci", "upperci") # rename columns with bootstrapped values
 
 host_df <- paste("LMER_model_outputs/TotalHost_model", date, sep="_") 
 host_df <- paste(host_df, ".csv", sep="") 
-write.csv(df_host_a, file = host_df)  # last saved model was: TotalHost_model_2020-11-05.csv
+write.csv(host_mod_df_a, file = host_df)  # last saved model was: TotalHost_model_2020-11-05.csv
 
 ```
 
@@ -731,12 +691,8 @@ Figure:
 
 ```{r total host figure, fig.height = 2, fig.width = 10, fig.align = "center", results = 'hide', message=FALSE}
 
-## need to add T0 samples to the plot (but these are modeled in different bootstrapping)
-df_T0_all <- read.csv("LMER_model_outputs/T0_combined_out_2020-11-12.csv", header = TRUE)
-df_T0_host <- subset(df_T0_all, param == "host")
-
 ## load the host bootstrapped model output
-df_host_a <- read.csv("LMER_model_outputs/TotalHost_model_2020-11-12.csv", head=T)
+df_host_a <- read.csv("LMER_model_outputs/TotalHost_model_2021-03-24.csv", head=T)
 df_host_a$ftemp <- as.factor(df_host_a$ftemp)
 df_host_a$fpco2 <- as.factor(df_host_a$fpco2)
 df_host_a$species <- factor(df_host_a$species, levels = c("SSID", "PSTR", "PAST", "UTEN"))
@@ -1468,28 +1424,29 @@ plot_grid(por_chlaVrate, por_redVchla, por_rateVpro, por_carbVlipid, por_carbVpr
 
 # set up the dataframe
 s_df <- unique(s_df) # remove any duplicate rows
-s_df_l <- gather(s_df, param, value, c(14:16,21:23))
+s_df_l <- gather(s_df, param, value, c(14:17,21:23))
 s_df$fpco2 <- factor(s_df$fpco2, levels = c("300", "420", "680", "3300"))
+sid_pca_df <- s_df[,c(14:17,21:23)]
 
 # run the adonis
-#s_pca_mod <- adonis(value ~ reef * ftemp * fpco2, data = s_df_l, method='eu') # below is the model with non sig interactions removed:
-s_pca_mod <- adonis(value ~ reef + ftemp + fpco2, data = s_df_l, method='eu')
+#s_pca_mod <- adonis2(sid_pca_df ~ reef * ftemp * fpco2, data = s_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
+s_pca_mod <- adonis2(sid_pca_df ~ fpco2 + ftemp + reef, data = s_df, by="margin", method = 'eu', permutations = bootnum)
 s_pca_mod # view SSID adonis output
 
 # extract pvalues
-s_pval <- s_pca_mod[["aov.tab"]][["Pr(>F)"]]
+s_pval <- s_pca_mod["Pr(>F)"]
 
 # perform principal component analysis (PCA)
-s_pca <- prcomp(s_df[,c(14:16,21:23)], center = TRUE, scale= TRUE)
+s_pca <- prcomp(sid_pca_df, center = TRUE, scale= TRUE)
 
 ```
 
 ```{r SSID PCA plot, fig.height=8, fig.width=8}
 
 # create labels for p values calculated above
-s_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[1], digits = 2)))
-s_temp_pval <-substitute(italic(P[temp])==p, list(p = format(s_pval[2], digits = 3)))
-s_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(s_pval[3], digits = 2)))
+s_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[1,1], digits = 2)))
+s_temp_pval <-substitute(italic(P[temp])==p, list(p = format(s_pval[2,1], digits = 3)))
+s_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(s_pval[3,1], digits = 2)))
 
 
 # temperature
@@ -1538,6 +1495,29 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
   annotate("text", x = -0.345, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3)
 
+# reef
+s_reef_pca <- autoplot(s_pca, data = s_df, 
+         colour = "reef",
+         shape = "reef",
+         fill = "reef",               
+         frame = TRUE, 
+         frame.type = "norm",
+         frame.alpha = 0.01,
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
+         loadings.label.repel = TRUE) +
+  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
+  #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.345, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+
 ```
 
 ### *Pseudodiploria strigosa*
@@ -1548,26 +1528,27 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
 p_df <- unique(p_df) # remove duplicate rows
 p_df_l <- gather(p_df, param, value, c(14:16,21:23))
 p_df$fpco2 <- factor(p_df$fpco2, levels = c("300", "420", "680", "3300"))
+dip_pca_df <- p_df[,c(14:17,21:23)]
 
 # run the adonis
-#p_pca_mod <- adonis(value ~ reef * ftemp * fpco2, data = p_df_l, method='eu') # below is the model with non sig interactions removed:
-p_pca_mod <- adonis(value ~ reef + ftemp + fpco2, data = p_df_l, method='eu')
+#p_pca_mod <- adonis2(dip_pca_df ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
+p_pca_mod <- adonis2(dip_pca_df ~ reef + fpco2 + ftemp, data = p_df, by="margin",  method = 'eu', permutations = bootnum)
 p_pca_mod # view PSTR adonis output
 
 # extract pvalues
-p_pval <- p_pca_mod[["aov.tab"]][["Pr(>F)"]]
+p_pval <- p_pca_mod["Pr(>F)"]
 
 # perform principal component analysis (PCA)
-p_pca <- prcomp(p_df[,c(14:16,21:23)], center = TRUE, scale= TRUE)
+p_pca <- prcomp(dip_pca_df, center = TRUE, scale= TRUE)
 
 ```
 
 ```{r PSTR PCA plot, fig.height=8, fig.width=8}
 
 # create labels for p values calculated above
-p_reef_pval <-substitute(italic(P[reef])==p, list(p = format(p_pval[1], digits = 2)))
-p_temp_pval <-substitute(italic(P[temp])==p, list(p = format(p_pval[2], digits = 3)))
-p_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3], digits = 2)))
+p_reef_pval <-substitute(italic(P[reef])==p, list(p = format(p_pval[1,1], digits = 2)))
+p_temp_pval <-substitute(italic(P[temp])==p, list(p = format(p_pval[2,1], digits = 3)))
+p_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3,1], digits = 2)))
 
 
 # temperature
@@ -1616,6 +1597,29 @@ p_pco2_pca <- autoplot(p_pca, data = p_df,
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
   annotate("text", x = -0.285, y = -0.38, label = deparse(p_pco2_pval), parse = TRUE, size = 3)
 
+# reef
+p_reef_pca <- autoplot(p_pca, data = p_df, 
+         colour = "reef",
+         shape = "reef",
+         fill = "reef",               
+         frame = TRUE, 
+         frame.type = "norm",
+         frame.alpha = 0.01,
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
+         loadings.label.repel = TRUE) +
+  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
+  #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.345, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3)
+
 ```
 
 ### *Porites astreoides*
@@ -1627,26 +1631,27 @@ a_df <- unique(a_df)
 a_df <- a_df[-17,] # we have two from the same colony in 400_28 that are performing similarly so one is being removed (CFAD12)
 a_df_l <- gather(a_df, param, value, c(14:16,21:23))
 a_df$fpco2 <- factor(a_df$fpco2, levels = c("300", "420", "680", "3300"))
+por_pca_df <- a_df[,c(14:16,18,21:23)]
 
 # run the adonis
-#a_pca_mod <- adonis(value ~ reef * ftemp * fpco2, data = a_df_l, method='eu') # below is the model with non sig interactions removed:
-a_pca_mod <- adonis(value ~ reef + ftemp + fpco2, data = a_df_l, method='eu')
+#a_pca_mod <- adonis2(por_pca_df ~ fpco2 * ftemp * reef, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
+a_pca_mod <- adonis2(por_pca_df ~ reef + ftemp + fpco2, data = a_df, by="margin", method = 'eu', permutations = bootnum)
 a_pca_mod # view PAST adonis output
 
 # extract pvalues
-a_pval <- a_pca_mod[["aov.tab"]][["Pr(>F)"]]
+a_pval <- a_pca_mod["Pr(>F)"]
 
 # perform principal component analysis (PCA)
-a_pca <- prcomp(a_df[,c(14:16,21:23)], center = TRUE, scale= TRUE)
+a_pca <- prcomp(por_pca_df, center = TRUE, scale= TRUE)
 
 ```
 
 ```{r PAST PCA plot, fig.height=8, fig.width=8}
 
 # create labels for p values calculated above
-a_reef_pval <-substitute(italic(P[reef])==p, list(p = format(a_pval[1], digits = 2)))
-a_temp_pval <-substitute(italic(P[temp])==p, list(p = format(a_pval[2], digits = 3)))
-a_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(a_pval[3], digits = 2)))
+a_reef_pval <-substitute(italic(P[reef])==p, list(p = format(a_pval[1,1], digits = 2)))
+a_temp_pval <-substitute(italic(P[temp])==p, list(p = format(a_pval[2,1], digits = 3)))
+a_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(a_pval[3,1], digits = 2)))
 
 
 # temperature
@@ -1694,6 +1699,29 @@ a_pco2_pca <- autoplot(a_pca, data = a_df,
     guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0)))) +
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
   annotate("text", x = -0.205, y = -0.5, label = deparse(a_pco2_pval), parse = TRUE, size = 3)
+
+# reef
+a_reef_pca <- autoplot(a_pca, data = a_df, 
+         colour = "reef",
+         shape = "reef",
+         fill = "reef",               
+         frame = TRUE, 
+         frame.type = "norm",
+         frame.alpha = 0.01,
+         loadings = TRUE, 
+         loadings.colour = "black", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
+         loadings.label.repel = TRUE) +
+  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
+  #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.345, y = -0.38, label = deparse(a_reef_pval), parse = TRUE, size = 3)
 
 ```
 
@@ -1826,104 +1854,66 @@ SSID_plot <- plot_grid(s_temp_pca, s_pco2_pca, s_reef_pca, ncol = 3, scale = 0.8
 ```{r SSID distance dataframe setup}
 
 s_dis <- s_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
-sid_pcWT <- summary(s_pca)$importance[2,1:2]
-
-sid_dist <- cbind(s_df[,c(1,7,10,11,12,9,25)], s_dis) # combine the datasets
-
-# going to also try to weight the PC distance by the overall variation 
-
-sid_dist$PC1_wt <- sid_dist$PC1 * sid_pcWT[1]
-sid_dist$PC2_wt <- sid_dist$PC2 * sid_pcWT[2]
+sid_dist <- cbind(s_df[,c(1,7,10,11,12,27)], s_dis) # combine the datasets
 
 # adds column with the control value PC1/PC2 per colony
 sid_dist$cont_pc1[sid_dist$treat2 == "447_28"] <- sid_dist$PC1[sid_dist$treat2 == "447_28"]
 sid_dist$cont_pc2[sid_dist$treat2 == "447_28"] <- sid_dist$PC2[sid_dist$treat2 == "447_28"]
 
-sid_dist$cont_pc1_wt[sid_dist$treat2 == "447_28"] <- sid_dist$PC1_wt[sid_dist$treat2 == "447_28"]
-sid_dist$cont_pc2_wt[sid_dist$treat2 == "447_28"] <- sid_dist$PC2_wt[sid_dist$treat2 == "447_28"]
-
 # get the 400_28 PC values
 sid_dist2 <- sid_dist %>%  
   group_by(colony) %>% 
   summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
-            con2_pc2 = sum(cont_pc2, na.rm = TRUE),
-            con2_pc1_wt = sum(cont_pc1_wt, na.rm = TRUE),
-            con2_pc2_wt = sum(cont_pc2_wt, na.rm = TRUE))
+            con2_pc2 = sum(cont_pc2, na.rm = TRUE))
 
 # Make columns of the 400_28 PC values
 sid_dist <- sid_dist %>% 
   left_join(sid_dist2, by = c("colony" = "colony"))
 
 sid_dist$dist <- sqrt(((sid_dist$PC1 - sid_dist$con2_pc1)^2) + ((sid_dist$PC2 - sid_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
-sid_dist$dist_wt <- sqrt(((sid_dist$PC1_wt - sid_dist$con2_pc1_wt)^2) + ((sid_dist$PC2_wt - sid_dist$con2_pc2_wt)^2)) # formula for calculating distance between control (T90) and treatment values
 sid_dist$treat_plot <- paste(sid_dist$fpco2, sid_dist$ftemp, sep = "_")
 
 ```
 
 ```{r SSID distance analysis}
 
-summary(lm(dist ~ fpco2 * ftemp * reef, data = sid_dist))
-summary(lm(dist_wt ~ fpco2 * ftemp * reef, data = sid_dist))
+sid_dist <- sid_dist %>% 
+  filter(treat_plot != "420_28")
+
+ssid_dist_mod <- lm(log(dist) ~ fpco2 + ftemp + reef, data = sid_dist)
+ssid_dist_mod2 <- lm(dist ~ fpco2 + ftemp + reef, data = sid_dist)
+ssid_dist_mod3 <- lm(log(dist) ~ fpco2 + ftemp, data = sid_dist)
+ssid_dist_mod4 <- lm(dist ~ fpco2 + ftemp, data = sid_dist)
+
+compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, rank = TRUE)
+plot(compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, rank = TRUE))
+
+
+summary(ssid_dist_mod)
+check_model(ssid_dist_mod)
+
+sid_dist_sum <- sid_dist %>% 
+  group_by(treat_plot, reef) %>% 
+  summarise(mean = mean(dist))
 
 ```
 
 <br/>
 
-```{r plots of SSID distances, fig.height = 3, fig.width = 10}
+```{r plots of SSID distances, fig.height = 3.5, fig.width = 6}
 
-# just treatment
-sid_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = sid_dist)
-sid_dist_sum2$treat <- paste(sid_dist_sum2$fpco2, sid_dist_sum2$ftemp, sep = "_")
-sid_dist$treat_plot <- ordered(sid_dist$treat_plot, levels = c("420_28", "300_28", "300_31", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+sid_png <- get_png("Figures/Supplemental_Figures/SSID_cartoon.png")
 
-sid_con_dis_plot <- ggplot(sid_dist_sum2) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", size= 0.8)) +
-  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
-  ylab("Mean distance from control") +
-  xlab("") +
-  #ylim(0, 7) +
-  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = sid_dist) +
-  geom_point(position = dodge, aes(x = treat, y = dist, colour = reef), shape = "-", size = 8) +  
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - ci, ymax = dist + ci, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 7, label = "control") +  
-  annotate("text", x = 2, y = 7, label = "pre-industrial") +
-  annotate("text", x = 4, y = 7, label = "present-day") +
-  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 7, label = "extreme") +
+ggplot(sid_dist_sum, aes(x = treat_plot, y = mean)) +
+  theme_pubr() +
+  geom_point(data = sid_dist, aes(x = treat_plot, y = dist, colour = reef), shape = 1, size = 3, alpha = 0.7, position = position_dodge(width = 0.6)) +
+  geom_segment(aes(x = treat_plot, xend = treat_plot, y = 0, yend = mean), colour = "grey", size = 1.5) +
+  geom_point(aes(colour = reef), size = 6) +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  ggtitle("Unweighted")
-
-
-# just treatment (weighted)
-sid_dist_sum2_wt <- summarySE(measurevar = "dist_wt", groupvars = c("fpco2", "ftemp", "reef"), data = sid_dist)
-sid_dist_sum2_wt$treat <- paste(sid_dist_sum2_wt$fpco2, sid_dist_sum2_wt$ftemp, sep = "_")
-
-sid_con_dis_wt_plot <- ggplot(sid_dist_sum2_wt) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", size= 0.8)) +
-  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
-  ylab("Mean distance from control") +
-  xlab("") +
-  #ylim(0, 7) +
-  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist_wt, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = sid_dist) +
-  geom_point(position = dodge, aes(x = treat, y = dist_wt, colour = reef), shape = "-", size = 8) +    
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist_wt - se, ymax = dist_wt + se, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 7, label = "control") +  
-  annotate("text", x = 2, y = 7, label = "pre-industrial") +
-  annotate("text", x = 4, y = 7, label = "present-day") +
-  annotate("text", x = 5.1, y = 7, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 7, label = "extreme") +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  ggtitle("Weighted")
-
-
-plot_grid(sid_con_dis_wt_plot, sid_con_dis_plot, ncol = 1, rel_heights = c(1,1.3)) +
-  ggsave("Figures/Supplemental_Figures/SSID_plasticity_09Mar21.pdf", width = 10, height = 7)
+  labs(y = "PC distance from control", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0,8)) +
+  annotation_custom(sid_png, xmin = 0.1, xmax = 2.6, ymin = 5.6, ymax = 8.1) +
+  ggsave("Figures/Supplemental_Figures/SSID_plasticity.pdf", width = 6, height = 3.5)
 
 ```
 
@@ -1937,105 +1927,67 @@ plot_grid(sid_con_dis_wt_plot, sid_con_dis_plot, ncol = 1, rel_heights = c(1,1.3
 ```{r PSTR distance dataframe setup}
 
 p_dis <- p_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
-dip_pcWT <- summary(p_pca)$importance[2,1:2]
-
-dip_dist <- cbind(p_df[,c(1,7,10,11,12,9,25)], p_dis) # combine the datasets
-
-# going to also try to weight the PC distance by the overall variation 
-
-dip_dist$PC1_wt <- dip_dist$PC1 * dip_pcWT[1]
-dip_dist$PC2_wt <- dip_dist$PC2 * dip_pcWT[2]
+dip_dist <- cbind(p_df[,c(1,7,10,11,12,27)], p_dis) # combine the datasets
 
 # adds column with the control value PC1/PC2 per colony
 dip_dist$cont_pc1[dip_dist$treat2 == "447_28"] <- dip_dist$PC1[dip_dist$treat2 == "447_28"]
 dip_dist$cont_pc2[dip_dist$treat2 == "447_28"] <- dip_dist$PC2[dip_dist$treat2 == "447_28"]
 
-dip_dist$cont_pc1_wt[dip_dist$treat2 == "447_28"] <- dip_dist$PC1_wt[dip_dist$treat2 == "447_28"]
-dip_dist$cont_pc2_wt[dip_dist$treat2 == "447_28"] <- dip_dist$PC2_wt[dip_dist$treat2 == "447_28"]
-
 # get the 400_28 PC values
 dip_dist2 <- dip_dist %>%  
   group_by(colony) %>% 
   summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
-            con2_pc2 = sum(cont_pc2, na.rm = TRUE),
-            con2_pc1_wt = sum(cont_pc1_wt, na.rm = TRUE),
-            con2_pc2_wt = sum(cont_pc2_wt, na.rm = TRUE))
+            con2_pc2 = sum(cont_pc2, na.rm = TRUE))
 
 # Make columns of the 400_28 PC values
 dip_dist <- dip_dist %>% 
   left_join(dip_dist2, by = c("colony" = "colony"))
 
-dip_dist$dist <- sqrt(((dip_dist$PC1 - dip_dist$con2_pc1)^2) + ((dip_dist$PC2 - dip_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
-dip_dist$dist_wt <- sqrt(((dip_dist$PC1_wt - dip_dist$con2_pc1_wt)^2) + ((dip_dist$PC2_wt - dip_dist$con2_pc2_wt)^2)) # formula for calculating distance between control (T90) and treatment values
+dip_dist$dist <- sqrt(((dip_dist$PC1 - dip_dist$con2_pc1)^2) + ((dip_dist$PC2 - dip_dist$con2_pc2)^2)) # formula for 
 dip_dist$treat_plot <- paste(dip_dist$fpco2, dip_dist$ftemp, sep = "_")
 
 ```
 
 ```{r PSTR distance analysis}
 
-summary(lm(dist ~ fpco2 * ftemp * reef, data = dip_dist))
-summary(lm(dist_wt ~ fpco2 * ftemp * reef, data = dip_dist))
+dip_dist <- dip_dist %>% 
+  filter(treat_plot != "420_28")
+
+pstr_dist_mod <- lm(log(dist) ~ fpco2 + ftemp + reef, data = dip_dist)
+pstr_dist_mod2 <- lm(log(dist) ~ fpco2 * ftemp * reef, data = dip_dist)
+pstr_dist_mod3 <- lm(log(dist) ~ fpco2 * ftemp + reef, data = dip_dist)
+pstr_dist_mod4 <- lm(log(dist) ~ fpco2 * ftemp, data = dip_dist)
+
+compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, rank = TRUE)
+plot(compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, rank = TRUE))
+
+
+summary(pstr_dist_mod2)
+check_model(pstr_dist_mod2)
+
+dip_dist_sum <- dip_dist %>% 
+  group_by(treat_plot, reef) %>% 
+  summarise(mean = mean(dist))
 
 ```
 
 <br/>
   
-```{r plots of PSTR distances, fig.height = 3, fig.width = 10}
+```{r plots of PSTR distances, fig.height = 3.5, fig.width = 6}
 
-# just treatment
-dip_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = dip_dist)
-dip_dist_sum2$treat <- paste(dip_dist_sum2$fpco2, dip_dist_sum2$ftemp, sep = "_")
-dip_dist$treat_plot <- ordered(dip_dist$treat_plot, levels = c("420_28", "300_28", "300_31", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+### Testing pstr png addition to plot:
+dip_png <- get_png("Figures/Supplemental_Figures/PSTR_cartoon.png")
 
-dip_con_dis_plot <- ggplot(dip_dist_sum2) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", size= 0.8)) +
-  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
-  ylab("Mean distance from control") +
-  xlab("") +
-  #ylim(0, 7) +
-  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = dip_dist) +
-  geom_point(position = dodge, aes(x = treat, y = dist, colour = reef), shape = "-", size = 8) +  
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - ci, ymax = dist + ci, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 5, label = "control") +  
-  annotate("text", x = 2, y = 5, label = "pre-industrial") +
-  annotate("text", x = 4, y = 5, label = "present-day") +
-  annotate("text", x = 5.1, y = 5, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 5, label = "extreme") +
+ggplot(dip_dist_sum, aes(x = treat_plot, y = mean)) +
+  theme_pubr() +
+  geom_point(data = dip_dist, aes(x = treat_plot, y = dist, colour = reef), shape = 1, size = 3, alpha = 0.7, position = position_dodge(width = 0.6)) +
+  geom_segment(aes(x = treat_plot, xend = treat_plot, y = 0, yend = mean), colour = "grey", size = 1.5) +
+  geom_point(aes(colour = reef), size = 6) +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  ggtitle("Unweighted")
-
-
-# just treatment (weighted)
-dip_dist_sum2_wt <- summarySE(measurevar = "dist_wt", groupvars = c("fpco2", "ftemp", "reef"), data = dip_dist)
-dip_dist_sum2_wt$treat <- paste(dip_dist_sum2_wt$fpco2, dip_dist_sum2_wt$ftemp, sep = "_")
-
-dip_con_dis_wt_plot <- ggplot(dip_dist_sum2_wt) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", size= 0.8)) +
-  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
-  ylab("Mean distance from control") +
-  xlab("") +
-  #ylim(0, 7) +
-  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist_wt, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = dip_dist) +
-  geom_point(position = dodge, aes(x = treat, y = dist_wt, colour = reef), shape = "-", size = 8) +    
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist_wt - se, ymax = dist_wt + se, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 5, label = "control") +  
-  annotate("text", x = 2, y = 5, label = "pre-industrial") +
-  annotate("text", x = 4, y = 5, label = "present-day") +
-  annotate("text", x = 5.1, y = 5, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 5, label = "extreme") +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  ggtitle("Weighted")
-
-
-## Save combined plot
-plot_grid(dip_con_dis_wt_plot, dip_con_dis_plot, ncol = 1, rel_heights = c(1,1.3)) +
-  ggsave("Figures/Supplemental_Figures/PSTR_plasticity_09Mar21.pdf", width = 10, height = 7)
+  labs(y = "PC distance from control", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0,8)) +
+  annotation_custom(dip_png, xmin = 0.01, xmax = 2.51, ymin = 5.5, ymax = 8) +
+  ggsave("Figures/Supplemental_Figures/PSTR_plasticity.pdf", width = 6, height = 3.5)
 
 ```
 
@@ -2049,44 +2001,57 @@ plot_grid(dip_con_dis_wt_plot, dip_con_dis_plot, ncol = 1, rel_heights = c(1,1.3
 ```{r PAST distance dataframe setup}
 
 a_dis <- a_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
-por_pcWT <- summary(a_pca)$importance[2,1:2]
-
-por_dist <- cbind(a_df[,c(1,7,10,11,12,9,25)], a_dis) # combine the datasets
-
-# going to also try to weight the PC distance by the overall variation 
-
-por_dist$PC1_wt <- por_dist$PC1 * por_pcWT[1]
-por_dist$PC2_wt <- por_dist$PC2 * por_pcWT[2]
+por_dist <- cbind(a_df[,c(1,7,10,11,12,27)], a_dis) # combine the datasets
 
 # adds column with the control value PC1/PC2 per colony
 por_dist$cont_pc1[por_dist$treat2 == "447_28"] <- por_dist$PC1[por_dist$treat2 == "447_28"]
 por_dist$cont_pc2[por_dist$treat2 == "447_28"] <- por_dist$PC2[por_dist$treat2 == "447_28"]
 
-por_dist$cont_pc1_wt[por_dist$treat2 == "447_28"] <- por_dist$PC1_wt[por_dist$treat2 == "447_28"]
-por_dist$cont_pc2_wt[por_dist$treat2 == "447_28"] <- por_dist$PC2_wt[por_dist$treat2 == "447_28"]
-
 # get the 400_28 PC values
 por_dist2 <- por_dist %>%  
   group_by(colony) %>% 
   summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
-            con2_pc2 = sum(cont_pc2, na.rm = TRUE),
-            con2_pc1_wt = sum(cont_pc1_wt, na.rm = TRUE),
-            con2_pc2_wt = sum(cont_pc2_wt, na.rm = TRUE))
+            con2_pc2 = sum(cont_pc2, na.rm = TRUE))
 
 # Make columns of the 400_28 PC values
 por_dist <- por_dist %>% 
   left_join(por_dist2, by = c("colony" = "colony"))
 
 por_dist$dist <- sqrt(((por_dist$PC1 - por_dist$con2_pc1)^2) + ((por_dist$PC2 - por_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
-por_dist$dist_wt <- sqrt(((por_dist$PC1_wt - por_dist$con2_pc1_wt)^2) + ((por_dist$PC2_wt - por_dist$con2_pc2_wt)^2)) # formula for calculating distance between control (T90) and treatment values
 por_dist$treat_plot <- paste(por_dist$fpco2, por_dist$ftemp, sep = "_")
 
 ```
 
 ```{r PAST distance analysis}
 
-summary(lm(dist ~ fpco2 * ftemp * reef, data = por_dist))
-summary(lm(dist_wt ~ fpco2 * ftemp * reef, data = por_dist))
+por_dist <- por_dist %>% 
+  filter(treat_plot != "420_28")
+
+past_dist_mod <- lm(log(dist) ~ fpco2 * ftemp * reef, data = por_dist)
+past_dist_mod2 <- lm(log(dist) ~ fpco2 * ftemp * reef, data = por_dist)
+past_dist_mod3 <- lm(log(dist) ~ fpco2 * ftemp + reef, data = por_dist)
+past_dist_mod4 <- lm(dist ~ fpco2 + ftemp, data = por_dist)
+past_dist_mod5 <- lm(log(dist) ~ fpco2 + ftemp, data = por_dist)
+
+compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, rank = TRUE)
+plot(compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, rank = TRUE))
+
+
+summary(past_dist_mod5)
+check_model(past_dist_mod5)
+
+por_dist_sum <- por_dist %>% 
+  group_by(treat_plot, reef) %>% 
+  summarise(mean = mean(dist))
+
+ggplot(por_dist_sum, aes(x = treat_plot, y = mean)) +
+  theme_pubr() +
+  geom_point(data = por_dist, aes(x = treat_plot, y = dist, colour = reef), shape = 1, size = 3, alpha = 0.7, position = position_dodge(width = 0.6)) +
+  geom_segment(aes(x = treat_plot, xend = treat_plot, y = 0, yend = mean), colour = "grey", size = 1.5) +
+  geom_point(aes(colour = reef), size = 6) +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  labs(y = "PC distance from control", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0,7))
 
 ```
 
@@ -2094,59 +2059,20 @@ summary(lm(dist_wt ~ fpco2 * ftemp * reef, data = por_dist))
   
 ```{r plots of PAST distances, fig.height = 3, fig.width = 10}
 
-# just treatment
-por_dist_sum2 <- summarySE(measurevar = "dist", groupvars = c("fpco2", "ftemp", "reef"), data = por_dist)
-por_dist_sum2$treat <- paste(por_dist_sum2$fpco2, por_dist_sum2$ftemp, sep = "_")
-por_dist$treat_plot <- ordered(por_dist$treat_plot, levels = c("420_28", "300_28", "300_31", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+### Testing past png addition to plot:
 
-por_con_dis_plot <- ggplot(por_dist_sum2) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="bottom", panel.border = element_rect(colour = "black", size= 0.8)) +
-  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
-  ylab("Mean distance from control") +
-  xlab("") +
-  #ylim(0, 7) +
-  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = por_dist) +
-  geom_point(position = dodge, aes(x = treat, y = dist, colour = reef), shape = "-", size = 8) +  
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist - ci, ymax = dist + ci, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 4, label = "control") +  
-  annotate("text", x = 2, y = 4, label = "pre-industrial") +
-  annotate("text", x = 4, y = 4, label = "present-day") +
-  annotate("text", x = 5.1, y = 4, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 4, label = "extreme") +
+por_png <- get_png("Figures/Supplemental_Figures/PAST_cartoon.png")
+
+ggplot(por_dist_sum, aes(x = treat_plot, y = mean)) +
+  theme_pubr() +
+  geom_point(data = por_dist, aes(x = treat_plot, y = dist, colour = reef), shape = 1, size = 3, alpha = 0.7, position = position_dodge(width = 0.6)) +
+  geom_segment(aes(x = treat_plot, xend = treat_plot, y = 0, yend = mean), colour = "grey", size = 1.5) +
+  geom_point(aes(colour = reef), size = 6) +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  ggtitle("Unweighted")
-
-
-# just treatment (weighted)
-por_dist_sum2_wt <- summarySE(measurevar = "dist_wt", groupvars = c("fpco2", "ftemp", "reef"), data = por_dist)
-por_dist_sum2_wt$treat <- paste(por_dist_sum2_wt$fpco2, por_dist_sum2_wt$ftemp, sep = "_")
-
-por_con_dis_wt_plot <- ggplot(por_dist_sum2_wt) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), strip.text.x = element_blank(), panel.background=element_blank(), legend.key=element_blank(), strip.background = element_blank(), legend.position="none", panel.border = element_rect(colour = "black", size= 0.8)) +
-  #scale_x_continuous(breaks = c(2, 4 ,6 ,8, 10), labels = c("T0", "300", "420", "680", "3300"))+
-  ylab("Mean distance from control") +
-  xlab("") +
-  #ylim(0, 7) +
-  #geom_point(aes(x = treat, y = dist, colour = reef), position = dodge, alpha = 0.3, shape = 17, size = 2) +
-  geom_point(aes(x = treat_plot, y = dist_wt, colour = reef, group = reef), position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.2), alpha = 0.3, size = 1.8, data = por_dist) +
-  geom_point(position = dodge, aes(x = treat, y = dist_wt, colour = reef), shape = "-", size = 8) +    
-  geom_errorbar(position = dodge, aes(x = treat, ymin = dist_wt - se, ymax = dist_wt + se, colour = reef), width = 0, size = 1.5) +
-  geom_vline(xintercept = c(1.5, 3.5, 4.5, 6.5)) +
-  annotate("text", x = 0.8, y = 4, label = "control") +  
-  annotate("text", x = 2, y = 4, label = "pre-industrial") +
-  annotate("text", x = 4, y = 4, label = "present-day") +
-  annotate("text", x = 5.1, y = 4, label = "end-of-century") +
-  annotate("text", x = 6.9, y = 4, label = "extreme") +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  ggtitle("Weighted")
-
-
-plot_grid(por_con_dis_wt_plot, por_con_dis_plot, ncol = 1, rel_heights = c(1,1.3)) +
-  ggsave("Figures/Supplemental_Figures/PAST_plasticity_09Mar21.pdf", width = 10, height = 7)
+  labs(y = "PC distance from control", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0,8)) +
+  annotation_custom(por_png, xmin = 0.01, xmax = 2.51, ymin = 5.5, ymax = 8) +
+  ggsave("Figures/Supplemental_Figures/PAST_plasticity.pdf", width = 6, height = 3.5)
 
 ```
 
