@@ -34,6 +34,7 @@ library(ggplot2)
 library(dplyr)
 library(ggbiplot)
 library(tidyr)
+library(corrgram)
 library(openxlsx)
 library(plotly)
 library(tidyverse)
@@ -881,6 +882,97 @@ corrplot(por_corr_df2$r, method = "ellipse", type = "upper", col = wes_palette("
 
 ```
 
+```{r UPDATE for correlation and scatter plot for SSID}
+
+## Custom function for the border around the text
+panel.txt.brdr <- function (x = 0.5, y = 0.5, txt, cex, font, srt) 
+{
+  text(x, y, txt, cex = cex, font = font, srt = srt)
+  box(col = "#525252")
+}
+
+## Custom function for the top point fill/shape panel
+panel.pts.col <- function (x, y, corr = NULL, col.regions, cor.method, color, ...) 
+{
+  if (!is.null(corr)) 
+    return()
+  plot.xy(xy.coords(x, y), col = color, type = "p", ...)
+  box(col = "#525252")
+}
+
+## Custom function for the bottom fill/R2 panel (with significance)
+panel.fill.R2 <- function (x, y, corr = NULL, col.regions, cor.method, digits = 2, cex.cor, ...) 
+{
+  if (is.null(corr)) {
+    if (sum(complete.cases(x, y)) < 2) {
+      warning("Need at least 2 complete cases for cor()")
+      return()
+    }
+    else {
+      corr <- cor(x, y, use = "pair", method = cor.method)
+    }
+  }
+  ncol <- 14
+  pal <- col.regions(ncol)
+  col.ind <- as.numeric(cut(corr, breaks = seq(from = -1, 
+                                               to = 1, length.out = ncol + 1), include.lowest = TRUE))
+  usr <- par("usr")
+  rect(usr[1], usr[3], usr[2], usr[4], col = pal[col.ind], 
+       border = NA)
+  box(col = "#525252")
+  
+  auto <- missing(cex.cor)
+  on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  abscorr <- formatC(abs(corr), digits = digits, format = "f")
+  corr2 <- formatC(corr, digits = digits, format = "f")
+  pval <- cor.test(x, y, use = "pair", method = cor.method)[["p.value"]]
+  sig <- if(pval > 0.05){""}else if(pval < 0.05 & pval > 0.01){"*"}else if(pval < 0.01 & pval > 0.001){"**"}else if(pval < 0.001){"***"}
+  if (auto) 
+    cex.cor <- 0.4/strwidth(abscorr)
+  text(0.5, 0.5, paste0(corr2, sig), cex = cex.cor, font = 3, col = "#252525")
+  
+  
+  
+}
+
+
+## Create new correlation dataframe for SSID
+sid_corr_df <- s_df[,c(10:11,14:17,21:23)] %>% 
+  mutate(shape = case_when(ftemp == "28" ~ "19",
+                           ftemp == "31" ~ "21"),
+         colour = case_when(fpco2 == "300" ~ "#b2abd2",
+                            fpco2 == "420" ~ "#5e3c99",
+                            fpco2 == "680" ~ "#fdb863",
+                            fpco2 == "3300" ~ "#e66101"))
+  
+
+
+## Plot correlation matrix and scatter plot of all SSID physiology
+corrgram(sid_corr_df, order=TRUE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
+         col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
+         color = sid_corr_df$colour, pch = as.numeric(as.character(sid_corr_df$shape)),
+         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid"),
+         main = "SSID physiology") 
+
+
+
+
+
+# below saves the figure
+pdf(file = "Figures/Supplemental_Figures/SSID_CorrelationPlot.pdf", width = 10, height = 8)  
+
+corrgram(sid_corr_df, order=TRUE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
+         col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
+         color = sid_corr_df$colour, pch = as.numeric(as.character(sid_corr_df$shape)),
+         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid"),
+         main = "SSID physiology") 
+
+dev.off() 
+
+```
+
+
 <br/>
 **Figure 2.** Correlation matrix for *S. siderea*, *P. strigosa*, and *P. astreoides* depicting pair-wise comparisons of physiological parameters within each species. Colour and ellipse width denote R^2^ of each significant comparison, and blank grids represent non-significant pair-wise comparisons (*P* > 0.05).Each parameter is denoted in <span style="color: #0072B2;">blue</span> text along the diagonal of each plot. Correlations with R^2^ above 0.5 (shown in <span style="color: #E67D00;">orange</span> and <span style="color: #F21A00;">red</span> in matrix plot) are explored further below.
 
@@ -1433,7 +1525,7 @@ sid_pca_df <- s_df[,c(14:17,21:23)]
 
 # run the adonis
 #s_pca_mod <- adonis2(sid_pca_df ~ reef * ftemp * fpco2, data = s_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-s_pca_mod <- adonis2(sid_pca_df ~ fpco2 + ftemp + reef, data = s_df, by="margin", method = 'eu', permutations = bootnum)
+s_pca_mod <- adonis2(sid_pca_df ~ fpco2 + ftemp + reef, data = s_df, method = 'eu', permutations = bootnum)
 s_pca_mod # view SSID adonis output
 
 # extract pvalues
@@ -1517,7 +1609,8 @@ s_reef_pca <- autoplot(s_pca, data = s_df,
   #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
   #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
   annotate("text", x = -0.345, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
@@ -1734,9 +1827,10 @@ a_reef_pca <- autoplot(a_pca, data = a_df,
 
 temp_PCA <- ggarrange(s_temp_pca, p_temp_pca, a_temp_pca, ncol = 3, common.legend = TRUE, legend = "right")
 pCO2_PCA <- ggarrange(s_pco2_pca, p_pco2_pca, a_pco2_pca, ncol = 3, common.legend = TRUE, legend = "right")
+reef_PCA <- ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "right")
 
-ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
-  ggsave("Figures/Final_Figures/Figure2_PhysPCA_23March21.pdf", width = 13, height = 8)
+ggarrange(temp_PCA, pCO2_PCA, reef_PCA, nrow = 3) +
+  ggsave("Figures/Final_Figures/Figure2_PhysPCA_23March21.pdf", width = 13, height = 12)
 
 ```
 
