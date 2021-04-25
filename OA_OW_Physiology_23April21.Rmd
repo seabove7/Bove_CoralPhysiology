@@ -15,6 +15,8 @@ output:
   body{background-color: gray95 !important}
 </style>
 
+<br/>
+
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
@@ -243,7 +245,14 @@ df_90 <- df_90 %>%
 ## Principal component analyses {.tabset}
 
 #### *Methods:*
-Principal component analyses (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, pCO2, and reef environment) were evaluated using the *adonis2* function (**Tables XXX**). All statistical analyses were performed in R (`r R.Version()$version.string`) (R Core Development Team 2016). 
+Principal component analyses (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, pCO2, and reef environment) were evaluated using the *adonis2* function (**Tables XXX**). All statistical analyses were performed in R (`r R.Version()$version.string`) (R Core Development Team 2016).
+
+<br/>
+
+#### *Results:*
+*Text for results of PCA will go here*
+
+<br/>
 
 ### *Siderastrea siderea*
 
@@ -351,6 +360,10 @@ s_reef_pca <- autoplot(s_pca, data = s_df,
 
 ```
 
+<br/>
+<br/>
+
+
 ### *Pseudodiploria strigosa*
 
 ```{r PSTR PCA}
@@ -455,6 +468,10 @@ p_reef_pca <- autoplot(p_pca, data = p_df,
   annotate("text", x = -0.345, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3)
 
 ```
+
+<br/>
+<br/>
+
 
 ### *Porites astreoides*
 
@@ -562,6 +579,10 @@ a_reef_pca <- autoplot(a_pca, data = a_df,
 
 ```
 
+<br/>
+<br/>
+
+
 ### **Figure 1**
 
 ```{r PCA plot, fig.height=7, fig.width=13}
@@ -577,9 +598,6 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 
 **Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$ C blue; 31$^\circ$ C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
-#### *Results:*
-*Text for results of PCA will go here*
-
 
 <br/>
 <br/>
@@ -589,6 +607,13 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 
 #### *Methods:*
 *Text for methods of correlations will go here*
+
+<br/>
+
+#### *Results:*
+*Text for results of correlations will go here*
+
+<br/>
 
 ```{r functions for custom correlation and scatter plots}
 
@@ -646,7 +671,7 @@ panel.fill.R2 <- function (x, y, corr = NULL, col.regions, cor.method, digits = 
 
 ```
 
-```{r SSID correlation matrix and scatter plots}
+```{r SSID correlation matrix and scatter plots, results='hide'}
 
 ## Create new correlation dataframe for SSID
 sid_corr_df <- s_df[,c(10:11,14:17,21:23)] %>% 
@@ -669,7 +694,7 @@ dev.off()
 
 ```
 
-```{r PSTR correlation matrix and scatter plots}
+```{r PSTR correlation matrix and scatter plots, results='hide'}
 
 ## Create new correlation dataframe for SSID
 dip_corr_df <- p_df[,c(10:11,14:17,21:23)] %>% 
@@ -693,7 +718,7 @@ dev.off()
 
 ```
 
-```{r PAST correlation matrix and scatter plots}
+```{r PAST correlation matrix and scatter plots, results='hide'}
 
 ## Create new correlation dataframe for SSID
 por_corr_df <- a_df[,c(10:11,14:16,18,21:23)] %>% 
@@ -745,16 +770,21 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
 
 **Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicting pair-wise comparisons of physiological parameters within each species. Strength of correlations between parameteres is indicated by darker shades of blue in the bottom panel with a higher R^2^ value. Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological paramters are displayed in the top panel with temperature depicted by shape (28$^\circ$ C filled points; 31$^\circ$ C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange)
 
-#### *Results:*
-*Text for results of correlations will go here*
+<br/>
+<br/>
 
-<br/>
-<br/>
 
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
 *Text for methods of plasticity will go here*
+
+<br/>
+
+#### *Results:*
+*Text for results of correlations will go here*
+
+<br/>
 
 ### *S. siderea*
 
@@ -1012,11 +1042,6 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 ```
 
 **Figure 3.** *Text goes here for caption*
-
-<br/>
-
-#### *Results:*
-*Text for results of correlations will go here*
 
 <br/>
 <br/>
