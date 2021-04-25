@@ -742,7 +742,7 @@ dev.off()
 
 ```
 
-```{r save all species correlation/scatter plots, fig.width = 13, fig.height = 3.4}
+```{r save all species correlation/scatter plots, fig.width = 8, fig.height = 6.4}
 
 ssid_corr_plot <- readPNG("Figures/Supplemental_Figures/SSID_PhysCorrelations.png")
 pstr_corr_plot <- readPNG("Figures/Supplemental_Figures/PSTR_PhysCorrelations.png")
@@ -763,12 +763,12 @@ past_corr_plot <- ggplot() +
   theme_void() + 
   ggtitle(expression(paste(bold("  B)   "), italic("P. asteroides"))))
 
-ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
-  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 13, height = 3.2)
+ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
+  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 8, height = 6.4)
 
 ```
 
-**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicting pair-wise comparisons of physiological parameters within each species. Strength of correlations between parameteres is indicated by darker shades of blue in the bottom panel with a higher R^2^ value. Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological paramters are displayed in the top panel with temperature depicted by shape (28$^\circ$ C filled points; 31$^\circ$ C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange)
+**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value. Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
 
 <br/>
 <br/>
@@ -1041,7 +1041,7 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ```
 
-**Figure 3.** *Text goes here for caption*
+**Figure 3.** Assessment of phenotypic plasticity of *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
 
 <br/>
 <br/>
