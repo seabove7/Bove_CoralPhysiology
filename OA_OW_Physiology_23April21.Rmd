@@ -45,6 +45,7 @@ library(shiny)
 library(Rmisc)
 library(cowplot)
 library(ggfortify)
+library(finalfit)
 library(kableExtra)
 library(readr)
 library(lmerTest)
@@ -189,18 +190,18 @@ bootFUN <- function(model, newdata) {
   predict(update, newdata = newdata, type = "response") # predicts response variable with model and updated data 
 }
 
-bootFUN <- function(model, newdata) {
-  nr <- nrow(model$data) # count number of rows in the model (# of observations)
-  data <- model$data # pull data from model
-  
-  colnames(newdata)
-
-  data %>% group_by() %>% sample_frac(.5)
-  
-  #data <- data[sample(1:nr, size = nr, replace = TRUE), ] # random sample of numbers from 1 - nr (# of rows) to select data from
-  #update <- update(model, data = data) # rerun the model using the 'new' dataset from the random smapling above
-  #predict(update, newdata = newdata, type = "response") # predicts response variable with model and updated data 
-}
+#bootFUN <- function(model, newdata) {
+#  nr <- nrow(model$data) # count number of rows in the model (# of observations)
+#  data <- model$data # pull data from model
+#  
+#  colnames(newdata)
+#
+#  data %>% group_by() %>% sample_frac(.5)
+#  
+#  #data <- data[sample(1:nr, size = nr, replace = TRUE), ] # random sample of numbers from 1 - nr (# of rows) to select data from
+#  #update <- update(model, data = data) # rerun the model using the 'new' dataset from the random smapling above
+#  #predict(update, newdata = newdata, type = "response") # predicts response variable with model and updated data 
+#}
 
 ```
 
@@ -624,7 +625,7 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 ## Correlation assessments {.tabset}
 
 #### *Methods:*
-Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species. The strength (R^2^) of each correlation was calculated using the corrgram() package (version `r packageVersion("corrgram")`) and the significance was calculated using the cor.test() function. These relationships were then visualized through simple scatterplots.
+Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species. The strength (R^2^) of each correlation was calculated using the corrgram package (version `r packageVersion("corrgram")`) and the significance was calculated using the cor.test() function. These relationships were then visualized through simple scatterplots.
 
 <br/>
 
@@ -805,7 +806,7 @@ All figures and statistical analyses were carried out in `r R.Version()$version.
 
 <br/>
 
-### *S. siderea*
+### *Siderastrea siderea*
 
 ```{r SSID distance dataframe setup}
 
@@ -839,24 +840,39 @@ sid_dist <- sid_dist %>%
 
 ```{r SSID distance analysis, include=FALSE}
 
-#### GLM and bootstrapping SSID plasticity distance
-## Fit the GLM
-ssid_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
+## Model selection (via AIC)
+ssid_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist) # best fit
+ssid_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
+
+# check for best-fit model
+compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
+plot(compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE))
+
+
+## Best-fit GLM with Gamma log link
+ssid_dist_glm <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
 summary(ssid_dist_glm)
 
-## Run parametric bootstrapping:
-newdata <- data.frame(reef = sid_dist$reef, fpco2 = sid_dist$fpco2, ftemp = sid_dist$ftemp) # creates df of predictor variables
-boot <- replicate(bootnum, bootFUN(model = ssid_dist_glm, newdata = newdata)) # run the bootFUN the number (bootnum) of times specified and save as matrix
 
-## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe (but as a new name)
-sid_dist_boot <- cbind(sid_dist, as.data.frame(t(apply(boot, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
-colnames(sid_dist_boot)[16:18] <- c("mean", "lowerci", "upperci") # rename mean/CI columns
+## Bootstrapping with boot_predict() function in package finalfit (version 1.0.2)
+newdata_ssid <- data.frame(reef = sid_dist$reef, fpco2 = sid_dist$fpco2, ftemp = sid_dist$ftemp, treat_plot = sid_dist$treat_plot, dist = sid_dist$dist)
 
+ssid_dist_boot <- boot_predict(ssid_dist_glm, newdata = newdata_ssid, R = bootnum, boot_compare = FALSE,  estimate_name = "Predicted plasticity") %>% # compute boot predictions
+  mutate(plasticity = as.character(`Predicted plasticity`), # create second predicted column for plotting
+         plasticity = gsub("[()to]", "", plasticity)) %>% # remove characters
+  separate(plasticity, c("estimate", "lowerci", "rm", "upperci"), " ") %>% # separate into three columns for estimate, lower CI, and upper CI
+  dplyr::select(-rm) %>% # remove the blank column created
+  mutate_if(is.character, as.numeric) # convert the esimate/CI from character to numeric
+  
 ```
 
 ```{r plots of SSID distances, fig.height = 3.5, fig.width = 6}
 
-## Summary data for plotting
+## Summary data for plotting based on mean/SE instead of boot
 sid_dist_sum <- sid_dist %>% 
   mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
   group_by(treat_plot, reef) %>% 
@@ -865,12 +881,12 @@ sid_dist_sum <- sid_dist %>%
 
 
 ## Plasticity plot
-ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+ssid_plast_plot <- ggplot(ssid_dist_boot, aes(x = reef, y = estimate, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = sid_dist, aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
+  geom_point(aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
+  geom_errorbar(aes(ymin = lowerci, ymax = upperci), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
@@ -885,7 +901,7 @@ summary(ssid_dist_glm)
 
 ```
 
-### *P. strigosa*
+### *Pseudodiploria strigosa*
 
 ```{r PSTR distance dataframe setup}
 
@@ -919,20 +935,33 @@ dip_dist <- dip_dist %>%
 
 ```{r PSTR distance analysis, include=FALSE}
 
-## Fitting the model
-pstr_dist_mod <- lm(log(dist) ~ fpco2 + ftemp + reef, data = dip_dist)
-pstr_dist_mod2 <- lm(log(dist) ~ fpco2 * ftemp * reef, data = dip_dist)
-pstr_dist_mod3 <- lm(log(dist) ~ fpco2 * ftemp + reef, data = dip_dist)
-pstr_dist_mod4 <- lm(log(dist) ~ fpco2 * ftemp, data = dip_dist)
-pstr_dist_mod5 <- lm(log(dist) ~ (fpco2 + ftemp) * reef, data = dip_dist)
+## Model selection (via AIC)
+pstr_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist) # best fit
+pstr_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
 
 # check for best-fit model
-compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, rank = TRUE)
-plot(compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, rank = TRUE))
+compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, rank = TRUE)
+plot(compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, rank = TRUE))
 
-## Summary of best-fit model
-summary(pstr_dist_mod4)
-#check_model(pstr_dist_mod4)
+
+## Best-fit GLM with Gamma log link
+pstr_dist_glm <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist)
+summary(pstr_dist_glm)
+
+
+## Bootstrapping with boot_predict() function in package finalfit (version 1.0.2)
+newdata_pstr <- data.frame(reef = dip_dist$reef, fpco2 = dip_dist$fpco2, ftemp = dip_dist$ftemp, treat_plot = dip_dist$treat_plot, dist = dip_dist$dist)
+
+pstr_dist_boot <- boot_predict(pstr_dist_glm, newdata = newdata_pstr, R = bootnum, boot_compare = FALSE,  estimate_name = "Predicted plasticity") %>% # compute boot predictions
+  mutate(plasticity = as.character(`Predicted plasticity`), # create second predicted column for plotting
+         plasticity = gsub("[()to]", "", plasticity)) %>% # remove characters
+  separate(plasticity, c("estimate", "lowerci", "rm", "upperci"), " ") %>% # separate into three columns for estimate, lower CI, and upper CI
+  dplyr::select(-rm) %>% # remove the blank column created
+  mutate_if(is.character, as.numeric) # convert the esimate/CI from character to numeric
 
 ```
   
@@ -963,11 +992,11 @@ pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat_p
 
 
 ## Linear model output
-summary(pstr_dist_mod4)
+summary(pstr_dist_glm)
 
 ```
 
-### *P. astreoides*
+### *Porites astreoides*
 
 ```{r PAST distance dataframe setup}
 
@@ -1000,21 +1029,22 @@ por_dist <- por_dist %>%
 
 ```{r PAST distance analysis, include=FALSE}
 
-## Fitting the model
-past_dist_mod <- lm(log(dist) ~ fpco2 * ftemp * reef, data = por_dist)
-past_dist_mod2 <- lm(log(dist) ~ fpco2 * ftemp * reef, data = por_dist)
-past_dist_mod3 <- lm(log(dist) ~ fpco2 * ftemp + reef, data = por_dist)
-past_dist_mod4 <- lm(dist ~ fpco2 + ftemp, data = por_dist)
-past_dist_mod5 <- lm(log(dist) ~ fpco2 + ftemp, data = por_dist)
-past_dist_mod6 <- lm(log(dist) ~ (fpco2 + ftemp) * reef, data = por_dist)
+## Model selection (via AIC)
+past_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = por_dist)
+past_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist)
+past_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = por_dist)
+past_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist)
+past_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = por_dist)
+past_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist) # best fit
 
 # check for best-fit model
 compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, rank = TRUE)
 plot(compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, rank = TRUE))
 
-## Summary of best-fit model
-summary(past_dist_mod5)
-#check_model(past_dist_mod5)
+
+## Best-fit GLM with Gamma log link
+past_dist_glm <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist)
+summary(past_dist_glm)
 
 ```
   
@@ -1045,7 +1075,7 @@ past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat_p
 
 
 ## Linear model output
-summary(past_dist_mod5)
+summary(past_dist_glm)
 
 ```
 
