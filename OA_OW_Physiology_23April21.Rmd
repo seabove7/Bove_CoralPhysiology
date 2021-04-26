@@ -1,5 +1,6 @@
 ---
 title: "Coral Holobiont Physiology under OA/OW "
+date: "*Last compiled on `r format(Sys.time(), '%d %B %Y')`*"
 output: 
   html_document:
     theme: simplex
@@ -14,6 +15,12 @@ output:
   h1{color: navy !important}
   body{background-color: gray95 !important}
 </style>
+
+<br/>
+
+<center>
+**This is a working document for all the coral physiology data manipulation, analysis, and visualization portion of the physiology/gene expression manuscript. The document includes all figures, tables, supplemental materials, methods, and results for the physiology portion of the manuscript. Each major assessment is separated by the tabs on the left.** 
+</center>
 
 <br/>
 
@@ -269,7 +276,7 @@ Principal component analysis (PCA) (function *prcomp*) of scaled and centered ph
 <br/>
 
 #### *Results:*
-Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and colour intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in pysiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and colour intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).
+Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and colour intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in physiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and colour intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).
 
 <br/>
 
@@ -625,12 +632,12 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 ## Correlation assessments {.tabset}
 
 #### *Methods:*
-Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species. The Pearson correlation coefficient (R^2^) of each comparison was calculated using the corrgram package (version `r packageVersion("corrgram")`) and the significance was calculated using the *cor.test* function. These relationships were then visualized through simple scatterplots.
+Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species, redargless of temperature and *p*CO~2~ treatment. The Pearson correlation coefficient (R^2^) of each comparison was calculated using the corrgram package (version `r packageVersion("corrgram")`) and the significance was calculated using the *cor.test* function. These relationships were then visualized through simple scatterplots.
 
 <br/>
 
 #### *Results:*
-*Text for results of correlations will go here*
+Correlations of coral holobiont physiological parameters were generally positively related with one another across all three species. Correlations between *S. siderea* holobiont physiological parameters identified 15 significant relationships out of all 21 possible comparisons (**Figure 2A**). Of those significant correlations, six resulted in a Pearson's correlation coefficient (R^2^) equal to or greater than 0.5, with the strongest relationship identified being symbiont density vs chlorophyll a (R^2^ = 0.72). All pairwise physiological parameters were significantly correlated with one another in *P. strigosa* and of those, 14 correlations exhibit moderate (R^2^ > 0.50) positive relationships (**Figure 2B**. Notably, the two strongest correlations were host carbohydrate vs host protein (R^2^ = 0.70) and host carbohydrate vs chlorophyll a (R^2^ = 0.76). Compared to both *S. siderea* and *P. strigosa*, fewer physiological traits were significantly (p < 0.05) correlated with one another in *P. astreoides* (12 significant out of 21 total comparisons; **Figure 2C**). Of the significant correlations, only two pairwise comparisons resulted in a Pearson's correlation coefficient greater than 0.5: chlorophyll a vs colour intensity (R^2^ = 0.57) and host carbohydrate vs host protein (R^2^ = 0.68).
 
 <br/>
 
