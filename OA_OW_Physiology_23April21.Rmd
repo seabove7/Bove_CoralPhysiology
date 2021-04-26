@@ -264,12 +264,12 @@ df_90 <- df_90 %>%
 ## Principal component analyses {.tabset}
 
 #### *Methods:*
-Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, and reef environment) were evaluated using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")`) (**Tables XXX**).
+Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, and reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")`) (**Tables XXX**).
 
 <br/>
 
 #### *Results:*
-*Text for results of PCA will go here*
+Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and colour intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in pysiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and colour intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).
 
 <br/>
 
@@ -299,9 +299,9 @@ s_pca <- prcomp(sid_pca_df, center = TRUE, scale= TRUE)
 ```{r SSID PCA plot, fig.height=8, fig.width=8}
 
 # create labels for p values calculated above
-s_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[1,1], digits = 2)))
+s_pco2_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[1,1], digits = 2)))
 s_temp_pval <-substitute(italic(P[temp])==p, list(p = format(s_pval[2,1], digits = 3)))
-s_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(s_pval[3,1], digits = 2)))
+s_reef_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(s_pval[3,1], digits = 2)))
 
 
 # temperature
@@ -410,8 +410,8 @@ p_pca <- prcomp(dip_pca_df, center = TRUE, scale= TRUE)
 
 # create labels for p values calculated above
 p_reef_pval <-substitute(italic(P[reef])==p, list(p = format(p_pval[1,1], digits = 2)))
-p_temp_pval <-substitute(italic(P[temp])==p, list(p = format(p_pval[2,1], digits = 3)))
-p_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3,1], digits = 2)))
+p_pco2_pval <-substitute(italic(P[temp])==p, list(p = format(p_pval[2,1], digits = 3)))
+p_temp_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3,1], digits = 2)))
 
 
 # temperature
@@ -436,7 +436,7 @@ p_temp_pca <- autoplot(p_pca, data = p_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
     guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.15, y = -0.38, label = deparse(p_temp_pval), parse = TRUE, size = 3) +
+  annotate("text", x = -0.13, y = -0.38, label = deparse(p_temp_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
 # pco2
@@ -460,7 +460,7 @@ p_pco2_pca <- autoplot(p_pca, data = p_df,
     scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0)))) +
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.285, y = -0.38, label = deparse(p_pco2_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.28, y = -0.38, label = deparse(p_pco2_pval), parse = TRUE, size = 3)
 
 # reef
 p_reef_pca <- autoplot(p_pca, data = p_df, 
@@ -546,7 +546,7 @@ a_temp_pca <- autoplot(a_pca, data = a_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
     guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.245, y = -0.44, label = deparse(a_temp_pval), parse = TRUE, size = 3) +
+  annotate("text", x = -0.22, y = -0.44, label = deparse(a_temp_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
 
 # pco2
@@ -625,7 +625,7 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 ## Correlation assessments {.tabset}
 
 #### *Methods:*
-Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species. The strength (R^2^) of each correlation was calculated using the corrgram package (version `r packageVersion("corrgram")`) and the significance was calculated using the cor.test() function. These relationships were then visualized through simple scatterplots.
+Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species. The Pearson correlation coefficient (R^2^) of each comparison was calculated using the corrgram package (version `r packageVersion("corrgram")`) and the significance was calculated using the *cor.test* function. These relationships were then visualized through simple scatterplots.
 
 <br/>
 
@@ -787,7 +787,7 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
 
 ```
 
-**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value. Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
+**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
 
 <br/>
 <br/>
@@ -796,8 +796,7 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
-Using PC1 and PC2 for each species, we then calculated the phenotypic plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (400 $\mu$atm; 28$^\circ$C) fragment from that same colony. 
-All figures and statistical analyses were carried out in `r R.Version()$version.string` (R Core Development Team 2016).
+Using PC1 and PC2 for each species, we then calculated the phenotypic plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (400 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table SXX**). All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Development Team 2016).
 
 <br/>
 
@@ -858,15 +857,16 @@ ssid_dist_glm <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), 
 summary(ssid_dist_glm)
 
 
-## Bootstrapping with boot_predict() function in package finalfit (version 1.0.2)
-newdata_ssid <- data.frame(reef = sid_dist$reef, fpco2 = sid_dist$fpco2, ftemp = sid_dist$ftemp, treat_plot = sid_dist$treat_plot, dist = sid_dist$dist)
-
-ssid_dist_boot <- boot_predict(ssid_dist_glm, newdata = newdata_ssid, R = bootnum, boot_compare = FALSE,  estimate_name = "Predicted plasticity") %>% # compute boot predictions
-  mutate(plasticity = as.character(`Predicted plasticity`), # create second predicted column for plotting
-         plasticity = gsub("[()to]", "", plasticity)) %>% # remove characters
-  separate(plasticity, c("estimate", "lowerci", "rm", "upperci"), " ") %>% # separate into three columns for estimate, lower CI, and upper CI
-  dplyr::select(-rm) %>% # remove the blank column created
-  mutate_if(is.character, as.numeric) # convert the esimate/CI from character to numeric
+#### Can't seem to make bootstrapping work for PSTR so just going to report mean/SE in the plots and then the GLM model output
+### Bootstrapping with boot_predict() function in package finalfit (version 1.0.2)
+#newdata_ssid <- data.frame(reef = sid_dist$reef, fpco2 = sid_dist$fpco2, ftemp = sid_dist$ftemp, treat_plot = sid_dist$treat_plot, dist = sid_dist$dist)
+#
+#ssid_dist_boot <- boot_predict(ssid_dist_glm, newdata = newdata_ssid, R = bootnum, boot_compare = FALSE,  estimate_name = "Predicted plasticity") %>% # compute boot predictions
+#  mutate(plasticity = as.character(`Predicted plasticity`), # create second predicted column for plotting
+#         plasticity = gsub("[()to]", "", plasticity)) %>% # remove characters
+#  separate(plasticity, c("estimate", "lowerci", "rm", "upperci"), " ") %>% # separate into three columns for estimate, lower CI, and upper CI
+#  dplyr::select(-rm) %>% # remove the blank column created
+#  mutate_if(is.character, as.numeric) # convert the esimate/CI from character to numeric
   
 ```
 
@@ -881,12 +881,12 @@ sid_dist_sum <- sid_dist %>%
 
 
 ## Plasticity plot
-ssid_plast_plot <- ggplot(ssid_dist_boot, aes(x = reef, y = estimate, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_errorbar(aes(ymin = lowerci, ymax = upperci), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
+  geom_point(data = sid_dist, aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
@@ -951,17 +951,6 @@ plot(compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dis
 ## Best-fit GLM with Gamma log link
 pstr_dist_glm <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist)
 summary(pstr_dist_glm)
-
-
-## Bootstrapping with boot_predict() function in package finalfit (version 1.0.2)
-newdata_pstr <- data.frame(reef = dip_dist$reef, fpco2 = dip_dist$fpco2, ftemp = dip_dist$ftemp, treat_plot = dip_dist$treat_plot, dist = dip_dist$dist)
-
-pstr_dist_boot <- boot_predict(pstr_dist_glm, newdata = newdata_pstr, R = bootnum, boot_compare = FALSE,  estimate_name = "Predicted plasticity") %>% # compute boot predictions
-  mutate(plasticity = as.character(`Predicted plasticity`), # create second predicted column for plotting
-         plasticity = gsub("[()to]", "", plasticity)) %>% # remove characters
-  separate(plasticity, c("estimate", "lowerci", "rm", "upperci"), " ") %>% # separate into three columns for estimate, lower CI, and upper CI
-  dplyr::select(-rm) %>% # remove the blank column created
-  mutate_if(is.character, as.numeric) # convert the esimate/CI from character to numeric
 
 ```
   
