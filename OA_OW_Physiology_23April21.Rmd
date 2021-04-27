@@ -19,7 +19,7 @@ output:
 <br/>
 
 <center>
-**This is a working document for all the coral physiology data manipulation, analysis, and visualization portion of the physiology/gene expression manuscript. The document includes all figures, tables, supplemental materials, methods, and results for the physiology portion of the manuscript. Each major assessment is separated by the tabs on the left.** 
+**This is a working document for all the coral physiology data manipulation, analysis, and visualization portion of the physiology/gene expression manuscript. The document includes all figures, tables, supplemental materials, methods, and results for the physiology portion of the manuscript. Each major analysis is separated by the tabs on the left.** 
 </center>
 
 <br/>
@@ -272,7 +272,7 @@ df_90 <- df_90 %>%
 ## Principal component analyses {.tabset}
 
 #### *Methods:*
-Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, and reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")`) (**Tables XXX**).
+Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, and reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")`).
 
 <br/>
 
@@ -914,6 +914,10 @@ Anova(ssid_dist_glm, type = "III", test.statistic = "F") # comparison of the 'ma
 
 ```
 
+<br/>
+<br/>
+
+
 ### *Pseudodiploria strigosa*
 
 ```{r PSTR distance dataframe setup}
@@ -1003,6 +1007,10 @@ Anova(pstr_dist_glm, type = "III", test.statistic = "F") # comparison of the 'ma
 
 ```
 
+<br/>
+<br/>
+
+
 ### *Porites astreoides*
 
 ```{r PAST distance dataframe setup}
@@ -1091,6 +1099,10 @@ Anova(past_dist_glm, type = "III", test.statistic = "F") # comparison of the 'ma
 
 ```
 
+<br/>
+<br/>
+
+
 ### **Figure 3**
 
 ```{r plot and save all species plasticity, fig.width = 13, fig.height = 4}
@@ -1108,7 +1120,15 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ## *Siderastrea siderea* subset {.tabset} 
 
-Here, I am looking at the physiological response of a subset of *S. siderea* samples that were also assessed for transcriptomic analyses. From the TagSeq data, we were able to identify relative abundance of Symbiodinacaea genus within each fragment as either *Cladocopium spp.* dominated (> 50% reads mapping to *Cladocopium*) or *Durusdinium spp.* dominated (> 50% reads mapping to *Durusdinium*). We then used this information to assess differences in physiological responses based on dominant Symbiodinacaea genera.
+#### *Methods:*
+Using the subset of *S. siderea* fragments with known Symbiodinacaea community composition identified from transcriptomic analyses, we further assessed the differences in coral holobiont physiological responses by dominant symbiont genera. Relative abundance of Symbiodinacaea genus within each fragment aas assigned as either *Cladocopium spp.* dominated (> 50% reads mapping to *Cladocopium*) or *Durusdinium spp.* dominated (> 50% reads mapping to *Durusdinium*). A PCA was performed with all coral holobiont physiological parameters with the addition of parameter representing percent of reads mapping to *Cladocopium spp.* such that higher percentages represented *Cladocopium* dominated fragments and lower percentages represented *Durusdinium* dominated fragments. The phyenotypic plasticity of the subset of *S. siderea* fragments was also assessed using the same methods described above. The effects of dominant Symbiodinacaea genus and treatment (*p*CO~2~ and temperature) were assessed using a generalized linear models (function *glm*) with a Gamma distribution and log-link and main effects were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error.
+
+<br/>
+
+#### *Results:*
+Two principal components (PCs) explained approximately 60% of the variance in holobiont physiological responses of the subset of *S. siderea* fragments (**Figure 4A**). Interestingly, PC2 was driven by differences in Symbiodinacaea genera, along with host lipid content and colour intensity, while PC1 represented host carbohydrate and symbiont cell density. Fragments of *S. siderea* hosting higher abundances of *Cladocopium spp.* symbionts exhibited faster calcification rates while fragments dominated by *Durusdinium spp.* tended to have higher host lipid and protein content (**Figure 4A**). Experimental *p*CO~2~ (p < 0.001) and temperature (p < 0.01), dominant Symbiodinacaea genus (p < 0.001), and natal reef environment (p < 0.01) all significantly altered the holobiont physiology in the subset of *S. siderea* (**Figure S2; Table S5**). Analysis of the subset of *S. siderea* holobiont fragments suggests that dominant Symbiodinacaea genus (p = 0.05) and *p*CO~2~ (p = 0.05) altered the phenotypic plasticity in these samples (**Figure 4B; Table S6, S7**), however, the small sample size and marginal p value should be noted with interpretation.
+
+<br/>
 
 ### Principal component analysis
 
@@ -1121,7 +1141,7 @@ sid_sub_pca_df <- s_df_sub[,c(14:17,21:23,29)]
 
 ## run the adonis
 #s_sub_pca_mod <- adonis2(sid_sub_pca_df ~ reef * ftemp * fpco2 * domSymb, data = s_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-s_sub_pca_mod <- adonis2(sid_sub_pca_df ~ fpco2 + ftemp + reef + domSymb + reef:ftemp + ftemp:domSymb + fpco2:domSymb , data = s_df, method = 'eu', permutations = bootnum)
+s_sub_pca_mod <- adonis2(sid_sub_pca_df ~ fpco2 + ftemp + reef + domSymb, data = s_df, method = 'eu', permutations = bootnum)
 s_sub_pca_mod # view SSID adonis output
 
 # extract pvalues
@@ -1192,8 +1212,8 @@ s_sub_temp_pca <- autoplot(s_sub_pca, data = s_df_sub,
   scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  guides(color = guide_legend(keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0))), shape = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE)) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA), legend.position = "bottom") +
   annotate("text", x = -0.30, y = -0.38, label = deparse(s_sub_temp_pval), parse = TRUE, size = 3)
 
 # pco2
@@ -1215,8 +1235,8 @@ s_sub_pco2_pca <- autoplot(s_sub_pca, data = s_df_sub,
     scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
     scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
     scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
+    guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0))), shape = guide_legend(keyheight = 0.3, nrow = 2, byrow = TRUE)) +
+    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA), legend.position = "bottom") +
   annotate("text", x = -0.30, y = -0.38, label = deparse(s_sub_pco2_pval), parse = TRUE, size = 3)
 
 # reef
@@ -1236,19 +1256,11 @@ s_sub_reef_pca <- autoplot(s_sub_pca, data = s_df_sub,
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
-  #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_shape_manual("reef environment", labels = c("offshore", "inshore"), values = c(1,2)) +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA), legend.position = "bottom") +
   annotate("text", x = -0.345, y = -0.38, label = deparse(s_sub_reef_pval), parse = TRUE, size = 3)
-
-```
-
-```{r SSID subset PCA all plots, eval=FALSE, include=FALSE}
-
-ggarrange(s_sub_symb_pca, s_sub_pco2_pca, s_sub_temp_pca, s_sub_reef_pca, ncol = 2,  nrow = 2)
 
 ```
 
@@ -1257,6 +1269,8 @@ ggarrange(s_sub_symb_pca, s_sub_pco2_pca, s_sub_temp_pca, s_sub_reef_pca, ncol =
 
 
 ### Correlation assessments
+
+**Not sure I want to include this? But maybe put it in the supplemental materials!**
 
 ##### *Siderastrea siderea* subset correlations 
 ```{r SSID subset corr plot}
@@ -1422,7 +1436,7 @@ Anova(ssid_sub_dist_glm, type = "III", test.statistic = "F") # comparison of the
 <br/>
 
 
-### Figure 4
+### **Figure 4**
 
 ```{r save SSID subset PCA and plasticity, fig.width = 13, fig.height = 6}
 
@@ -1432,6 +1446,20 @@ ggarrange(s_sub_symb_pca, ssid_sub_plast_plot, ncol = 2, labels = "AUTO") +
 ```
 
 **Figure 4.** *Text will go here*
+
+<br/>
+<br/>
+
+
+### *Figure S2*
+
+```{r Figure S2 SSID subset PCA all plots, fig.height = 4, fig.width = 12}
+
+ggarrange(s_sub_pco2_pca, s_sub_temp_pca, s_sub_reef_pca, nrow = 1, labels = "AUTO")
+
+```
+
+**Figure S2.** *Text will go here*
 
 <br/>
 <br/>
