@@ -68,6 +68,7 @@ library(wesanderson)
 library(performance)
 library(MASS)
 library(png)
+library(car)
 
 ```
 
@@ -808,7 +809,9 @@ Using PC1 and PC2 for each species, we then calculated the phenotypic plasticity
 <br/>
 
 #### *Results:*
-*Text for results of correlations will go here*
+SSID: 
+
+Plasticity of *P. strigosa* and *P. astreoides* was not significantly altered by temperature treatment, *p*CO~2~ treatment, or natal reef environment (**Figure 3B, 3C, Table S3**). However, *P. astreoides* exhibited a slight trend in the inshore fragments suggesting potentially higher plasticity with increasing *p*CO~2~ that is not seen in the offshore fragments (**Figure 3C**).
 
 <br/>
 
@@ -860,8 +863,10 @@ plot(compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dis
 
 
 ## Best-fit GLM with Gamma log link
-ssid_dist_glm <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
-summary(ssid_dist_glm)
+sid_dist$fpco2 <- factor(sid_dist$fpco2, levels = c("420", "300", "680", "3300"))
+ssid_dist_glm <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+summary(ssid_dist_glm) # summary output of the GLM
+Anova(ssid_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 
 #### Can't seem to make bootstrapping work for PSTR so just going to report mean/SE in the plots and then the GLM model output
@@ -903,8 +908,9 @@ ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat_p
   scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore"))
   
 
-## Linear model output
-summary(ssid_dist_glm)
+## Model output
+summary(ssid_dist_glm) # summary output of the GLM
+Anova(ssid_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
 
@@ -945,10 +951,10 @@ dip_dist <- dip_dist %>%
 ## Model selection (via AIC)
 pstr_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist)
 pstr_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
-pstr_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist) # best fit
+pstr_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist) # best fit but results in singularity for 400_31 so moving forward with mod6
 pstr_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
 pstr_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = dip_dist)
-pstr_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist) # using this model
 
 # check for best-fit model
 compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, rank = TRUE)
@@ -956,7 +962,7 @@ plot(compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dis
 
 
 ## Best-fit GLM with Gamma log link
-pstr_dist_glm <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_glm <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
 summary(pstr_dist_glm)
 
 ```
@@ -987,8 +993,9 @@ pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat_p
   scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore"))
 
 
-## Linear model output
-summary(pstr_dist_glm)
+## Model output
+summary(pstr_dist_glm) # summary output of the GLM
+Anova(pstr_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
 
@@ -1070,8 +1077,9 @@ past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat_p
   scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore"))
 
 
-## Linear model output
-summary(past_dist_glm)
+## Model output
+summary(past_dist_glm) # summary output of the GLM
+Anova(past_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
 
