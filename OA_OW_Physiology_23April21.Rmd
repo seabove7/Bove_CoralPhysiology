@@ -1,6 +1,6 @@
 ---
 title: "Coral Holobiont Physiology under OA/OW "
-date: "*Last compiled on `r format(Sys.time(), '%d %B %Y')`*"
+date: "*Last run on `r format(Sys.time(), '%d %B %Y')`*"
 output: 
   html_document:
     theme: simplex
@@ -712,7 +712,7 @@ sid_corr_df <- s_df[,c(10:11,14:17,21:23)] %>%
 ## Plot correlation matrix and scatter plot of all SSID physiology  
 png(file = "Figures/Supplemental_Figures/SSID_PhysCorrelations.png", width = 330, height = 225, units='mm', res = 300)  
 
-corrgram(sid_corr_df, order = TRUE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
+corrgram(sid_corr_df, order = FALSE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
          col.regions = colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
          color = sid_corr_df$colour, pch = as.numeric(as.character(sid_corr_df$shape)),
          labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
@@ -736,7 +736,7 @@ dip_corr_df <- p_df[,c(10:11,14:17,21:23)] %>%
 ## Plot correlation matrix and scatter plot of all PSTR physiology
 png(file = "Figures/Supplemental_Figures/PSTR_PhysCorrelations.png", width = 330, height = 225, units='mm', res = 300) 
 
-corrgram(dip_corr_df, order=TRUE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
+corrgram(dip_corr_df, order = FALSE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
          col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
          color = dip_corr_df$colour, pch = as.numeric(as.character(dip_corr_df$shape)),
          labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
@@ -760,7 +760,7 @@ por_corr_df <- a_df[,c(10:11,14:16,18,21:23)] %>%
 ## Plot correlation matrix and scatter plot of all PAST physiology
 png(file = "Figures/Supplemental_Figures/PAST_PhysCorrelations.png", width = 330, height = 225, units='mm', res = 300) 
 
-corrgram(por_corr_df, order=TRUE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
+corrgram(por_corr_df, order = FALSE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
          col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
          color = por_corr_df$colour, pch = as.numeric(as.character(por_corr_df$shape)),
          labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
@@ -1106,7 +1106,9 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 <br/>
 
 
-## *S. siderea* subset {.tabset} 
+## *Siderastrea siderea* subset {.tabset} 
+
+Here, I am looking at the physiological response of a subset of *S. siderea* samples that were also assessed for transcriptomic analyses. From the TagSeq data, we were able to identify relative abundance of Symbiodinacaea genus within each fragment as either *Cladocopium spp.* dominated (> 50% reads mapping to *Cladocopium*) or *Durusdinium spp.* dominated (> 50% reads mapping to *Durusdinium*). We then used this information to assess differences in physiological responses based on dominant Symbiodinacaea genera.
 
 ### Principal component analysis
 
@@ -1130,7 +1132,7 @@ s_sub_pca <- prcomp(sid_sub_pca_df, center = TRUE, scale= TRUE)
 
 ```
 
-```{r SSID subset PCA plot, fig.height=8, fig.width=8}
+```{r SSID subset PCA plot}
 
 # create labels for p values calculated above
 s_sub_pco2_pval <- substitute(italic(P[reef])==p, list(p = format(s_sub_pval[1,1], digits = 2)))
@@ -1147,6 +1149,7 @@ s_sub_PS_pval <- substitute(italic(P[symb%*%pCO[2]])==p, list(p = format(s_sub_p
 s_sub_symb_pca <- autoplot(s_sub_pca, data = s_df_sub, 
          colour = "domSymb",
          #fill = "domSymb",
+         size = 3,
          shape = "fpco2",
          frame = TRUE, 
          frame.type = "t",
@@ -1163,10 +1166,11 @@ s_sub_symb_pca <- autoplot(s_sub_pca, data = s_df_sub,
     scale_shape_manual(values = c(21, 23, 24, 22), labels = c("pre industrial", "current", "end-of-century", "extreme")) +
     scale_colour_manual("domSymb", labels = c("Cladocopium spp.", "Durusdinium spp."), values = c(wes_palette("Royal1", 3:5, type = "continuous"))) +
     #scale_fill_manual("domSymb", labels = c("Cladocopium spp.", "Durusdinium spp."), values = c(wes_palette("Royal1", 3:5, type = "continuous"))) +
-    guides(fill = FALSE, shape = guide_legend(keyheight = 0.8, label.theme = element_text(size = 9)), color = guide_legend(label.theme = element_text(face = "italic", size = 9), keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.42, y = -0.38, label = deparse(s_sub_symb_pval), parse = TRUE, size = 3) +
-  ggsave("Figures/Final_Figures/Figure4_SSID_PhysPCA.pdf", width = 8, height = 6)
+    guides(fill = FALSE, shape = FALSE, color = guide_legend(label.theme = element_text(face = "italic", size = 9), keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+    theme_pubr() +
+    theme(legend.title = element_blank(), legend.position = c(0.14, 0.95)) +
+    #theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  annotate("text", x = -0.42, y = -0.38, label = deparse(s_sub_symb_pval), parse = TRUE, size = 3)
 
 # temperature
 s_sub_temp_pca <- autoplot(s_sub_pca, data = s_df_sub, 
@@ -1254,14 +1258,14 @@ ggarrange(s_sub_symb_pca, s_sub_pco2_pca, s_sub_temp_pca, s_sub_reef_pca, ncol =
 
 ### Correlation assessments
 
+##### *Siderastrea siderea* subset correlations 
 ```{r SSID subset corr plot}
 
 ## create a C dom and D dom dataframe
 sid_corr_D <- s_df_sub[s_df_sub$domSymb == "D",] 
 sid_corr_C <- s_df_sub[s_df_sub$domSymb == "C",]
 
-
-## Create new correlation dataframe for SSID
+## Create new correlation dataframe for SSID subset
 sid_sub_corr_df <- s_df_sub[,c(10:11,14:17,21:23,30)] %>% 
   mutate(colour = case_when(domSymb == "C" ~ "#899DA4",
                            domSymb == "D" ~ "#E19171"),
@@ -1270,14 +1274,19 @@ sid_sub_corr_df <- s_df_sub[,c(10:11,14:17,21:23,30)] %>%
                             fpco2 == "680" ~ "24",
                             fpco2 == "3300" ~ "22"))
 
-sid_sub_corr_D_df <- sid_corr_D[,c(10:11,14:17,21:23)] %>% 
-  mutate(shape = case_when(ftemp == "28" ~ "19",
-                           ftemp == "31" ~ "21"),
-         colour = case_when(fpco2 == "300" ~ "#b2abd2",
-                            fpco2 == "420" ~ "#5e3c99",
-                            fpco2 == "680" ~ "#fdb863",
-                            fpco2 == "3300" ~ "#e66101"))
 
+## Correlation matrix and scatterplots coloured by dominant symbiont type for all subset samples
+corrgram(sid_sub_corr_df, order = FALSE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
+         col.regions = colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
+         color = sid_sub_corr_df$colour, pch = as.numeric(as.character(sid_sub_corr_df$shape)),
+         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
+
+```
+
+##### *Siderastrea siderea* dominated by *Cladocopium spp.*  correlations 
+```{r SSID C subset corr plot}
+
+## Create new correlation dataframe for SSID C subset
 sid_sub_corr_C_df <- sid_corr_C[,c(10:11,14:17,21:23)] %>% 
   mutate(shape = case_when(ftemp == "28" ~ "19",
                            ftemp == "31" ~ "21"),
@@ -1286,25 +1295,33 @@ sid_sub_corr_C_df <- sid_corr_C[,c(10:11,14:17,21:23)] %>%
                             fpco2 == "680" ~ "#fdb863",
                             fpco2 == "3300" ~ "#e66101"))
 
-## Plot correlation matrix and scatter plot of all SSID physiology  
-#png(file = "Figures/Supplemental_Figures/SSID_PhysCorrelations.png", width = 330, height = 225, units='mm', res = 300)  
 
-corrgram(sid_sub_corr_df, order = TRUE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
-         col.regions = colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
-         color = sid_sub_corr_df$colour, pch = as.numeric(as.character(sid_sub_corr_df$shape)),
-         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
-
-corrgram(sid_sub_corr_C_df, order = TRUE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
+## Correlation matrix and scatterplots coloured by pCO2 for C dominated samples only
+corrgram(sid_sub_corr_C_df, order = FALSE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
          col.regions = colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
          color = sid_sub_corr_C_df$colour, pch = as.numeric(as.character(sid_sub_corr_C_df$shape)),
          labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
 
-corrgram(sid_sub_corr_D_df, order = TRUE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
+```
+
+##### *Siderastrea siderea* dominated by *Durusdinium spp.*  correlations 
+```{r SSID D subset corr plot}
+
+## Create new correlation dataframe for SSID D subset
+sid_sub_corr_D_df <- sid_corr_D[,c(10:11,14:17,21:23)] %>% 
+  mutate(shape = case_when(ftemp == "28" ~ "19",
+                           ftemp == "31" ~ "21"),
+         colour = case_when(fpco2 == "300" ~ "#b2abd2",
+                            fpco2 == "420" ~ "#5e3c99",
+                            fpco2 == "680" ~ "#fdb863",
+                            fpco2 == "3300" ~ "#e66101"))
+
+
+## Correlation matrix and scatterplots coloured by pCO2 for D dominated samples only
+corrgram(sid_sub_corr_D_df, order = FALSE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
          col.regions = colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
          color = sid_sub_corr_D_df$colour, pch = as.numeric(as.character(sid_sub_corr_D_df$shape)),
          labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
-
-#dev.off() 
 
 ```
 
@@ -1314,9 +1331,107 @@ corrgram(sid_sub_corr_D_df, order = TRUE, lower.panel = panel.fill.R2, upper.pan
 
 ### Plasticity analysis
 
-```{r}
+```{r SSID subset distance dataframe setup}
+
+s_sub_dis <- s_sub_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+sid_sub_dist <- cbind(s_df_sub[,c(1,7,10,11,12,27,30)], s_sub_dis) # combine the datasets
+
+# adds column with the control value PC1/PC2 per colony
+sid_sub_dist$cont_pc1[sid_sub_dist$treat2 == "447_28"] <- sid_sub_dist$PC1[sid_sub_dist$treat2 == "447_28"]
+sid_sub_dist$cont_pc2[sid_sub_dist$treat2 == "447_28"] <- sid_sub_dist$PC2[sid_sub_dist$treat2 == "447_28"]
+
+# get the 400_28 PC values
+sid_sub_dist2 <- sid_sub_dist %>%  
+  group_by(colony) %>% 
+  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
+            con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+
+# Make columns of the 400_28 PC values
+sid_sub_dist <- sid_sub_dist %>% 
+  left_join(sid_sub_dist2, by = c("colony" = "colony"))
+
+sid_sub_dist$dist <- sqrt(((sid_sub_dist$PC1 - sid_sub_dist$con2_pc1)^2) + ((sid_sub_dist$PC2 - sid_sub_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+sid_sub_dist$treat_plot <- paste(sid_sub_dist$fpco2, sid_sub_dist$ftemp, sep = "_")
+
+
+## modify dataframe to remove the control treatment and reorder levels
+sid_sub_dist <- sid_sub_dist %>% 
+  filter(treat_plot != "420_28") %>% 
+  mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31")),
+         reef = factor(reef, levels = c("N", "F")),
+         ftemp = factor(ftemp, levels = c("28", "31")),
+         fpco2 = factor(fpco2, levels = c("300", "420", "680", "3300")))
 
 ```
+
+```{r SSID subset distance analysis, include=FALSE}
+
+## Model selection (via AIC)
+ssid_sub_dist_mod <- glm(dist ~ reef * fpco2 * ftemp * domSymb, family = Gamma(link = "log"), data = sid_sub_dist)
+ssid_sub_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp + domSymb, family = Gamma(link = "log"), data = sid_sub_dist)
+ssid_sub_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp + domSymb, family = Gamma(link = "log"), data = sid_sub_dist)
+ssid_sub_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp + domSymb, family = Gamma(link = "log"), data = sid_sub_dist)
+ssid_sub_dist_mod5 <- glm(dist ~ domSymb * fpco2 + ftemp + reef, family = Gamma(link = "log"), data = sid_sub_dist)
+ssid_sub_dist_mod6 <- glm(dist ~ fpco2 + ftemp + domSymb, family = Gamma(link = "log"), data = sid_sub_dist) # best fit
+
+# check for best-fit model
+compare_performance(ssid_sub_dist_mod, ssid_sub_dist_mod2, ssid_sub_dist_mod3, ssid_sub_dist_mod4, ssid_sub_dist_mod5, ssid_sub_dist_mod6, rank = TRUE)
+plot(compare_performance(ssid_sub_dist_mod, ssid_sub_dist_mod2, ssid_sub_dist_mod3, ssid_sub_dist_mod4, ssid_sub_dist_mod5, ssid_sub_dist_mod6, rank = TRUE))
+
+
+## Best-fit GLM with Gamma log link
+ssid_sub_dist_glm <- glm(dist ~ fpco2 + ftemp + domSymb, family = Gamma(link = "log"), data = sid_sub_dist, contrasts = list(domSymb=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+summary(ssid_sub_dist_glm) # summary output of the GLM
+Anova(ssid_sub_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+
+```
+
+```{r plots of SSID subset distances}
+
+## Summary data for plotting based on mean/SE instead of boot
+sid_sub_dist_sum <- sid_sub_dist %>% 
+  mutate(fpco2 = factor(fpco2, levels = c("300", "420", "680", "3300"))) %>% 
+  #mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
+  group_by(fpco2, domSymb) %>% 
+  summarise(mean = mean(dist),
+            se = (sd(dist) / sqrt(n()))) 
+
+
+## Plasticity plot
+ssid_sub_plast_plot <- ggplot(sid_sub_dist_sum, aes(x = domSymb, y = mean, shape = fpco2, fill = fpco2)) +
+  theme_pubr() +
+  theme(legend.title = element_blank(), legend.position = c(0.08, 0.87), axis.text.x = element_text(face = "italic"), axis.ticks.x = element_blank()) +
+  guides(shape = guide_legend(ncol = 1)) +
+  geom_point(data = sid_sub_dist, aes(x = domSymb, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.2)) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), size = 1, width = 0.1, position = position_dodge(width = 0.2)) +
+  geom_point(size = 5, position = position_dodge(width = 0.2)) +
+  scale_shape_manual(values = c(21, 22, 24, 23)) +
+  scale_fill_manual(values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) + 
+  labs(y = "PC distance from control", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 10)) +
+  scale_x_discrete(labels = c("C" = "Cladocopium spp.", "D" = "Durusdinium spp."))
+  
+
+## Model output
+summary(ssid_sub_dist_glm) # summary output of the GLM
+Anova(ssid_sub_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+
+```
+
+<br/>
+<br/>
+
+
+### Figure 4
+
+```{r save SSID subset PCA and plasticity, fig.width = 13, fig.height = 6}
+
+ggarrange(s_sub_symb_pca, ssid_sub_plast_plot, ncol = 2, labels = "AUTO") +
+  ggsave("Figures/Final_Figures/Figure4_SSIDPhys.pdf", width = 13, height = 6)
+
+```
+
+**Figure 4.** *Text will go here*
 
 <br/>
 <br/>
