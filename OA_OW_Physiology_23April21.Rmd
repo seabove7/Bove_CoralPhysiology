@@ -364,7 +364,6 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
 s_reef_pca <- autoplot(s_pca, data = s_df, 
          colour = "reef",
          shape = "reef",
-         fill = "reef",               
          frame = TRUE, 
          frame.type = "t",
          frame.level = 0.95,
@@ -377,13 +376,12 @@ s_reef_pca <- autoplot(s_pca, data = s_df,
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
-  #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
+  scale_shape_manual("reef environment", labels = c("offshore", "inshore"), values = c(21,24)) +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.345, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste(bold("A)   "), italic("S. siderea"))))
 
 ```
 
@@ -474,7 +472,6 @@ p_pco2_pca <- autoplot(p_pca, data = p_df,
 p_reef_pca <- autoplot(p_pca, data = p_df, 
          colour = "reef",
          shape = "reef",
-         fill = "reef",               
          frame = TRUE, 
          frame.type = "t",
          frame.level = 0.95,
@@ -487,12 +484,12 @@ p_reef_pca <- autoplot(p_pca, data = p_df,
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
-  #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  scale_shape_manual("reef environment", labels = c("offshore", "inshore"), values = c(21,24)) +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.345, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.17, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
 ```
 
@@ -584,7 +581,6 @@ a_pco2_pca <- autoplot(a_pca, data = a_df,
 a_reef_pca <- autoplot(a_pca, data = a_df, 
          colour = "reef",
          shape = "reef",
-         fill = "reef",               
          frame = TRUE, 
          frame.type = "t",
          frame.level = 0.95,
@@ -597,12 +593,12 @@ a_reef_pca <- autoplot(a_pca, data = a_df,
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
-  #scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  #scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-    guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+  scale_shape_manual("reef environment", labels = c("offshore", "inshore"), values = c(21,24)) +
+  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.345, y = -0.38, label = deparse(a_reef_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.245, y = -0.38, label = deparse(a_reef_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
 
 ```
 
@@ -616,15 +612,31 @@ a_reef_pca <- autoplot(a_pca, data = a_df,
 
 temp_PCA <- ggarrange(s_temp_pca, p_temp_pca, a_temp_pca, ncol = 3, common.legend = TRUE, legend = "right")
 pCO2_PCA <- ggarrange(s_pco2_pca, p_pco2_pca, a_pco2_pca, ncol = 3, common.legend = TRUE, legend = "right")
-#reef_PCA <- ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "right") # includes a row for RZ
 
 ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
-  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 13, height = 7)
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 13, height = 7) +
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.png", width = 13, height = 7)
+
 
 ```
 
 **Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$ C blue; 31$^\circ$ C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
+<br/>
+<br/>
+
+
+### *Figure S1*
+
+```{r PCA plot reefs, fig.height = 3.8, fig.width = 13}
+
+ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "right") +
+  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.pdf", width = 13, height = 3.8) +
+  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.png", width = 13, height = 3.8)
+
+```
+
+**Figure S1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicted by natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -791,7 +803,8 @@ past_corr_plot <- ggplot() +
   ggtitle(expression(paste(bold("  B)   "), italic("P. asteroides"))))
 
 ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
-  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 8, height = 6.4)
+  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 8, height = 6.4) +
+  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.png", width = 8, height = 6.4)
 
 ```
 
@@ -1108,7 +1121,8 @@ Anova(past_dist_glm, type = "III", test.statistic = "F") # comparison of the 'ma
 ```{r plot and save all species plasticity, fig.width = 13, fig.height = 4}
 
 ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRUE, legend = "right", ncol = 3) +
-  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.pdf", width = 13, height = 4)
+  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.pdf", width = 13, height = 4) +
+  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.png", width = 13, height = 4)
 
 ```
 
@@ -1188,9 +1202,9 @@ s_sub_symb_pca <- autoplot(s_sub_pca, data = s_df_sub,
     #scale_fill_manual("domSymb", labels = c("Cladocopium spp.", "Durusdinium spp."), values = c(wes_palette("Royal1", 3:5, type = "continuous"))) +
     guides(fill = FALSE, shape = FALSE, color = guide_legend(label.theme = element_text(face = "italic", size = 9), keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
     theme_pubr() +
-    theme(legend.title = element_blank(), legend.position = c(0.14, 0.95)) +
+    theme(legend.title = element_blank(), legend.position = c(0.16, 0.95)) +
     #theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA)) +
-  annotate("text", x = -0.42, y = -0.38, label = deparse(s_sub_symb_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.47, y = -0.38, label = deparse(s_sub_symb_pval), parse = TRUE, size = 4)
 
 # temperature
 s_sub_temp_pca <- autoplot(s_sub_pca, data = s_df_sub, 
@@ -1212,9 +1226,9 @@ s_sub_temp_pca <- autoplot(s_sub_pca, data = s_df_sub,
   scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21,22,23,24)) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#0072B2", "#D55E00"))+
-  guides(color = guide_legend(keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0))), shape = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE)) +
+  guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0))), shape = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE)) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA), legend.position = "bottom") +
-  annotate("text", x = -0.30, y = -0.38, label = deparse(s_sub_temp_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.45, y = -0.38, label = deparse(s_sub_temp_pval), parse = TRUE, size = 3)
 
 # pco2
 s_sub_pco2_pca <- autoplot(s_sub_pca, data = s_df_sub, 
@@ -1235,9 +1249,9 @@ s_sub_pco2_pca <- autoplot(s_sub_pca, data = s_df_sub,
     scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
     scale_fill_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(NA, NA, NA, NA))+
     scale_colour_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0))), shape = guide_legend(keyheight = 0.3, nrow = 2, byrow = TRUE)) +
+    guides(fill = FALSE, color = guide_legend(order = 1, keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0, 0))), shape = guide_legend(keyheight = 0.1, nrow = 2, byrow = TRUE)) +
     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), legend.title = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.background = element_rect(fill = "transparent", colour = NA), legend.position = "bottom") +
-  annotate("text", x = -0.30, y = -0.38, label = deparse(s_sub_pco2_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.45, y = -0.38, label = deparse(s_sub_pco2_pval), parse = TRUE, size = 3)
 
 # reef
 s_sub_reef_pca <- autoplot(s_sub_pca, data = s_df_sub, 
@@ -1258,9 +1272,9 @@ s_sub_reef_pca <- autoplot(s_sub_pca, data = s_df_sub,
          loadings.label.repel = TRUE) +
   scale_shape_manual("reef environment", labels = c("offshore", "inshore"), values = c(1,2)) +
   scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(),strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA), legend.position = "bottom") +
-  annotate("text", x = -0.345, y = -0.38, label = deparse(s_sub_reef_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.45, y = -0.38, label = deparse(s_sub_reef_pval), parse = TRUE, size = 3)
 
 ```
 
@@ -1414,7 +1428,7 @@ sid_sub_dist_sum <- sid_sub_dist %>%
 ## Plasticity plot
 ssid_sub_plast_plot <- ggplot(sid_sub_dist_sum, aes(x = domSymb, y = mean, shape = fpco2, fill = fpco2)) +
   theme_pubr() +
-  theme(legend.title = element_blank(), legend.position = c(0.08, 0.87), axis.text.x = element_text(face = "italic"), axis.ticks.x = element_blank()) +
+  theme(legend.title = element_blank(), legend.position = c(0.09, 0.87), axis.text.x = element_text(face = "italic"), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1)) +
   geom_point(data = sid_sub_dist, aes(x = domSymb, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.2)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), size = 1, width = 0.1, position = position_dodge(width = 0.2)) +
@@ -1438,14 +1452,15 @@ Anova(ssid_sub_dist_glm, type = "III", test.statistic = "F") # comparison of the
 
 ### **Figure 4**
 
-```{r save SSID subset PCA and plasticity, fig.width = 13, fig.height = 6}
+```{r save SSID subset PCA and plasticity, fig.width = 11, fig.height = 5}
 
 ggarrange(s_sub_symb_pca, ssid_sub_plast_plot, ncol = 2, labels = "AUTO") +
-  ggsave("Figures/Final_Figures/Figure4_SSIDPhys.pdf", width = 13, height = 6)
+  ggsave("Figures/Final_Figures/Figure4_SSIDPhys.pdf", width = 11, height = 5) +
+  ggsave("Figures/Final_Figures/Figure4_SSIDPhys.png", width = 11, height = 5)
 
 ```
 
-**Figure 4.** *Text will go here*
+**Figure 4.** *Siderastrea siderea* coral holobiont physiology based on dominant Symbiodinacaea genus. (**A**) Principal component analysis of all physiological parameters depicted by dominant Symbiodinacaea genus (*Cladocopium spp.* grey; *Durusdinium spp.* pink). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions. (**B**) Assessment of phenotypic plasticity based on dominant Symbiodinacaea genus with higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square).
 
 <br/>
 <br/>
@@ -1453,13 +1468,15 @@ ggarrange(s_sub_symb_pca, ssid_sub_plast_plot, ncol = 2, labels = "AUTO") +
 
 ### *Figure S2*
 
-```{r Figure S2 SSID subset PCA all plots, fig.height = 4, fig.width = 12}
+```{r Figure S2 SSID subset PCA all plots, fig.height = 4.3, fig.width = 12}
 
-ggarrange(s_sub_pco2_pca, s_sub_temp_pca, s_sub_reef_pca, nrow = 1, labels = "AUTO")
+ggarrange(s_sub_pco2_pca, s_sub_temp_pca, s_sub_reef_pca, nrow = 1, ncol = 3, labels = "AUTO", align = "h") +
+  ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCAs.pdf", width = 13, height = 5.1) +
+  ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCAs.png", width = 13, height = 5.1)
 
 ```
 
-**Figure S2.** *Text will go here*
+**Figure S2.** Principal component analysis of *Siderastrea siderea* coral holobiont physiology subset with known Symbiodinacaea community composition depicted by (**A**) *p*CO~2~ (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange), (**B**) temperature treatment (28$^\circ$ C blue; 31$^\circ$ C red), and (**C**) natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions. 
 
 <br/>
 <br/>
