@@ -26,7 +26,7 @@ output:
 
 ```{r setup, include=FALSE}
 
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, options(knitr.kable.NA = ''))
 options(warn = -1)
 
 ```
@@ -39,6 +39,7 @@ options(warn = -1)
 ## Packages to load
 library(knitr)
 library(readr)
+library(broom)
 library(ggplot2)
 library(dplyr)
 library(ggbiplot)
@@ -872,14 +873,17 @@ ssid_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"
 ssid_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
 
 # check for best-fit model
-compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
-plot(compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE))
+ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
+plot(ssid_plast_aic)
 
 
 ## Best-fit GLM with Gamma log link
 ssid_dist_glm <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
-summary(ssid_dist_glm) # summary output of the GLM
-Anova(ssid_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+ssid_glm_out <- summary(ssid_dist_glm) # summary output of the GLM
+ssid_anova_out <- Anova(ssid_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+
+
+
 
 
 #### Can't seem to make bootstrapping work for PSTR so just going to report mean/SE in the plots and then the GLM model output
@@ -922,8 +926,8 @@ ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat_p
   
 
 ## Model output
-summary(ssid_dist_glm) # summary output of the GLM
-Anova(ssid_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+ssid_glm_out # summary output of the GLM
+ssid_anova_out # comparison of the 'main effects'
 
 ```
 
@@ -977,14 +981,14 @@ pstr_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"
 pstr_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
 
 # check for best-fit model
-compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, rank = TRUE)
-plot(compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, rank = TRUE))
+pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, rank = TRUE)
+plot(pstr_plast_aic)
 
 
 ## Best-fit GLM with Gamma log link
 pstr_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
-summary(pstr_dist_glm) # summary output of the GLM
-Anova(pstr_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+pstr_glm_out <- summary(pstr_dist_glm) # summary output of the GLM
+pstr_anova_out <- Anova(pstr_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
   
@@ -1015,8 +1019,8 @@ pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat_p
 
 
 ## Model output
-summary(pstr_dist_glm) # summary output of the GLM
-Anova(pstr_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+pstr_glm_out # summary output of the GLM
+pstr_anova_out # comparison of the 'main effects'
 
 ```
 
@@ -1069,14 +1073,14 @@ past_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"
 past_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist) # best fit but using mod4 to include reef
 
 # check for best-fit model
-compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, rank = TRUE)
-plot(compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, rank = TRUE))
+past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, rank = TRUE)
+plot(past_plast_aic)
 
 
 ## Best-fit GLM with Gamma log link
-past_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist)
-summary(past_dist_glm) # summary output of the GLM
-Anova(past_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+past_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+past_glm_out <- summary(past_dist_glm) # summary output of the GLM
+past_anova_out <- Anova(past_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
   
@@ -1107,8 +1111,8 @@ past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat_p
 
 
 ## Model output
-summary(past_dist_glm) # summary output of the GLM
-Anova(past_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+past_glm_out # summary output of the GLM
+past_anova_out # comparison of the 'main effects'
 
 ```
 
@@ -1410,7 +1414,7 @@ plot(compare_performance(ssid_sub_dist_mod, ssid_sub_dist_mod2, ssid_sub_dist_mo
 ## Best-fit GLM with Gamma log link
 ssid_sub_dist_glm <- glm(dist ~ fpco2 + ftemp + domSymb, family = Gamma(link = "log"), data = sid_sub_dist, contrasts = list(domSymb=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
 summary(ssid_sub_dist_glm) # summary output of the GLM
-Anova(ssid_sub_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+ssid_sub_anova_out <- Anova(ssid_sub_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
 
@@ -1442,7 +1446,7 @@ ssid_sub_plast_plot <- ggplot(sid_sub_dist_sum, aes(x = domSymb, y = mean, shape
 
 ## Model output
 summary(ssid_sub_dist_glm) # summary output of the GLM
-Anova(ssid_sub_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+ssid_sub_anova_out # comparison of the 'main effects'
 
 ```
 
@@ -1482,7 +1486,7 @@ ggarrange(s_sub_pco2_pca, s_sub_temp_pca, s_sub_reef_pca, nrow = 1, ncol = 3, la
 <br/>
 
 
-## Physiological paramters {.tabset}
+## Physiological paramters (working) {.tabset}
 
 Physiological response parameters were assessed using mixed-effects linear models across species and treatments. Model selection was carried out using backward elimination of random-effects followed by fixed-effects using the package [*lmerTest*](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf) (version `r packageVersion("lmerTest")`)
 
@@ -2032,234 +2036,347 @@ ggsave("Figures/Supplemental_Figures/FigureS1_physiology.pdf")
 
 
 
----
-
 <br/>
 <br/>
 
 
 ## Supplemental Tables{.tabset} 
 
+### Table S1 *WORKING*
 
-```{r protein table}
+**Figure S1.** Akaike information criterion (AIC) generalized linear model (GLM) selection comparisons for plasticity assessments to select the best-fit model per species.
+```{r table S1 for markdown}
 
-df_pro_a$treat2 <- paste(df_pro_a$fpco2, df_pro_a$ftemp, sep = "_")
-pro_tab <- df_pro_a[,c(9,21,18:20)] #subset for species, treatment, parameter, and model values
-pro_tab$binder <- paste(pro_tab$species, pro_tab$treat2, sep = "_")
+## combine model output
+plast_aic <- rbind(ssid_plast_aic, pstr_plast_aic, past_plast_aic) # combine all PERMANOVA model outputs
+plast_aic$treat <- rownames(plast_aic) # add column for rownames
+plast_aic$species <- c(rep("SSID", 6), rep("PSTR", 6), rep("PAST", 6)) # add column for species ID
+plast_aic <- plast_aic[c(6, 1:5, 7)] # reorder columns so treatment is first
 
-T90_pro_mean <- summarySE(data=pro_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90_pro_low <- summarySE(data=pro_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90_pro_up <- summarySE(data=pro_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
 
-pro_tab <- cbind(T90_pro_mean, T90_pro_low, T90_pro_up)[, c(1,2,4,5,13,21)]
-pro_tab$mean <- round(pro_tab$mean, 2)
-pro_tab$lowerci <- round(pro_tab$lowerci, 2)
-pro_tab$upperci <- round(pro_tab$upperci, 2)
+##### STILL NEED TO MAKE THIS PRETTIER BUT JUST A PLACE HOLDER FOR NOW
 
-colnames(pro_tab)[colnames(pro_tab)=="treat2"] <- "treatment"
-colnames(pro_tab)[colnames(pro_tab)=="lowerci"] <- "lower 95%"
-colnames(pro_tab)[colnames(pro_tab)=="upperci"] <- "upper 95%"
-pro_tab$treatment <- factor(pro_tab$treatment, c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
-
-table1 <- kable(pro_tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral host protein content and 95% confidence intervals for each  species") %>%
-  kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 8) %>%
-  pack_rows("(b) PSTR", 9, 16) %>%
-  pack_rows("(c) PAST", 17, 24)
-table1
-
-```
-
-```{r lipid table}
-
-df_lipid_a$treat2 <- paste(df_lipid_a$fpco2, df_lipid_a$ftemp, sep = "_")
-lipid_tab <- df_lipid_a[,c(9,21,18:20)] #subset for species, treatment, parameter, and model values
-lipid_tab$binder <- paste(lipid_tab$species, lipid_tab$treat2, sep = "_")
-
-T90_lipid_mean <- summarySE(data=lipid_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90_lipid_low <- summarySE(data=lipid_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90_lipid_up <- summarySE(data=lipid_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
-
-lipid_tab <- cbind(T90_lipid_mean, T90_lipid_low, T90_lipid_up)[, c(1,2,4,5,13,21)]
-lipid_tab$mean <- round(lipid_tab$mean, 2)
-lipid_tab$lowerci <- round(lipid_tab$lowerci, 2)
-lipid_tab$upperci <- round(lipid_tab$upperci, 2)
-
-colnames(lipid_tab)[colnames(lipid_tab)=="treat2"] <- "treatment"
-colnames(lipid_tab)[colnames(lipid_tab)=="lowerci"] <- "lower 95%"
-colnames(lipid_tab)[colnames(lipid_tab)=="upperci"] <- "upper 95%"
-lipid_tab$treatment <- factor(lipid_tab$treatment, c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
-
-table2 <- kable(lipid_tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral host lipid content and 95% confidence intervals for each  species") %>%
-  kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 8) %>%
-  pack_rows("(b) PSTR", 9, 16) %>%
-  pack_rows("(c) PAST", 17, 24)
-table2
+### update formatting of text 
+#pca_mod_out <- pca_mod_out %>% 
+#  mutate(SumOfSqs = round(as.numeric(SumOfSqs), 0), # round values
+#         R2 = round(as.numeric(R2), 3),
+#         `F` = round(as.numeric(`F`), 2),
+#         `Pr(>F)` = round(as.numeric(`Pr(>F)`), 5)) %>% 
+#  mutate(treat = gsub("[0-9]", "", treat), # rename the treatment IDs
+#         treat = gsub("fpco", "pCO2", treat),
+#         treat = gsub("ftemp", "temperature", treat),
+#         treat = gsub("reef", "reef environment", treat)) %>% 
+#  rename("P-value" = `Pr(>F)`, # rename columns
+#         " " = treat)
+#  
+## combine them with format
+table_s1 <- kable(plast_aic[-2], booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  pack_rows("Siderastrea Siderea", 1, 6, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 7, 12, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 13, 18, italic = TRUE)
+table_s1
 
 ```
 
-```{r carbohydrate table}
+<br/>
+<br/>
 
-df_carb_a$treat2 <- paste(df_carb_a$fpco2, df_carb_a$ftemp, sep = "_")
-carb_tab <- df_carb_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
-carb_tab$binder <- paste(carb_tab$species, carb_tab$treat2, sep = "_")
 
-T90_carb_mean <- summarySE(data=carb_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90_carb_low <- summarySE(data=carb_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90_carb_up <- summarySE(data=carb_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+---
 
-carb_tab <- cbind(T90_carb_mean, T90_carb_low, T90_carb_up)[, c(1,2,4,5,13,21)]
-carb_tab$mean <- round(carb_tab$mean, 2)
-carb_tab$lowerci <- round(carb_tab$lowerci, 2)
-carb_tab$upperci <- round(carb_tab$upperci, 2)
+### Table S2
 
-colnames(carb_tab)[colnames(carb_tab)=="treat2"] <- "treatment"
-colnames(carb_tab)[colnames(carb_tab)=="lowerci"] <- "lower 95%"
-colnames(carb_tab)[colnames(carb_tab)=="upperci"] <- "upper 95%"
-carb_tab$treatment <- factor(carb_tab$treatment, c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+**Table S2.** PERMANOVA model output from each species using the *adonis2* function with 1500 iterations.
+```{r table S2 for markdown}
 
-table3 <- kable(carb_tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral host carbohydrate content and 95% confidence intervals for each  species") %>%
-  kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 8) %>%
-  pack_rows("(b) PSTR", 9, 16) %>%
-  pack_rows("(c) PAST", 17, 24)
-table3
+## combine model output
+pca_mod_out <- rbind(s_pca_mod, p_pca_mod, a_pca_mod) # combine all PERMANOVA model outputs
+pca_mod_out$treat <- rownames(pca_mod_out) # add column for rownames
+pca_mod_out$species <- c(rep("SSID", 5), rep("PSTR", 5), rep("PAST", 5)) # add column for species ID
+pca_mod_out <- pca_mod_out[c(6, 1:5, 7)] # reorder columns so treatment is first
 
-```
 
-```{r density table}
-
-df_den_a$treat2 <- paste(df_den_a$fpco2, df_den_a$ftemp, sep = "_")
-den_tab <- df_den_a[,c(9,15,18:20)] #subset for species, treatment, parameter, and model values
-den_tab$binder <- paste(den_tab$species, den_tab$treat2, sep = "_")
-
-T90_den_mean <- summarySE(data=den_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90_den_low <- summarySE(data=den_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90_den_up <- summarySE(data=den_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
-
-den_tab <- cbind(T90_den_mean, T90_den_low, T90_den_up)[, c(1,2,4,5,13,21)]
-den_tab$mean <- round(den_tab$mean, 2)
-den_tab$lowerci <- round(den_tab$lowerci, 2)
-den_tab$upperci <- round(den_tab$upperci, 2)
-
-colnames(den_tab)[colnames(den_tab)=="treat2"] <- "treatment"
-colnames(den_tab)[colnames(den_tab)=="lowerci"] <- "lower 95%"
-colnames(den_tab)[colnames(den_tab)=="upperci"] <- "upper 95%"
-den_tab$treatment <- factor(den_tab$treatment, c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
-
-table4 <- kable(den_tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral symbiont density content and 95% confidence intervals for each  species") %>%
-  kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 8) %>%
-  pack_rows("(b) PSTR", 9, 16) %>%
-  pack_rows("(c) PAST", 17, 24)
-table4
+## update formatting of text 
+pca_mod_out <- pca_mod_out %>% 
+  mutate(SumOfSqs = round(as.numeric(SumOfSqs), 0), # round values
+         R2 = round(as.numeric(R2), 3),
+         `F` = round(as.numeric(`F`), 2),
+         `Pr(>F)` = round(as.numeric(`Pr(>F)`), 5)) %>% 
+  mutate(treat = gsub("[0-9]", "", treat), # rename the treatment IDs
+         treat = gsub("fpco", "pCO2", treat),
+         treat = gsub("ftemp", "temperature", treat),
+         treat = gsub("reef", "reef environment", treat)) %>% 
+  rename("P-value" = `Pr(>F)`, # rename columns
+         " " = treat,
+         "Sum of Squares" = SumOfSqs)
+  
+## combine them with format
+table_s2 <- kable(pca_mod_out[-7], booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  pack_rows("Siderastrea Siderea", 1, 5, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 6, 10, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 11, 15, italic = TRUE) %>% 
+  row_spec(c(4:5,9:10,14:15), italic = TRUE)
+table_s2
 
 ```
 
-```{r chlorophyll table}
+<br/>
+<br/>
 
-df_chla_a$treat2 <- paste(df_chla_a$fpco2, df_chla_a$ftemp, sep = "_")
-chla_tab <- df_chla_a[,c(9,21,18:20)] #subset for species, treatment, parameter, and model values
-chla_tab$binder <- paste(chla_tab$species, chla_tab$treat2, sep = "_")
 
-T90_chla_mean <- summarySE(data=chla_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90_chla_low <- summarySE(data=chla_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90_chla_up <- summarySE(data=chla_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
+---
 
-chla_tab <- cbind(T90_chla_mean, T90_chla_low, T90_chla_up)[, c(1,2,4,5,13,21)]
-chla_tab$mean <- round(chla_tab$mean, 2)
-chla_tab$lowerci <- round(chla_tab$lowerci, 2)
-chla_tab$upperci <- round(chla_tab$upperci, 2)
+### Table S3
 
-colnames(chla_tab)[colnames(chla_tab)=="treat2"] <- "treatment"
-colnames(chla_tab)[colnames(chla_tab)=="lowerci"] <- "lower 95%"
-colnames(chla_tab)[colnames(chla_tab)=="upperci"] <- "upper 95%"
-chla_tab$treatment <- factor(chla_tab$treatment, c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
+**Table S3.** GLM output from plasticity assessments for each species. The intercept of each model was set as 300 $\mu$atm, 28$^\circ$C, and inshore reef environment.
+```{r table S3 for markdown}
 
-table5 <- kable(chla_tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral symbiont chlorophyll a content and 95% confidence intervals for each  species") %>%
-  kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 8) %>%
-  pack_rows("(b) PSTR", 9, 16) %>%
-  pack_rows("(c) PAST", 17, 24)
-table5
+## combine model output per species
+dist_mod_out <- rbind(tidy(ssid_dist_glm), tidy(pstr_dist_glm), tidy(past_dist_glm)) # combine all glm model outputs (the use of tidy() makes a tibble from the GLM)
+dist_mod_out$species <- c(rep("SSID", 9), rep("PSTR", 6), rep("PAST", 6)) # add column for species ID
 
-```
 
-```{r host table}
-
-df_host_a$treat2 <- paste(df_host_a$fpco2, df_host_a$ftemp, sep = "_")
-host_tab <- df_host_a[,c(9,21,18:20)] #subset for species, treatment, parameter, and model values
-host_tab$binder <- paste(host_tab$species, host_tab$treat2, sep = "_")
-
-T90_host_mean <- summarySE(data=host_tab, measurevar = "mean", groupvars = c("species", "treat2", "binder"))
-T90_host_low <- summarySE(data=host_tab, measurevar = "lowerci", groupvars = c("species", "treat2", "binder"))
-T90_host_up <- summarySE(data=host_tab, measurevar = "upperci", groupvars = c("species", "treat2", "binder"))
-
-host_tab <- cbind(T90_host_mean, T90_host_low, T90_host_up)[, c(1,2,4,5,13,21)]
-host_tab$mean <- round(host_tab$mean, 2)
-host_tab$lowerci <- round(host_tab$lowerci, 2)
-host_tab$upperci <- round(host_tab$upperci, 2)
-
-colnames(host_tab)[colnames(host_tab)=="treat2"] <- "treatment"
-colnames(host_tab)[colnames(host_tab)=="lowerci"] <- "lower 95%"
-colnames(host_tab)[colnames(host_tab)=="upperci"] <- "upper 95%"
-host_tab$treatment <- factor(host_tab$treatment, c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))
-
-table6 <- kable(host_tab[,-c(1)], booktabs = T, caption = "Table 1. T90 modeled mean coral host energy reserves and 95% confidence intervals for each  species") %>%
-  kable_styling(font_size = 10, full_width = F) %>% 
-  pack_rows("(a) SSID", 1, 8) %>%
-  pack_rows("(b) PSTR", 9, 16) %>%
-  pack_rows("(c) PAST", 17, 24)
-table6
+## update formatting of text 
+dist_mod_out <- dist_mod_out %>% 
+  mutate(estimate = round(as.numeric(estimate), 3), # round values
+         std.error = round(as.numeric(std.error), 3),
+         statistic = round(as.numeric(statistic), 2),
+         p.value = round(as.numeric(p.value), 3)) %>% 
+  mutate(term = gsub("21", "-current", term), # rename the treatment IDs
+         term = gsub("22", "-EOC", term),
+         term = gsub("21", "-extreme", term),
+         term = gsub("[0-9]", "", term),
+         term = gsub("fpco", "pCO2", term),
+         term = gsub("ftemp", "temperature (31C)", term),
+         term = gsub("reef", "reef environment (offshore)", term)) %>% 
+  rename(" " = term, # rename columns
+        "Estimate" = estimate,
+        "Standard error" = std.error,
+        "Statistic" = statistic,
+        "P-value" = p.value)
+  
+## combine them with format
+table_s3 <- kable(dist_mod_out[-6], booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  pack_rows("Siderastrea Siderea", 1, 9, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 10, 15, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 16, 21, italic = TRUE)
+table_s3
 
 ```
 
+<br/>
+<br/>
+
+
+---
+
+### Table S4
+
+**Table S4.** Type III test of analysis of deviance output based on the plasticity GLM per species in **Table S3**.
+```{r table S4 for markdown}
+
+## combine ANOVA output per species
+anova_mod_out <- rbind(ssid_anova_out, pstr_anova_out, past_anova_out) # combine all ANOVA model outputs
+anova_mod_out$treat <- rownames(anova_mod_out) # add column for rownames
+anova_mod_out$species <- c(rep("SSID", 5), rep("PSTR", 4), rep("PAST", 4)) # add column for species ID
+anova_mod_out <- anova_mod_out[c(5, 1:4, 6)] # reorder columns so treatment is first
+
+
+## update formatting of text 
+anova_mod_out <- anova_mod_out %>% 
+  mutate(`Sum Sq` = round(as.numeric(`Sum Sq`), 2), # round values
+         `F values` = round(as.numeric(`F values`), 1),
+         `Pr(>F)` = round(as.numeric(`Pr(>F)`), 2)) %>% 
+  mutate(treat = gsub("[0-9]", "", treat), # rename the treatment IDs
+         treat = gsub("fpco", "pCO2", treat),
+         treat = gsub("ftemp", "temperature", treat),
+         treat = gsub("reef", "reef environment", treat)) %>% 
+  rename("P-value" = `Pr(>F)`, # rename columns
+         " " = treat,
+         "Sum of Squares" = `Sum Sq`)
+  
+## combine them with format
+table_s4 <- kable(anova_mod_out[-6], booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  pack_rows("Siderastrea Siderea", 1, 5, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 6, 9, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 10, 13, italic = TRUE) %>% 
+  row_spec(c(5,9,13), italic = TRUE)
+table_s4
+
+```
+
+<br/>
+<br/>
+
+
+---
+
+### Table S5
+
+**Table S5.** PERMANOVA model output from the *Siderastrea siderea* samples with known Symbiodiniaceae community composition using the *adonis2* function with 1500 iterations.
+```{r table S5 for markdown}
+
+## rearrange SSID PCA output dataframe
+sub_pca_out <- s_sub_pca_mod # just renaming the SSID PCA output
+sub_pca_out$treat <- rownames(s_sub_pca_mod) # add column for rownames
+sub_pca_out <- sub_pca_out[c(6, 1:5)] # reorder columns so treatment is first
+
+
+## update formatting of text 
+sub_pca_out <- sub_pca_out %>% 
+  mutate(SumOfSqs = round(as.numeric(SumOfSqs), 0), # round values
+         R2 = round(as.numeric(R2), 3),
+         `F` = round(as.numeric(`F`), 2),
+         `Pr(>F)` = round(as.numeric(`Pr(>F)`), 5)) %>% 
+  mutate(treat = gsub("[0-9]", "", treat), # rename the treatment IDs
+         treat = gsub("fpco", "pCO2", treat),
+         treat = gsub("ftemp", "temperature", treat),
+         treat = gsub("reef", "reef environment", treat),
+         treat = gsub("domSymb", "dominant symbiont", treat)) %>% 
+  rename("P-value" = `Pr(>F)`, # rename columns
+         " " = treat,
+         "Sum of Squares" = SumOfSqs)
+  
+## combine them with format
+table_s5 <- kable(sub_pca_out, booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  row_spec(5:6, italic = TRUE)
+table_s5
+
+```
+
+<br/>
+<br/>
+
+
+---
+
+### Table S6
+
+**Table S6.** GLM output from plasticity assessments for the *Siderastrea siderea* samples with known Symbiodiniaceae community composition. The intercept of each model was set as 300 $\mu$atm, 28$^\circ$C, and *Cladocopium spp.* community dominance.
+```{r table S6 for markdown}
+
+## update formatting of text 
+ssid_dist_mod_out <- tidy(ssid_sub_dist_glm) %>% 
+  mutate(estimate = round(as.numeric(estimate), 3), # round values
+         std.error = round(as.numeric(std.error), 3),
+         statistic = round(as.numeric(statistic), 2),
+         p.value = round(as.numeric(p.value), 3)) %>% 
+  mutate(term = gsub("21", "-current", term), # rename the treatment IDs
+         term = gsub("22", "-EOC", term),
+         term = gsub("21", "-extreme", term),
+         term = gsub("[0-9]", "", term),
+         term = gsub("fpco", "pCO2", term),
+         term = gsub("ftemp", "temperature (31C)", term),
+         term = gsub("domSymb", "dominant symbiont (D)", term)) %>% 
+  rename(" " = term, # rename columns
+        "Estimate" = estimate,
+        "Standard error" = std.error,
+        "Statistic" = statistic,
+        "P-value" = p.value)
+  
+## combine them with format
+table_s6 <- kable(ssid_dist_mod_out, booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE)
+table_s6
+
+```
+
+<br/>
+<br/>
+
+
+---
+
+### Table S7
+
+**Table S7.** Type III test of analysis of deviance output based on the plasticity GLM for the *Siderastrea siderea* samples with known Symbiodiniaceae community composition in **Table S6**.
+```{r table S7 for markdown}
+
+## modify ANOVA output
+anova_sub_mod_out <- ssid_sub_anova_out # rename the ANOVA output
+anova_sub_mod_out$treat <- rownames(anova_sub_mod_out) # add column for rownames
+anova_sub_mod_out <- anova_sub_mod_out[c(5, 1:4)] # reorder columns so treatment is first
+
+
+## update formatting of text 
+anova_sub_mod_out <- anova_sub_mod_out %>% 
+  mutate(`Sum Sq` = round(as.numeric(`Sum Sq`), 2), # round values
+         `F values` = round(as.numeric(`F values`), 1),
+         `Pr(>F)` = round(as.numeric(`Pr(>F)`), 2)) %>% 
+  mutate(treat = gsub("[0-9]", "", treat), # rename the treatment IDs
+         treat = gsub("fpco", "pCO2", treat),
+         treat = gsub("ftemp", "temperature", treat),
+         treat = gsub("domSymb", "dominant symbiont", treat)) %>% 
+  rename("P-value" = `Pr(>F)`, # rename columns
+         " " = treat,
+         "Sum of Squares" = `Sum Sq`)
+  
+## combine them with format
+table_s7 <- kable(anova_sub_mod_out, booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  row_spec(4, italic = TRUE)
+table_s7
+
+```
+
+<br/>
+<br/>
+
+
+---
+
+<br/>
 
 ```{r excel WB, message=FALSE, warning=FALSE}
 
 ### Create workbook
 wb <- createWorkbook()
 
-# add 'Table 1' worksheet
-addWorksheet(wb, "Table 1 - protein") 
-writeData(wb, sheet = 1, x = pro_tab)
-setColWidths(wb, sheet = 1, cols = 1:5, widths = "auto")
+# add 'Table S1' worksheet
+addWorksheet(wb, "Table S1 - Plasticity AIC") 
+writeData(wb, sheet = 1, x = plast_aic)
+setColWidths(wb, sheet = 1, cols = 1:7, widths = "auto")
 
-# add 'Table 2' worksheet
-addWorksheet(wb, "Table 2 - lipid") 
-writeData(wb, sheet = 2, x = lipid_tab)
-setColWidths(wb, sheet = 2, cols = 1:5, widths = "auto")
+# add 'Table S2' worksheet
+addWorksheet(wb, "Table S2 - PERMANOVA all") 
+writeData(wb, sheet = 2, x = pca_mod_out)
+setColWidths(wb, sheet = 2, cols = 1:7, widths = "auto")
 
-# add 'Table 3' worksheet
-addWorksheet(wb, "Table 3 - carbohydrate") 
-writeData(wb, sheet = 3, x = carb_tab)
-setColWidths(wb, sheet = 3, cols = 1:5, widths = "auto")
+# add 'Table S3' worksheet
+addWorksheet(wb, "Table S3 - Plasticity GLM") 
+writeData(wb, sheet = 3, x = dist_mod_out)
+setColWidths(wb, sheet = 3, cols = 1:6, widths = "auto")
 
-# add 'Table 4' worksheet
-addWorksheet(wb, "Table 4 - density") 
-writeData(wb, sheet = 4, x = den_tab)
-setColWidths(wb, sheet = 4, cols = 1:5, widths = "auto")
+# add 'Table S4' worksheet
+addWorksheet(wb, "Table S4 - Plasticity ANOVA") 
+writeData(wb, sheet = 4, x = anova_mod_out)
+setColWidths(wb, sheet = 4, cols = 1:6, widths = "auto")
 
-# add 'Table 5' worksheet
-addWorksheet(wb, "Table 5 - chlorophyll") 
-writeData(wb, sheet = 5, x = chla_tab)
-setColWidths(wb, sheet = 5, cols = 1:5, widths = "auto")
+# add 'Table S5' worksheet
+addWorksheet(wb, "Table S5 - SSID PERMANOVA") 
+writeData(wb, sheet = 5, x = sub_pca_out)
+setColWidths(wb, sheet = 5, cols = 1:6, widths = "auto")
 
-# add 'Table 6' worksheet
-addWorksheet(wb, "Table 6 - total host") 
-writeData(wb, sheet = 6, x = host_tab)
+# add 'Table S6' worksheet
+addWorksheet(wb, "Table S6 - SSID plasticity GLM") 
+writeData(wb, sheet = 6, x = ssid_dist_mod_out)
 setColWidths(wb, sheet = 6, cols = 1:5, widths = "auto")
+
+# add 'Table S7' worksheet
+addWorksheet(wb, "Table S7 - SSID plast ANOVA") 
+writeData(wb, sheet = 7, x = anova_sub_mod_out)
+setColWidths(wb, sheet = 7, cols = 1:5, widths = "auto")
 
 # save workbook
 saveWorkbook(wb, file="Data/Supplemental/Supplemental_Tables.xlsx", overwrite = TRUE)
 
 
 ```
-
-
-
-<br/>
 
 
 ## Session information
