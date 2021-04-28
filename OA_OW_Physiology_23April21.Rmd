@@ -2049,9 +2049,7 @@ ggsave("Figures/Supplemental_Figures/FigureS1_physiology.pdf")
 
 ## combine model output
 plast_aic <- rbind(ssid_plast_aic, pstr_plast_aic, past_plast_aic) # combine all PERMANOVA model outputs
-plast_aic$treat <- rownames(plast_aic) # add column for rownames
 plast_aic$species <- c(rep("SSID", 6), rep("PSTR", 6), rep("PAST", 6)) # add column for species ID
-plast_aic <- plast_aic[c(6, 1:5, 7)] # reorder columns so treatment is first
 
 
 ##### STILL NEED TO MAKE THIS PRETTIER BUT JUST A PLACE HOLDER FOR NOW
