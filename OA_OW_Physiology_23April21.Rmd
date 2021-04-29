@@ -24,6 +24,21 @@ output:
 
 <br/>
 
+---
+
+<span style="color: red;">**Current plan of attack:**</span>
+
+1. Compile figures/tables, results, methods -- *done!*
+2. Approval of these materials (Sarah) -- *now*
+    + Approval from Karl/Justin? -- *do we do this before drafting?*
+3. Update introduction -- *goal of June 1*
+4. Update discussion -- *goal of July 1*
+5. Send to coauthors -- *goal of August 1*
+
+---
+
+<br/>
+
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, options(knitr.kable.NA = ''))
