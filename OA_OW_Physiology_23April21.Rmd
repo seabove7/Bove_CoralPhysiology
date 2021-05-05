@@ -1218,7 +1218,7 @@ s_sub_symb_pca <- autoplot(s_sub_pca, data = s_df_sub,
          colour = "domSymb",
          #fill = "domSymb",
          size = 3,
-         shape = "fpco2",
+         shape = "domSymb",
          frame = TRUE, 
          frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
          frame.level = 0.95, # using 95% CI for all ellipses
@@ -1231,10 +1231,10 @@ s_sub_symb_pca <- autoplot(s_sub_pca, data = s_df_sub,
          loadings.label.hjust = 2, 
          loadings.label.vjust = 0.85,
          loadings.label.repel = TRUE) +
-    scale_shape_manual(values = c(21, 23, 24, 22), labels = c("pre industrial", "current", "end-of-century", "extreme")) +
-    scale_colour_manual("domSymb", labels = c("Cladocopium spp.", "Durusdinium spp."), values = c(wes_palette("Royal1", 3:5, type = "continuous"))) +
-    #scale_fill_manual("domSymb", labels = c("Cladocopium spp.", "Durusdinium spp."), values = c(wes_palette("Royal1", 3:5, type = "continuous"))) +
-    guides(fill = FALSE, shape = FALSE, color = guide_legend(label.theme = element_text(face = "italic", size = 9), keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
+    scale_shape_manual("",values = c(21, 24), labels = c("Cladocopium spp.", "Durusdinium spp.")) +
+    scale_colour_manual("", labels = c("Cladocopium spp.", "Durusdinium spp."), values = c(wes_palette("Royal1", 3:5, type = "continuous"))) +
+    #scale_fill_manual("", labels = c("Cladocopium spp.", "Durusdinium spp."), values = c(wes_palette("Royal1", 3:5, type = "continuous"))) +
+    guides(fill = FALSE, color = guide_legend(label.theme = element_text(face = "italic", size = 9), keyheight = 0.3, nrow = 2, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
     theme_pubr() +
     theme(legend.title = element_blank(), legend.position = c(0.16, 0.95)) +
     annotate("text", x = -0.47, y = -0.38, label = deparse(s_sub_symb_pval), parse = TRUE, size = 4)
