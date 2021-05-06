@@ -1,5 +1,5 @@
 ---
-title: "Coral holobiont physiology under ocean acidification and warming"
+title: "Global Change Alters Coral Holobiont Physiology And Suggests Future Shifts In Caribbean Coral Reef Diversity"
 date: "*Last run on `r format(Sys.time(), '%d %B %Y')`*"
 output: 
   html_document:
@@ -26,6 +26,14 @@ output:
 
 ---
 
+**Potential target journals to submit:**
+
+* Ecology
+* Journal of Experimental Biology
+* Global Change Biology
+* Others?
+  
+---  
 
 <br/>
 
