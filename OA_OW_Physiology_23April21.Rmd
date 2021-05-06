@@ -48,8 +48,9 @@ options(warn = -1)
 
 ```{r packages, include=FALSE}
 
-#library("devtools")
+library("devtools")
 #install_github("vqv/ggbiplot") # need this to download ggbiplot if not already installed
+install_github("Ryo-N7/centralperk")
 
 ## Packages to load
 library(knitr)
@@ -85,6 +86,7 @@ library(performance)
 library(MASS)
 library(png)
 library(car)
+library(centralperk)
 
 ```
 
@@ -1858,6 +1860,10 @@ saveWorkbook(wb, file="Data/Supplemental/Supplemental_Tables.xlsx", overwrite = 
 ## Session information
 
 Session information from the last run date on `r date`:
+
+<br/>
+<em>`r phoebe()`</em>
+<br/>
 
 ```{r}
 
