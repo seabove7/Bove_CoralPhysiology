@@ -84,6 +84,9 @@ library(MASS)
 library(png)
 library(car)
 
+## Source the custom functions necessary for running this script
+source("Code/CustomFunctions.R")
+
 ```
 
 ```{r set formatting and labels, include=FALSE}
@@ -115,15 +118,6 @@ date <- Sys.Date()
 ```
 
 ```{r original dataframe adjustment, include=FALSE}
-
-#df <- read_csv("Data/Raw_data/phys_all_21Oct19.csv") # read in full dataframe
-#den_count <- read_csv("/Users/colleen/Dropbox/Grad school/UNC_PhD_Folders/Boston_Experiment/Physiology/Symbiont #Density/density_ForAddition_23Mar21.csv")
-#
-#test <- merge(df, den_count, by = "coral")
-#test$X1 <- NULL
-#test$X1_1 <- NULL 
-#
-#write.csv(test, "Data/Raw_data/phys_all_23March2021.csv")
 
 df <- read_csv("Data/Raw_data/phys_all_23March2021.csv") # read in full dataframe
 df$X1 <- NULL
@@ -192,38 +186,10 @@ df2_T90$treat2 <- paste0(df2_T90$fpco2, df2_T90$temp)
 
 ```{r bootstrap model setup}
 
-## Function to remove rows with any missing values
-completeFun <- function(data, desiredCols) {
-  completeVec <- complete.cases(data[, desiredCols])
-  return(data[completeVec, ])
-}
-
 ## Performing the parametric bootstrapping of the model:
 bootnum = 1500 # set number of iterations (we used 2000) between 999 and 9999
-seed = 3 #seed to make results replicatable (our seed was 7)
+seed = 3 # seed to make results replicatable (our seed was 3)
 set.seed(3)
-
-## This is a bootstrap function that will sample WITH replacement (explained step by step within the function)
-bootFUN <- function(model, newdata) {
-  nr <- nrow(model$data) # count number of rows in the model (# of observations)
-  data <- model$data # pull data from model
-  data <- data[sample(1:nr, size = nr, replace = TRUE), ] # random sample of numbers from 1 - nr (# of rows) to select data from
-  update <- update(model, data = data) # rerun the model using the 'new' dataset from the random smapling above
-  predict(update, newdata = newdata, type = "response") # predicts response variable with model and updated data 
-}
-
-#bootFUN <- function(model, newdata) {
-#  nr <- nrow(model$data) # count number of rows in the model (# of observations)
-#  data <- model$data # pull data from model
-#  
-#  colnames(newdata)
-#
-#  data %>% group_by() %>% sample_frac(.5)
-#  
-#  #data <- data[sample(1:nr, size = nr, replace = TRUE), ] # random sample of numbers from 1 - nr (# of rows) to select data from
-#  #update <- update(model, data = data) # rerun the model using the 'new' dataset from the random smapling above
-#  #predict(update, newdata = newdata, type = "response") # predicts response variable with model and updated data 
-#}
 
 ```
 
@@ -251,8 +217,8 @@ for (p in 1:length(param_list)) {
 
 ```{r T90 df setup}
 
-df_90 <- subset(df, T0_T90 == "T90") 
-df_90 <- subset(df_90, species != "T") 
+df_withT <- subset(df, T0_T90 == "T90") 
+df_90 <- subset(df_withT, species != "T") 
 df_90 <- df_90[,-c(18:33)]
 df_90 <- completeFun(df_90, "den")
 df_90 <- completeFun(df_90, "host")
@@ -264,21 +230,6 @@ df_90_l <- gather(df_90, param, value, 14:23)
 s_df <- subset(df_90, species == "S") 
 p_df <- subset(df_90, species == "P") 
 a_df <- subset(df_90, species == "A") 
-
-```
-
-```{r add in the SSID dominant symbionts}
-
-symbs <- read.csv("Data/Raw_data/domSSID_symbiont.csv")[,c(2,3,5)]
-
-symbs <- symbs %>% 
-  mutate(domSymb = ifelse(percent > 50, "C", "D"))
-
-s_df <- s_df %>% 
-  left_join(symbs, by = c("coral" = "Sample"))
-
-df_90 <- df_90 %>% 
-  left_join(symbs, by = c("coral" = "Sample"))
 
 ```
 
@@ -683,62 +634,6 @@ Correlations of coral holobiont physiological parameters were generally positive
 
 <br/>
 
-```{r functions for custom correlation and scatter plots}
-
-## Custom function for the border around the text
-panel.txt.brdr <- function (x = 0.5, y = 0.5, txt, cex, font, srt) 
-{
-  text(x, y, txt, cex = cex, font = font, srt = srt)
-  box(col = "#525252")
-}
-
-## Custom function for the top point fill/shape panel
-panel.pts.col <- function (x, y, corr = NULL, col.regions, cor.method, color, ...) 
-{
-  if (!is.null(corr)) 
-    return()
-  plot.xy(xy.coords(x, y), col = color, type = "p", ...)
-  box(col = "#525252")
-}
-
-## Custom function for the bottom fill/R2 panel (with significance)
-panel.fill.R2 <- function (x, y, corr = NULL, col.regions, cor.method, digits = 2, cex.cor, ...) 
-{
-  if (is.null(corr)) {
-    if (sum(complete.cases(x, y)) < 2) {
-      warning("Need at least 2 complete cases for cor()")
-      return()
-    }
-    else {
-      corr <- cor(x, y, use = "pair", method = cor.method)
-    }
-  }
-  ncol <- 14
-  pal <- col.regions(ncol)
-  col.ind <- as.numeric(cut(corr, breaks = seq(from = -1, 
-                                               to = 1, length.out = ncol + 1), include.lowest = TRUE))
-  usr <- par("usr")
-  rect(usr[1], usr[3], usr[2], usr[4], col = pal[col.ind], 
-       border = NA)
-  box(col = "#525252")
-  
-  auto <- missing(cex.cor)
-  on.exit(par(usr))
-  par(usr = c(0, 1, 0, 1))
-  abscorr <- formatC(abs(corr), digits = digits, format = "f")
-  corr2 <- formatC(corr, digits = digits, format = "f")
-  pval <- cor.test(x, y, use = "pair", method = cor.method)[["p.value"]]
-  sig <- if(pval > 0.05){""}else if(pval < 0.05 & pval > 0.01){"*"}else if(pval < 0.01 & pval > 0.001){"**"}else if(pval < 0.001){"***"}
-  if (auto) 
-    cex.cor <- 0.4/strwidth(abscorr)
-  text(0.5, 0.5, paste0(corr2, sig), cex = cex.cor, font = 3, col = "#252525")
-  
-  
-  
-}
-
-```
-
 ```{r SSID correlation matrix and scatter plots, results='hide'}
 
 ## Create new correlation dataframe for SSID
@@ -809,6 +704,9 @@ corrgram(por_corr_df, order = FALSE, lower.panel=panel.fill.R2, upper.panel=pane
 dev.off() 
 
 ```
+
+
+### *Figure 2*
 
 ```{r save all species correlation/scatter plots, fig.width = 8, fig.height = 6.4}
 
@@ -1159,6 +1057,105 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 ```
 
 **Figure 3.** Assessment of phenotypic plasticity of *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
+
+<br/>
+<br/>
+
+
+## Supplemental Figures{.tabset}
+
+### Figure S2
+
+```{r all coral physiology plot, fig.width = 10, fig.height = 13}
+
+## subset for the physiology parameters per species and convert from wide to long format
+df_withT_phys <- gather(df_withT, param, value, c(14:17, 34, 38:39, 42))[,-13:-33]
+
+# reorder the parameters and assign labels for plotting
+df_withT_phys <- df_withT_phys %>% 
+  mutate(param = factor(param, levels = c("carb", "lipid", "pro", "host", "chla", "den", "red", "sum"), labels = c(expression(paste("Carbohydrate (mg cm"^-2,")")), expression(paste("Lipid (mg cm"^-2,")")), expression(paste("Protein (mg cm"^-2,")")), expression(paste("Total Host (mg cm"^-2,")")), expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")")), expression(paste("Density (10"^6,"cells cm"^-2,")")), expression(paste("Red"," channel")), expression(paste("Sum"," channel")))),
+         species = factor(species, levels = c("S", "P", "A", "T"), labels = c(expression(italic("Siderastrea siderea")), expression(italic("Pseudodiploria strigosa")), expression(italic("Porites astreoides")), expression(italic("Undaria tenuifolia")))))
+
+
+## Plot all phys for all species (mean, SE, and raw observations)
+ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
+  geom_point(alpha = 0.2, position = position_dodge(width = 0.3)) +
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
+  stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2)) +
+  scale_colour_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b"))+
+  facet_grid(param ~ species, scales = "free_y", labeller = label_parsed) +
+  guides(color = guide_legend(override.aes = list(linetype = c(0, 0)))) +
+  labs(y = "", x = alab) +
+  ggsave("Figures/Supplemental_Figures/FigureS2_AllPhysiology.pdf", width = 10, height = 13) +
+  ggsave("Figures/Supplemental_Figures/FigureS2_AllPhysiology.png", width = 10, height = 13) 
+
+```
+
+**Figure S2.** All the physiology!
+
+<br/>
+<br/>
+
+
+### Figure S3
+
+```{r}
+
+
+test <- df[,-c(13:16, 37:42)]
+test <- completeFun(test, "sum") # run function to remove any missing values
+
+View(test)
+
+test <- test %>% 
+  mutate(sum = (sum * -1),
+         red = (red * -1)) %>% 
+  filter(species != "T")
+
+df_noT_colour <- gather(test, tp, colour, c(13,14,17,18,21,22,25,26,30))
+
+
+
+# reorder the parameters and assign labels for plotting
+df_noT_colour <- df_noT_colour %>% 
+  mutate(colour = (colour * -1),
+         tp = factor(tp, levels = c("red_bw1", "red_bw2", "red_bw3", "red_bw4", "red", "sum_bw1", "sum_bw2", "sum_bw3", "sum_bw4", "sum"), labels = c("pre-acclimation", "t0", "t30", "t60", "t90", "Pre-acclimation", "T0", "T30", "T60", "T90")),
+         species = factor(species, levels = c("S", "P", "A"), labels = c(expression(italic("Siderastrea siderea")), expression(italic("Pseudodiploria strigosa")), expression(italic("Porites astreoides")))))
+
+  
+
+ggplot(df_noT_colour %>% filter(tp == c("pre-acclimation", "t0", "t30", "t60", "t90")), aes(x = tp, y = colour, colour = ftemp, group = ftemp)) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
+  geom_point(alpha = 0.3, position = position_dodge(width = 0.2)) +
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
+  stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "line", aes(group = treat2)) +
+  #stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "point", aes(group = treat2), size = 7) +  
+  #stat_summary(fun.y = mean, fun.ymin = function(x) mean(x) - sd(x),  fun.ymax = function(x) mean(x) + sd(x),  geom = "pointrange", position = position_dodge(width = 0.2)) +
+  #stat_summary(fun.y = mean, geom = "line", aes(group = treat2), position = position_dodge(width = 0.2)) +
+  facet_grid(species ~ fpco2, scales = "free_y", labeller = label_parsed) +
+  scale_colour_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b")) +  
+  labs(x = "time point", y = "colour intensity (sum of RGB channels)")
+
+
+ggplot(df_noT_colour %>% filter(tp == c("Pre-acclimation", "T0", "T30", "T60", "T90")), aes(x = tp, y = colour, colour = ftemp, group = ftemp)) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
+  geom_point(alpha = 0.3, position = position_dodge(width = 0.2)) +
+  stat_summary(fun.y = mean, fun.ymin = function(x) mean(x) - sd(x),  fun.ymax = function(x) mean(x) + sd(x),  geom = "pointrange", position = position_dodge(width = 0.2)) +
+  stat_summary(fun.y = mean, geom = "line", position = position_dodge(width = 0.2)) +
+  #stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
+  #stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "line") +
+  #stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "point") +  
+  facet_grid(species ~ fpco2, scales = "free_y", labeller = label_parsed) +
+  scale_colour_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b")) +  
+  labs(x = "time point", y = "colour intensity (sum of RGB channels)")
+  
+
+```
+
 
 <br/>
 <br/>
