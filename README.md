@@ -26,6 +26,8 @@ GitHub repository containing data and code accompanying the OA/OW Coral Physiolo
       * Figure3_PhysPlasticity (*PNG and PDF versions*)
    * Supplemental
       * FigureS1_PhysPCA_RZ (*PNG and PDF versions*)
-3. Scripts
-   * Custom python script used for white correction of photos for colour analysis (Written by [Matthew Kendall](https://github.com/matt-kendall)) ()
+3. Code
    * R script containing custom functions needed for Rmarkdown code ()
+   * Custom python script used for white correction of photos for colour analysis (Written by [Matthew Kendall](https://github.com/matt-kendall)) (*whiteCorrection.py*)
+   * MATLAB Macros required for the colour intensity analysis used here that was modified from [Winters et al 2009](https://www.tau.ac.il/lifesci/departments/zoology/members/loya/documents/206Winters.pdf) (*Macros folder*)
+   * README with instructions for use of the whiteCorrection.py script and protocol for colour correction (*README.md*)
