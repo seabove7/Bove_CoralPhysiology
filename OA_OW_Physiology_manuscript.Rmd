@@ -1093,7 +1093,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
 
 ```
 
-**Figure S2.** Mean ($\pm$SE) physiological parameter (each row) measured for *S. siderea* (**A**), *P. strigosa* (**B**), *P. astreoides* (**C**), and (**D**) *U. tenuifolia* at the completion of the 93-day experimental period. 
+**Figure S2.** Mean ($\pm$SE) physiological parameter (each row) measured for *S. siderea* (**A**), *P. strigosa* (**B**), *P. astreoides* (**C**), and *U. tenuifolia* (**D**) at the completion of the 93-day experimental period. 
 
 <br/>
 <br/>
