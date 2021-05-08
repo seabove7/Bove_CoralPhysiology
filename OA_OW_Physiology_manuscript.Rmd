@@ -606,22 +606,6 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 <br/>
 
 
-### *Figure S1*
-
-```{r PCA plot reefs, fig.height = 3.8, fig.width = 13}
-
-ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "right") +
-  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.pdf", width = 13, height = 3.8) +
-  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.png", width = 13, height = 3.8)
-
-```
-
-**Figure S1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicted by natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
-
-<br/>
-<br/>
-
-
 ## Correlation assessments {.tabset}
 
 #### *Methods:*
@@ -1064,6 +1048,22 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ## Supplemental Figures{.tabset}
 
+### Figure S1
+
+```{r PCA plot reefs, fig.height = 3.8, fig.width = 13}
+
+ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "right") +
+  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.pdf", width = 13, height = 3.8) +
+  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.png", width = 13, height = 3.8)
+
+```
+
+**Figure S1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicted by natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+
+<br/>
+<br/>
+
+
 ### Figure S2
 
 ```{r all coral physiology plot, fig.width = 10, fig.height = 13}
@@ -1074,7 +1074,7 @@ df_withT_phys <- gather(df_withT, param, value, c(14:17, 34, 38:39, 42))[,-13:-3
 # reorder the parameters and assign labels for plotting
 df_withT_phys <- df_withT_phys %>% 
   mutate(param = factor(param, levels = c("carb", "lipid", "pro", "host", "chla", "den", "red", "sum"), labels = c(expression(paste("Carbohydrate (mg cm"^-2,")")), expression(paste("Lipid (mg cm"^-2,")")), expression(paste("Protein (mg cm"^-2,")")), expression(paste("Total Host (mg cm"^-2,")")), expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")")), expression(paste("Density (10"^6,"cells cm"^-2,")")), expression(paste("Red"," channel")), expression(paste("Sum"," channel")))),
-         species = factor(species, levels = c("S", "P", "A", "T"), labels = c(expression(italic("Siderastrea siderea")), expression(italic("Pseudodiploria strigosa")), expression(italic("Porites astreoides")), expression(italic("Undaria tenuifolia")))))
+         species = factor(species, levels = c("S", "P", "A", "T"), labels = c(expression(paste(bold("A)  "), italic("Siderastrea siderea"))), expression(paste(bold("B)  "), italic("Pseudodiploria strigosa"))), expression(paste(bold("C)  "), italic("Porites astreoides"))), expression(paste(bold("D)  "), italic("Undaria tenuifolia"))))))
 
 
 ## Plot all phys for all species (mean, SE, and raw observations)
@@ -1093,7 +1093,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
 
 ```
 
-**Figure S2.** All the physiology!
+**Figure S2.** Mean ($\pm$SE) physiological parameter (each row) measured for *S. siderea* (**A**), *P. strigosa* (**B**), *P. astreoides* (**C**), and (**D**) *U. tenuifolia* at the completion of the 93-day experimental period. 
 
 <br/>
 <br/>
@@ -1101,61 +1101,9 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
 
 ### Figure S3
 
-```{r}
+![](Figures/Supplemental_Figures/FigureS3_BleachingImages.png)
 
-
-test <- df[,-c(13:16, 37:42)]
-test <- completeFun(test, "sum") # run function to remove any missing values
-
-View(test)
-
-test <- test %>% 
-  mutate(sum = (sum * -1),
-         red = (red * -1)) %>% 
-  filter(species != "T")
-
-df_noT_colour <- gather(test, tp, colour, c(13,14,17,18,21,22,25,26,30))
-
-
-
-# reorder the parameters and assign labels for plotting
-df_noT_colour <- df_noT_colour %>% 
-  mutate(colour = (colour * -1),
-         tp = factor(tp, levels = c("red_bw1", "red_bw2", "red_bw3", "red_bw4", "red", "sum_bw1", "sum_bw2", "sum_bw3", "sum_bw4", "sum"), labels = c("pre-acclimation", "t0", "t30", "t60", "t90", "Pre-acclimation", "T0", "T30", "T60", "T90")),
-         species = factor(species, levels = c("S", "P", "A"), labels = c(expression(italic("Siderastrea siderea")), expression(italic("Pseudodiploria strigosa")), expression(italic("Porites astreoides")))))
-
-  
-
-ggplot(df_noT_colour %>% filter(tp == c("pre-acclimation", "t0", "t30", "t60", "t90")), aes(x = tp, y = colour, colour = ftemp, group = ftemp)) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
-  geom_point(alpha = 0.3, position = position_dodge(width = 0.2)) +
-  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
-  stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "line", aes(group = treat2)) +
-  #stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "point", aes(group = treat2), size = 7) +  
-  #stat_summary(fun.y = mean, fun.ymin = function(x) mean(x) - sd(x),  fun.ymax = function(x) mean(x) + sd(x),  geom = "pointrange", position = position_dodge(width = 0.2)) +
-  #stat_summary(fun.y = mean, geom = "line", aes(group = treat2), position = position_dodge(width = 0.2)) +
-  facet_grid(species ~ fpco2, scales = "free_y", labeller = label_parsed) +
-  scale_colour_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b")) +  
-  labs(x = "time point", y = "colour intensity (sum of RGB channels)")
-
-
-ggplot(df_noT_colour %>% filter(tp == c("Pre-acclimation", "T0", "T30", "T60", "T90")), aes(x = tp, y = colour, colour = ftemp, group = ftemp)) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
-  geom_point(alpha = 0.3, position = position_dodge(width = 0.2)) +
-  stat_summary(fun.y = mean, fun.ymin = function(x) mean(x) - sd(x),  fun.ymax = function(x) mean(x) + sd(x),  geom = "pointrange", position = position_dodge(width = 0.2)) +
-  stat_summary(fun.y = mean, geom = "line", position = position_dodge(width = 0.2)) +
-  #stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
-  #stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "line") +
-  #stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2), geom = "point") +  
-  facet_grid(species ~ fpco2, scales = "free_y", labeller = label_parsed) +
-  scale_colour_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b")) +  
-  labs(x = "time point", y = "colour intensity (sum of RGB channels)")
-  
-
-```
-
+**Figure S3.** Coral colour change over experimental period. Representative images of fragments of *P. astreoides* (**A**), *S. siderea* (**B**), and *P. strigosa* (**C**) from the same colonies demonstrating change in coral colour over time in either control (400 μatm; 28 °C) or warming (400 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
 
 <br/>
 <br/>
@@ -1165,7 +1113,7 @@ ggplot(df_noT_colour %>% filter(tp == c("Pre-acclimation", "T0", "T30", "T60", "
 
 ### Table S1 *WORKING*
 
-**Figure S1.** Akaike information criterion (AIC) generalized linear model (GLM) selection comparisons for plasticity assessments to select the best-fit model per species.
+**Table S1.** Akaike information criterion (AIC) generalized linear model (GLM) selection comparisons for plasticity assessments to select the best-fit model per species.
 ```{r table S1 for markdown}
 
 ## combine model output
