@@ -237,12 +237,14 @@ a_df <- subset(df_90, species == "A")
 ## Principal component analyses {.tabset}
 
 #### *Methods:*
-Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, and reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")`).
+Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, and reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")`). An additional PERMANOVA was conducted on the combined physiology from all three species to compare species responses combined with treatments and reef environment. 
 
 <br/>
 
 #### *Results:*
-Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and colour intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in physiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and colour intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).
+Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and colour intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in physiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and colour intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).  
+
+The first two PCs of the combined holobiont physiology explained about 62% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied with higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S5**). Despite coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S5**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited similar physiological responses under stress.
 
 <br/>
   
@@ -600,7 +602,7 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 
 ```
 
-**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$ C blue; 31$^\circ$ C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$ C blue; 31$^\circ$ C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -846,7 +848,7 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
 
 ```
 
-**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
+**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
 
 <br/>
 <br/>
@@ -1167,7 +1169,7 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ```
 
-**Figure 3.** Assessment of phenotypic plasticity of *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
+**Figure 3.** Assessment of phenotypic plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
 
 <br/>
 <br/>
@@ -1185,7 +1187,7 @@ ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, le
 
 ```
 
-**Figure S1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for *S. siderea* (**A**), *P. strigosa* (**B**), and *P. astreoides* (**C**) depicted by natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* depicted by natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1220,7 +1222,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
 
 ```
 
-**Figure S2.** Mean ($\pm$SE) physiological parameter (each row) measured for *S. siderea* (**A**), *P. strigosa* (**B**), *P. astreoides* (**C**), and *U. tenuifolia* (**D**) at the completion of the 93-day experimental period. 
+**Figure S2.** Mean ($\pm$SE) physiological parameter (each row) measured for (**A**) *S. siderea*, (**B**) *P. strigosa*, (**C**) *P. astreoides*, and (**D**) *U. tenuifolia* at the completion of the 93-day experimental period. 
 
 <br/>
 <br/>
@@ -1230,7 +1232,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
 
 ![](Figures/Supplemental_Figures/FigureS3_BleachingImages.png)
 
-**Figure S3.** Coral colour changes over the experimental period. Representative images of fragments of *P. astreoides* (**A**), *S. siderea* (**B**), and *P. strigosa* (**C**) from the same colonies demonstrating change in coral colour over time in either control (400 μatm; 28 °C) or warming (400 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
+**Figure S3.** Coral colour changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral colour over time in either control (400 μatm; 28 °C) or warming (400 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
 
 <br/>
 <br/>
