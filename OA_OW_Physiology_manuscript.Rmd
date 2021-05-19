@@ -759,7 +759,7 @@ sid_corr_df <- s_df[,c(10:11,14:17,21:23)] %>%
                             fpco2 == "3300" ~ "#e66101"))
 
 ## Plot correlation matrix and scatter plot of all SSID physiology  
-png(file = "Figures/Supplemental_Figures/SSID_PhysCorrelations.png", width = 330, height = 225, units='mm', res = 300)  
+png(file = "Figures/Supplemental_Figures/SSID_PhysCorrelations.png", width = 240.57, height = 164.025, units='mm', res = 300)  
 
 corrgram(sid_corr_df, order = FALSE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
          col.regions = colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
@@ -783,7 +783,7 @@ dip_corr_df <- p_df[,c(10:11,14:17,21:23)] %>%
   
 
 ## Plot correlation matrix and scatter plot of all PSTR physiology
-png(file = "Figures/Supplemental_Figures/PSTR_PhysCorrelations.png", width = 330, height = 225, units='mm', res = 300) 
+png(file = "Figures/Supplemental_Figures/PSTR_PhysCorrelations.png", width = 240.57, height = 164.025, units='mm', res = 300) 
 
 corrgram(dip_corr_df, order = FALSE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
          col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
@@ -807,7 +807,7 @@ por_corr_df <- a_df[,c(10:11,14:16,18,21:23)] %>%
   
 
 ## Plot correlation matrix and scatter plot of all PAST physiology
-png(file = "Figures/Supplemental_Figures/PAST_PhysCorrelations.png", width = 330, height = 225, units='mm', res = 300) 
+png(file = "Figures/Supplemental_Figures/PAST_PhysCorrelations.png", width = 240.57, height = 164.025, units='mm', res = 300) 
 
 corrgram(por_corr_df, order = FALSE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
          col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
