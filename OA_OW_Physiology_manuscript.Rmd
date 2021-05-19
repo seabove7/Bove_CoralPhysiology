@@ -1383,7 +1383,7 @@ dist_mod_out <- dist_mod_out %>%
          p.value = round(as.numeric(p.value), 3)) %>% 
   mutate(term = gsub("21", "-current", term), # rename the treatment IDs
          term = gsub("22", "-EOC", term),
-         term = gsub("21", "-extreme", term),
+         term = gsub("23", "-extreme", term),
          term = gsub("[0-9]", "", term),
          term = gsub("fpco", "pCO2", term),
          term = gsub("ftemp", "temperature (31C)", term),
