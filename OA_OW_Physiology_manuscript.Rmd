@@ -857,12 +857,12 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
-Using PC1 and PC2 for each species, we then calculated the phenotypic plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (400 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). The main effects of treatment and reef environment were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error. 
+Using PC1 and PC2 for each species, we then calculated the physiological plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (400 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). The main effects of treatment and reef environment were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error. 
 
 <br/>
 
 #### *Results:*
-Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered the phenotypic plasticity of *S. siderea* (**Figure 3A; Table S3, S4**). Offshore fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 400 $\mu$atm, 31$^\circ$C and 700 $\mu$atm, 28$^\circ$C. Plasticity of *P. strigosa* and *P. astreoides* was not significantly altered by temperature treatment, *p*CO~2~ treatment, or natal reef environment (**Figure 3B, 3C; Table S3, S4**). However, *P. astreoides* exhibited a slight trend in the inshore fragments suggesting potentially higher plasticity with increasing *p*CO~2~ that is not seen in the offshore fragments (**Figure 3C**).
+Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered the physiological plasticity of *S. siderea* (**Figure 3A; Table S3, S4**). Offshore fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 400 $\mu$atm, 31$^\circ$C and 700 $\mu$atm, 28$^\circ$C. Plasticity of *P. strigosa* and *P. astreoides* was not significantly altered by temperature treatment, *p*CO~2~ treatment, or natal reef environment (**Figure 3B, 3C; Table S3, S4**). However, *P. astreoides* exhibited a slight trend in the inshore fragments suggesting potentially higher plasticity with increasing *p*CO~2~ that is not seen in the offshore fragments (**Figure 3C**).
 
 <br/>
 
@@ -1172,7 +1172,7 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ```
 
-**Figure 3.** Assessment of phenotypic plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
+**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
 
 <br/>
 <br/>
@@ -1387,7 +1387,7 @@ ssid_host_symb_reef <- ggarrange(sid_host_reef_pca, sid_symb_reef_pca,ncol = 2, 
 
 ## Add all together for final figure:
 ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 3) +
-  #ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.pdf", width = 9, height = 10) +
+  ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.pdf", width = 9, height = 10) +
   ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.png", width = 9, height = 10)
 
 
@@ -1410,18 +1410,18 @@ dip_pca_df_symb <- p_df[,c(14,16,17)] # symbiont only phys (chla, density, colou
 
 ## run the adonis for HOST phys
 #s_pca_host_mod <- adonis2(dip_pca_df_host ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-s_pca_host_mod <- adonis2(dip_pca_df_host ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
-s_pca_host_mod # view PSTR adonis output
+p_pca_host_mod <- adonis2(dip_pca_df_host ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
+p_pca_host_mod # view PSTR adonis output
 
 ## run the adonis for SYMB phys
 #s_pca_symb_mod <- adonis2(dip_pca_df_symb ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-s_pca_symb_mod <- adonis2(dip_pca_df_symb ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
-s_pca_symb_mod # view PSTR adonis output
+p_pca_symb_mod <- adonis2(dip_pca_df_symb ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
+p_pca_symb_mod # view PSTR adonis output
 
 
 ## perform principal component analysis (PCA)
-s_pca_host <- prcomp(dip_pca_df_host, center = TRUE, scale= TRUE)
-s_pca_symb <- prcomp(dip_pca_df_symb, center = TRUE, scale= TRUE)
+p_pca_host <- prcomp(dip_pca_df_host, center = TRUE, scale= TRUE)
+p_pca_symb <- prcomp(dip_pca_df_symb, center = TRUE, scale= TRUE)
 
 ```
 
@@ -1429,7 +1429,7 @@ s_pca_symb <- prcomp(dip_pca_df_symb, center = TRUE, scale= TRUE)
 
 ## Temperature PCAs
 # HOST temperature
-dip_host_temp_pca <- autoplot(s_pca_host, data = p_df, 
+dip_host_temp_pca <- autoplot(p_pca_host, data = p_df, 
                               colour = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
@@ -1455,7 +1455,7 @@ dip_host_temp_pca <- autoplot(s_pca_host, data = p_df,
 
 
 # SYMB temperature
-dip_symb_temp_pca <- autoplot(s_pca_symb, data = p_df, 
+dip_symb_temp_pca <- autoplot(p_pca_symb, data = p_df, 
                               colour = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
@@ -1483,7 +1483,7 @@ dip_symb_temp_pca <- autoplot(s_pca_symb, data = p_df,
 
 ## pCO2 PCAs
 # HOST pco2
-dip_host_pco2_pca <- autoplot(s_pca_host, data = p_df, 
+dip_host_pco2_pca <- autoplot(p_pca_host, data = p_df, 
                               colour = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
@@ -1508,7 +1508,7 @@ dip_host_pco2_pca <- autoplot(s_pca_host, data = p_df,
 
 
 # SYMB pco2
-dip_symb_pco2_pca <- autoplot(s_pca_symb, data = p_df, 
+dip_symb_pco2_pca <- autoplot(p_pca_symb, data = p_df, 
                               colour = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
@@ -1535,7 +1535,7 @@ dip_symb_pco2_pca <- autoplot(s_pca_symb, data = p_df,
 
 ## Reef PCAs
 # HOST reef
-dip_host_reef_pca <- autoplot(s_pca_host, data = p_df,  
+dip_host_reef_pca <- autoplot(p_pca_host, data = p_df,  
                               colour = "reef",
                               fill = "reef",
                               frame = TRUE, 
@@ -1558,7 +1558,7 @@ dip_host_reef_pca <- autoplot(s_pca_host, data = p_df,
 
 
 # SYMB reef
-dip_symb_reef_pca <- autoplot(s_pca_symb, data = p_df,  
+dip_symb_reef_pca <- autoplot(p_pca_symb, data = p_df,  
                               colour = "reef",
                               fill = "reef",
                               frame = TRUE, 
@@ -1590,7 +1590,7 @@ PSTR_host_symb_reef <- ggarrange(dip_host_reef_pca, dip_symb_reef_pca,ncol = 2, 
 
 ## Add all together for final figure:
 ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 3) +
-  #ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.pdf", width = 9, height = 10) +
+  ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.pdf", width = 9, height = 10) +
   ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.png", width = 9, height = 10)
 
 
@@ -1613,18 +1613,18 @@ por_pca_df_symb <- a_df[,c(14,16,18)] # symbiont only phys (chla, density, colou
 
 ## run the adonis for HOST phys
 #s_pca_host_mod <- adonis2(por_pca_df_host ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-s_pca_host_mod <- adonis2(por_pca_df_host ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
-s_pca_host_mod # view PAST adonis output
+a_pca_host_mod <- adonis2(por_pca_df_host ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
+a_pca_host_mod # view PAST adonis output
 
 ## run the adonis for SYMB phys
 #s_pca_symb_mod <- adonis2(por_pca_df_symb ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-s_pca_symb_mod <- adonis2(por_pca_df_symb ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
-s_pca_symb_mod # view PAST adonis output
+a_pca_symb_mod <- adonis2(por_pca_df_symb ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
+a_pca_symb_mod # view PAST adonis output
 
 
 ## perform principal component analysis (PCA)
-s_pca_host <- prcomp(por_pca_df_host, center = TRUE, scale= TRUE)
-s_pca_symb <- prcomp(por_pca_df_symb, center = TRUE, scale= TRUE)
+a_pca_host <- prcomp(por_pca_df_host, center = TRUE, scale= TRUE)
+a_pca_symb <- prcomp(por_pca_df_symb, center = TRUE, scale= TRUE)
 
 ```
 
@@ -1632,7 +1632,7 @@ s_pca_symb <- prcomp(por_pca_df_symb, center = TRUE, scale= TRUE)
 
 ## Temperature PCAs
 # HOST temperature
-por_host_temp_pca <- autoplot(s_pca_host, data = a_df, 
+por_host_temp_pca <- autoplot(a_pca_host, data = a_df, 
                               colour = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
@@ -1658,7 +1658,7 @@ por_host_temp_pca <- autoplot(s_pca_host, data = a_df,
 
 
 # SYMB temperature
-por_symb_temp_pca <- autoplot(s_pca_symb, data = a_df, 
+por_symb_temp_pca <- autoplot(a_pca_symb, data = a_df, 
                               colour = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
@@ -1686,7 +1686,7 @@ por_symb_temp_pca <- autoplot(s_pca_symb, data = a_df,
 
 ## pCO2 PCAs
 # HOST pco2
-por_host_pco2_pca <- autoplot(s_pca_host, data = a_df, 
+por_host_pco2_pca <- autoplot(a_pca_host, data = a_df, 
                               colour = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
@@ -1711,7 +1711,7 @@ por_host_pco2_pca <- autoplot(s_pca_host, data = a_df,
 
 
 # SYMB pco2
-por_symb_pco2_pca <- autoplot(s_pca_symb, data = a_df, 
+por_symb_pco2_pca <- autoplot(a_pca_symb, data = a_df, 
                               colour = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
@@ -1738,7 +1738,7 @@ por_symb_pco2_pca <- autoplot(s_pca_symb, data = a_df,
 
 ## Reef PCAs
 # HOST reef
-por_host_reef_pca <- autoplot(s_pca_host, data = a_df,  
+por_host_reef_pca <- autoplot(a_pca_host, data = a_df,  
                               colour = "reef",
                               fill = "reef",
                               frame = TRUE, 
@@ -1761,7 +1761,7 @@ por_host_reef_pca <- autoplot(s_pca_host, data = a_df,
 
 
 # SYMB reef
-por_symb_reef_pca <- autoplot(s_pca_symb, data = a_df,  
+por_symb_reef_pca <- autoplot(a_pca_symb, data = a_df,  
                               colour = "reef",
                               fill = "reef",
                               frame = TRUE, 
@@ -1793,7 +1793,7 @@ PAST_host_symb_reef <- ggarrange(por_host_reef_pca, por_symb_reef_pca,ncol = 2, 
 
 ## Add all together for final figure:
 ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 3) +
-  #ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.pdf", width = 9, height = 10) +
+  ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.pdf", width = 9, height = 10) +
   ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.png", width = 9, height = 10)
 
 
@@ -2109,6 +2109,65 @@ table_s5
 
 <br/>
 
+### Table S6
+
+**Table S6.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with 1500 iterations.
+```{r table S6 for markdown}
+
+## combine model output
+pca_host_mod_out <- rbind(s_pca_host_mod, p_pca_host_mod, a_pca_host_mod) # combine all PERMANOVA model outputs
+pca_symb_mod_out <- rbind(s_pca_symb_mod, p_pca_symb_mod, a_pca_symb_mod) # combine all PERMANOVA model outputs
+pca_host_symb_mod_out <- cbind(pca_host_mod_out, pca_symb_mod_out)
+
+
+pca_host_symb_mod_out$treat <- rownames(pca_host_symb_mod_out) # add column for rownames
+pca_host_symb_mod_out$species <- c(rep("SSID", 5), rep("PSTR", 5), rep("PAST", 5)) # add column for species ID
+pca_host_symb_mod_out <- pca_host_symb_mod_out[c(11, 1:10, 12)] # reorder columns so treatment is first
+
+
+## update formatting of text 
+pca_host_symb_mod_out <- pca_host_symb_mod_out %>% 
+  mutate(SumOfSqs = round(as.numeric(SumOfSqs), 0), # round values from host
+         R2 = round(as.numeric(R2), 3),
+         `F` = round(as.numeric(`F`), 2),
+         `Pr(>F)` = round(as.numeric(`Pr(>F)`), 5)) %>% 
+  mutate(SumOfSqs.1 = round(as.numeric(SumOfSqs.1), 0), # round values from symbiont
+         R2.1 = round(as.numeric(R2.1), 3),
+         `F.1` = round(as.numeric(`F.1`), 2),
+         `Pr(>F).1` = round(as.numeric(`Pr(>F).1`), 5)) %>% 
+  mutate(treat = gsub("[0-9]", "", treat), # rename the treatment IDs
+         treat = gsub("fpco", "pCO2", treat),
+         treat = gsub("ftemp", "temperature", treat),
+         treat = gsub("reef", "reef environment", treat)) %>% 
+  rename("P-value" = `Pr(>F)`, # rename columns
+         " " = treat,
+         "Sum of Squares" = SumOfSqs,
+         "Df " = Df.1,
+         "Sum of Squares " = SumOfSqs.1,
+         "R2 " = R2.1,
+         "F " = F.1,
+         "P-value " = `Pr(>F).1`)
+  
+## combine them with format
+table_s6 <- kable(pca_host_symb_mod_out[-12], booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  add_header_above(c(" " = 1, "Coral host" = 5, "Algal symbionts" = 5)) %>% 
+  pack_rows("Siderastrea Siderea", 1, 5, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 6, 10, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 11, 15, italic = TRUE) %>% 
+  row_spec(c(4:5,9:10,14:15), italic = TRUE)
+table_s6
+
+```
+
+
+<br/>
+<br/>
+
+---
+
+<br/>
+
 ```{r excel WB, message=FALSE, warning=FALSE}
 
 ### Create workbook
@@ -2138,6 +2197,11 @@ setColWidths(wb, sheet = 4, cols = 1:6, widths = "auto")
 addWorksheet(wb, "Table S5 - Species PERMANOVA") 
 writeData(wb, sheet = 5, x = all_pca_mod)
 setColWidths(wb, sheet = 5, cols = 1:6, widths = "auto")
+
+# add 'Table S6' worksheet
+addWorksheet(wb, "Table S6 - HostVsymb PERMANOVA") 
+writeData(wb, sheet = 6, x = pca_host_symb_mod_out)
+setColWidths(wb, sheet = 6, cols = 1:12, widths = "auto")
 
 
 # save workbook
