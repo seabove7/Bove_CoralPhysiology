@@ -244,7 +244,7 @@ Principal component analysis (PCA) (function *prcomp*) of scaled and centered ph
 #### *Results:*
 Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and colour intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in physiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and colour intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).  
 
-The first two PCs of the combined holobiont physiology explained about 62% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied with higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S5**). Despite coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S5**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited similar physiological responses under stress.
+The first two PCs of the combined holobiont physiology explained about 62% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied with higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S5**). Despite coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S5**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited similar physiological responses under stress. Further, corals from the inshore reef environment exhibited more constrained physiology than their offshore counterparts (**Figure S7; Table S5**).
 
 <br/>
   
@@ -1393,7 +1393,7 @@ ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 
 
 ```
 
-**Figure S2.** SSID coral host versus algal symbiont physiology PCAs
+**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, colour intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1596,7 +1596,7 @@ ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 
 
 ```
 
-**Figure S3.** PSTR coral host versus algal symbiont physiology PCAs
+**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, colour intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1799,7 +1799,7 @@ ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 
 
 ```
 
-**Figure S4.** PAST coral host versus algal symbiont physiology PCAs
+**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, colour intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -2111,7 +2111,7 @@ table_s5
 
 ### Table S6
 
-**Table S6.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with 1500 iterations.
+**Table S6.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with 1500 iterations depicted in **Figures S2-S4**.
 ```{r table S6 for markdown}
 
 ## combine model output
