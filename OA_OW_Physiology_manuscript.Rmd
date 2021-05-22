@@ -1,5 +1,5 @@
 ---
-title: "Global Change Alters Coral Holobiont Physiology And Suggests Future Shifts In Caribbean Coral Reef Diversity"
+title: "Global change modulates physiological plasticity of tropical reef-building corals"
 date: "*Last run on `r format(Sys.time(), '%d %B %Y')`*"
 output: 
   html_document:
