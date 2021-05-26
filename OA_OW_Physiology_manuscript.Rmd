@@ -1853,7 +1853,7 @@ symb_dist <- symb_dist %>%
 
 ```
 
-```{r host v symb plasticity plots, fig.width = 7, fig.height = 8}
+```{r host v symb plasticity plots, fig.width = 9, fig.height = 9}
 
 host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
   theme_pubr() +
