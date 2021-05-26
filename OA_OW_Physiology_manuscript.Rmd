@@ -840,7 +840,7 @@ pstr_corr_plot <- ggplot() +
 past_corr_plot <- ggplot() + 
   background_image(past_corr_plot) + 
   theme_void() + 
-  ggtitle(expression(paste(bold("  B)   "), italic("P. asteroides"))))
+  ggtitle(expression(paste(bold("  C)   "), italic("P. asteroides"))))
 
 ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
   ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 8, height = 6.4) +
@@ -868,40 +868,12 @@ Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered 
 
 ### *Siderastrea siderea*
 
-```{r SSID distance dataframe setup}
-
-s_dis <- s_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
-sid_dist <- cbind(s_df[,c(1,7,10,11,12,27)], s_dis) # combine the datasets
-
-# adds column with the control value PC1/PC2 per colony
-sid_dist$cont_pc1[sid_dist$treat2 == "447_28"] <- sid_dist$PC1[sid_dist$treat2 == "447_28"]
-sid_dist$cont_pc2[sid_dist$treat2 == "447_28"] <- sid_dist$PC2[sid_dist$treat2 == "447_28"]
-
-# get the 400_28 PC values
-sid_dist2 <- sid_dist %>%  
-  group_by(colony) %>% 
-  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
-            con2_pc2 = sum(cont_pc2, na.rm = TRUE))
-
-# Make columns of the 400_28 PC values
-sid_dist <- sid_dist %>% 
-  left_join(sid_dist2, by = c("colony" = "colony"))
-
-sid_dist$dist <- sqrt(((sid_dist$PC1 - sid_dist$con2_pc1)^2) + ((sid_dist$PC2 - sid_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
-sid_dist$treat_plot = paste(sid_dist$fpco2, sid_dist$ftemp, sep = "_")
-
-
-## modify dataframe to remove the control treatment and reorder levels
-sid_dist <- sid_dist %>% 
-  filter(treat_plot != "420_28") %>% 
-  mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31")),
-         reef = factor(reef, levels = c("N", "F")),
-         ftemp = factor(ftemp, levels = c("28", "31")),
-         fpco2 = factor(fpco2, levels = c("300", "420", "680", "3300")))
-
-```
-
 ```{r SSID distance analysis, include=FALSE}
+
+## Calculate the PCA distance with custom function
+sid_dist <- PCAplast(pca = s_pca, data = s_df)
+sid_dist_sum <- DistSum(data = sid_dist)
+
 
 ## Model selection (via AIC)
 ssid_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = sid_dist)
@@ -940,14 +912,6 @@ ssid_anova_out <- Anova(ssid_dist_glm, type = "III", test.statistic = "F") # com
 
 ```{r plots of SSID distances, fig.height = 3.5, fig.width = 6}
 
-## Summary data for plotting based on mean/SE instead of boot
-sid_dist_sum <- sid_dist %>% 
-  mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
-  group_by(treat_plot, reef) %>% 
-  summarise(mean = mean(dist),
-            se = (sd(dist) / sqrt(n()))) 
-
-
 ## Plasticity plot
 ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
   theme_pubr() +
@@ -977,40 +941,12 @@ ssid_anova_out # comparison of the 'main effects'
 
 ### *Pseudodiploria strigosa*
 
-```{r PSTR distance dataframe setup}
-
-p_dis <- p_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
-dip_dist <- cbind(p_df[,c(1,7,10,11,12,27)], p_dis) # combine the datasets
-
-# adds column with the control value PC1/PC2 per colony
-dip_dist$cont_pc1[dip_dist$treat2 == "447_28"] <- dip_dist$PC1[dip_dist$treat2 == "447_28"]
-dip_dist$cont_pc2[dip_dist$treat2 == "447_28"] <- dip_dist$PC2[dip_dist$treat2 == "447_28"]
-
-# get the 400_28 PC values
-dip_dist2 <- dip_dist %>%  
-  group_by(colony) %>% 
-  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
-            con2_pc2 = sum(cont_pc2, na.rm = TRUE))
-
-# Make columns of the 400_28 PC values
-dip_dist <- dip_dist %>% 
-  left_join(dip_dist2, by = c("colony" = "colony"))
-
-dip_dist$dist <- sqrt(((dip_dist$PC1 - dip_dist$con2_pc1)^2) + ((dip_dist$PC2 - dip_dist$con2_pc2)^2)) # formula for 
-dip_dist$treat_plot = paste(dip_dist$fpco2, dip_dist$ftemp, sep = "_")
-
-
-## modify dataframe to remove the control treatment and reorder levels
-dip_dist <- dip_dist %>% 
-  filter(treat_plot != "420_28")%>% 
-  mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31")),
-         reef = factor(reef, levels = c("N", "F")),
-         ftemp = factor(ftemp, levels = c("28", "31")),
-         fpco2 = factor(fpco2, levels = c("300", "420", "680", "3300")))
-
-```
-
 ```{r PSTR distance analysis, include=FALSE}
+
+## Calculate the PCA distance with custom function
+dip_dist <- PCAplast(pca = p_pca, data = p_df)
+dip_dist_sum <- DistSum(data = dip_dist)
+
 
 ## Model selection (via AIC)
 pstr_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist)
@@ -1033,14 +969,6 @@ pstr_anova_out <- Anova(pstr_dist_glm, type = "III", test.statistic = "F") # com
 ```
   
 ```{r plots of PSTR distances, fig.height = 3.5, fig.width = 6}
-
-## Summary data for plotting
-dip_dist_sum <- dip_dist %>% 
-  mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
-  group_by(treat_plot, reef) %>% 
-  summarise(mean = mean(dist),
-            se = (sd(dist) / sqrt(n()))) 
-
 
 ## Plasticity plot
 pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
@@ -1071,39 +999,12 @@ pstr_anova_out # comparison of the 'main effects'
 
 ### *Porites astreoides*
 
-```{r PAST distance dataframe setup}
-
-a_dis <- a_pca$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
-por_dist <- cbind(a_df[,c(1,7,10,11,12,27)], a_dis) # combine the datasets
-
-# adds column with the control value PC1/PC2 per colony
-por_dist$cont_pc1[por_dist$treat2 == "447_28"] <- por_dist$PC1[por_dist$treat2 == "447_28"]
-por_dist$cont_pc2[por_dist$treat2 == "447_28"] <- por_dist$PC2[por_dist$treat2 == "447_28"]
-
-# get the 400_28 PC values
-por_dist2 <- por_dist %>%  
-  group_by(colony) %>% 
-  summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
-            con2_pc2 = sum(cont_pc2, na.rm = TRUE))
-
-# Make columns of the 400_28 PC values
-por_dist <- por_dist %>% 
-  left_join(por_dist2, by = c("colony" = "colony"))
-
-por_dist$dist <- sqrt(((por_dist$PC1 - por_dist$con2_pc1)^2) + ((por_dist$PC2 - por_dist$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
-por_dist$treat_plot = paste(por_dist$fpco2, por_dist$ftemp, sep = "_")
-
-## modify dataframe to remove the control treatment and reorder levels
-por_dist <- por_dist %>% 
-  filter(treat_plot != "420_28")%>% 
-  mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31")),
-         reef = factor(reef, levels = c("N", "F")),
-         ftemp = factor(ftemp, levels = c("28", "31")),
-         fpco2 = factor(fpco2, levels = c("300", "420", "680", "3300")))
-
-```
-
 ```{r PAST distance analysis, include=FALSE}
+
+## Calculate the PCA distance with custom function
+por_dist <- PCAplast(pca = a_pca, data = a_df)
+por_dist_sum <- DistSum(data = por_dist)
+
 
 ## Model selection (via AIC)
 past_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = por_dist)
@@ -1126,14 +1027,6 @@ past_anova_out <- Anova(past_dist_glm, type = "III", test.statistic = "F") # com
 ```
   
 ```{r plots of PAST distances, fig.height = 3, fig.width = 10}
-
-## Summary data for plotting
-por_dist_sum <- por_dist %>% 
-  mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
-  group_by(treat_plot, reef) %>% 
-  summarise(mean = mean(dist),
-            se = (sd(dist) / sqrt(n()))) 
-
 
 ## Plasticity plot
 past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
@@ -1886,7 +1779,126 @@ autoplot(all_pca, data = all_df,
 <br/>
 
 
+### Figure S8
 
+```{r host v symb plasticity distance calculations }
+
+#### SSID
+# host
+ssid_host_dist <- PCAplast(pca = s_pca_host, data = s_df)
+ssid_host_dist_sum <- DistSum(data = ssid_host_dist)
+
+# symbiont
+ssid_symb_dist <- PCAplast(pca = s_pca_symb, data = s_df)
+ssid_symb_dist_sum <- DistSum(data = ssid_symb_dist)
+
+
+#### PSTR
+# host
+pstr_host_dist <- PCAplast(pca = p_pca_host, data = p_df)
+pstr_host_dist_sum <- DistSum(data = pstr_host_dist)
+
+# symbiont
+pstr_symb_dist <- PCAplast(pca = p_pca_symb, data = p_df)
+pstr_symb_dist_sum <- DistSum(data = pstr_symb_dist)
+
+
+#### PAST
+# host
+past_host_dist <- PCAplast(pca = a_pca_host, data = a_df)
+past_host_dist_sum <- DistSum(data = past_host_dist)
+
+# symbiont
+past_symb_dist <- PCAplast(pca = a_pca_symb, data = a_df)
+past_symb_dist_sum <- DistSum(data = past_symb_dist)
+
+
+#### Combined data by host or symbiont
+## Host:
+host_dist <- rbind(ssid_host_dist, pstr_host_dist, past_host_dist)
+host_sum <- rbind(ssid_host_dist_sum, pstr_host_dist_sum, past_host_dist_sum)
+
+## Symbionts:
+symb_dist <- rbind(ssid_symb_dist, pstr_symb_dist, past_symb_dist)
+symb_sum <- rbind(ssid_symb_dist_sum, pstr_symb_dist_sum, past_symb_dist_sum)
+
+```
+
+```{r species labels for distance plots}
+
+## Adding pretty species labels for all dataframes
+host_sum <- host_sum %>% 
+  mutate(species = factor(species, levels = c("S", "P", "A"), 
+                          labels = c(expression(italic("Siderastrea siderea")), 
+                                     expression(italic("Pseudodiploria strigosa")), 
+                                     expression(italic("Porites astreoides")))))
+
+host_dist <- host_dist %>% 
+  mutate(species = factor(species, levels = c("S", "P", "A"), 
+                          labels = c(expression(italic("Siderastrea siderea")), 
+                                     expression(italic("Pseudodiploria strigosa")), 
+                                     expression(italic("Porites astreoides")))))
+
+symb_sum <- symb_sum %>% 
+  mutate(species = factor(species, levels = c("S", "P", "A"), 
+                          labels = c(expression(italic("Siderastrea siderea")), 
+                                     expression(italic("Pseudodiploria strigosa")), 
+                                     expression(italic("Porites astreoides")))))
+
+symb_dist <- symb_dist %>% 
+  mutate(species = factor(species, levels = c("S", "P", "A"), 
+                          labels = c(expression(italic("Siderastrea siderea")), 
+                                     expression(italic("Pseudodiploria strigosa")), 
+                                     expression(italic("Porites astreoides")))))
+
+```
+
+```{r host v symb plasticity plots, fig.width = 7, fig.height = 8}
+
+host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+  theme_pubr() +
+  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
+  guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
+  geom_point(data = host_dist, aes(x = reef, y = dist), size = 2, alpha = 0.5, position = position_dodge(width = 0.55)) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
+  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
+  scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
+  scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
+  labs(y = "Coral host plasticity", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 6)) +
+  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
+  facet_wrap(~ species, ncol = 1, labeller = label_parsed)
+
+
+symb_dist_plot <- ggplot(symb_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+  theme_pubr() +
+  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
+  guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
+  geom_point(data = symb_dist, aes(x = reef, y = dist), size = 2, alpha = 0.5, position = position_dodge(width = 0.55)) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
+  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
+  scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
+  scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
+  labs(y = "Algal symbiont plasticity", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 6)) +
+  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
+  facet_wrap(~ species, ncol = 1, labeller = label_parsed)
+
+
+########### Full plot:
+
+ggarrange(host_dist_plot, symb_dist_plot, nrow = 1, common.legend = TRUE, legend = "right", labels = "AUTO") +
+  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.pdf", width = 9, height = 9) +
+  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.png", width = 9, height = 9)
+
+
+```
+
+
+<br/>
+<br/>
 
 
 ## Supplemental Tables{.tabset} 

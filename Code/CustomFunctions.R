@@ -66,3 +66,57 @@ panel.fill.R2 <- function (x, y, corr = NULL, col.regions, cor.method, digits = 
   
 }
 
+
+
+################################################################################
+
+### Custom function to calculate PCA distances for plasticity
+
+PCAplast <- function(pca, data) {
+  
+  pca_df <- pca
+  data_df <- data
+  
+  pca_dist <- pca_df$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
+  dist_df <- cbind(data_df[,c(1,7,8, 10,11,12,27)], pca_dist) # combine the datasets
+  
+  # adds column with the control value PC1/PC2 per colony
+  dist_df$cont_pc1[dist_df$treat2 == "447_28"] <- dist_df$PC1[dist_df$treat2 == "447_28"]
+  dist_df$cont_pc2[dist_df$treat2 == "447_28"] <- dist_df$PC2[dist_df$treat2 == "447_28"]
+  
+  # get the 400_28 PC values
+  dist_df2 <- dist_df %>%  
+    group_by(colony) %>% 
+    summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
+              con2_pc2 = sum(cont_pc2, na.rm = TRUE))
+  
+  # Make columns of the 400_28 PC values
+  dist_df <- dist_df %>% 
+    left_join(dist_df2, by = c("colony" = "colony"))
+  
+  dist_df$dist <- sqrt(((dist_df$PC1 - dist_df$con2_pc1)^2) + ((dist_df$PC2 - dist_df$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
+  dist_df$treat_plot = paste(dist_df$fpco2, dist_df$ftemp, sep = "_")
+  
+  
+  ## modify dataframe to remove the control treatment and reorder levels
+  dist_df <- dist_df %>% 
+    filter(treat_plot != "420_28") %>% 
+    mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31")),
+           reef = factor(reef, levels = c("N", "F")),
+           ftemp = factor(ftemp, levels = c("28", "31")),
+           fpco2 = factor(fpco2, levels = c("300", "420", "680", "3300")))
+  
+  
+}
+
+
+
+### Summary function for plotting plasticity
+
+DistSum <- function(data) {
+  data_update <- data %>% 
+    mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
+    group_by(treat_plot, reef, species) %>% 
+    summarise(mean = mean(dist),
+              se = (sd(dist) / sqrt(n()))) 
+}
