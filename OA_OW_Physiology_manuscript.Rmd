@@ -1824,6 +1824,41 @@ symb_sum <- rbind(ssid_symb_dist_sum, pstr_symb_dist_sum, past_symb_dist_sum)
 
 ```
 
+```{r host v symb plasticity analyses}
+
+# add a 'part' label for combining datasets
+host_dist$part <- rep("host", nrow(host_dist))
+symb_dist$part <- rep("symb", nrow(symb_dist))
+
+# combine datasets
+combined_dist <- rbind(host_dist, symb_dist)
+
+
+
+
+## Model selection (via AIC)
+comb_dist_mod  <- glm(dist ~ species * part * reef * fpco2 * ftemp, family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod2 <- glm(dist ~ species * part * reef * fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod3 <- glm(dist ~ species * part * reef + fpco2 * ftemp, family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod4 <- glm(dist ~ species * reef + part + fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist) # best fit (AIC)
+comb_dist_mod5 <- glm(dist ~ species * part * reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod6 <- glm(dist ~ species * part * fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod7 <- glm(dist ~ reef * species * part * (fpco2 + ftemp), family = Gamma(link = "log"), data = combined_dist) 
+comb_dist_mod8 <- glm(dist ~ reef * species * part * (fpco2 + ftemp), family = Gamma(link = "log"), data = combined_dist) 
+
+# check for best-fit model
+comb_plast_aic <- compare_performance(comb_dist_mod, comb_dist_mod2, comb_dist_mod3, comb_dist_mod4, comb_dist_mod5, comb_dist_mod6, comb_dist_mod7, comb_dist_mod8, rank = TRUE)
+plot(comb_plast_aic)
+
+
+## Best-fit GLM with Gamma log link
+comb_dist_glm <- glm(dist ~ species * reef + part + fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist, contrasts = list(species=contr.sum, part=contr.sum, reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+comb_glm_out <- summary(comb_dist_glm) # summary output of the GLM
+comb_anova_out <- Anova(comb_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+
+```
+
+
 ```{r species labels for distance plots}
 
 ## Adding pretty species labels for all dataframes
