@@ -1,5 +1,5 @@
 ---
-title: "Global change modulates physiological plasticity of tropical reef-building corals"
+title: "Global change differentially modulates physiological plasticity of tropical reef-building corals"
 date: "*Last run on `r format(Sys.time(), '%d %B %Y')`*"
 output: 
   html_document:
