@@ -145,7 +145,8 @@ df$fpco2 <- factor(df$fpco2, c("420", "T0", "300", "680", "3300"))
 df$ftemp <- factor(df$ftemp, c("28", "T0", "31"))
 
 # calculate phys parameters
-df$den <- df$den / 1000000 # adjust symbiont density to display 10^6 cells
+df$den <- (df$den / 1000000) # adjust symbiont density to display 10^6 cells
+df$chla <- (df$chla / df$SA) # standardize chla to surface area
 df$host <- df$pro + df$carb + df$lipid # calculate total host energy reserves (sum of carb, protein, lipids)
 df$treat[df$T0_T90 == "T0"] <- "T0" # replace T0 'treat' with T0 text
 df$treat <- factor(df$treat, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31")) # adjust treatment levels
@@ -857,7 +858,7 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
-Using PC1 and PC2 for each species, we then calculated the physiological plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (400 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). The main effects of treatment and reef environment were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error. 
+Using PC1 and PC2 for each species, we then calculated the physiological plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (400 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). The main effects of treatment and reef environment were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error. All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Development Team 2016).
 
 <br/>
 
