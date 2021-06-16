@@ -72,40 +72,50 @@ panel.fill.R2 <- function (x, y, corr = NULL, col.regions, cor.method, digits = 
 
 ### Custom function to calculate PCA distances for plasticity
 
-PCAplast <- function(pca, data) {
+PCAplast <- function(pca, data, control_col, control_lvl, colony = "colony") {
   
+  # rename the user input info
   pca_df <- pca
   data_df <- data
-  
-  pca_dist <- pca_df$x[,1:2] # grab PC1 and PC2 distances from prcomp() object
-  dist_df <- cbind(data_df[,c(1,7,8, 10,11,12,27)], pca_dist) # combine the datasets
-  
-  # adds column with the control value PC1/PC2 per colony
-  dist_df$cont_pc1[dist_df$treat2 == "447_28"] <- dist_df$PC1[dist_df$treat2 == "447_28"]
-  dist_df$cont_pc2[dist_df$treat2 == "447_28"] <- dist_df$PC2[dist_df$treat2 == "447_28"]
-  
-  # get the 400_28 PC values
-  dist_df2 <- dist_df %>%  
-    group_by(colony) %>% 
-    summarise(con2_pc1 = sum(cont_pc1, na.rm = TRUE),
-              con2_pc2 = sum(cont_pc2, na.rm = TRUE))
-  
-  # Make columns of the 400_28 PC values
-  dist_df <- dist_df %>% 
-    left_join(dist_df2, by = c("colony" = "colony"))
-  
-  dist_df$dist <- sqrt(((dist_df$PC1 - dist_df$con2_pc1)^2) + ((dist_df$PC2 - dist_df$con2_pc2)^2)) # formula for calculating distance between control (T90) and treatment values
-  dist_df$treat_plot = paste(dist_df$fpco2, dist_df$ftemp, sep = "_")
+  control_name <- control_col
+  control_lvl <- control_lvl
   
   
-  ## modify dataframe to remove the control treatment and reorder levels
-  dist_df <- dist_df %>% 
-    filter(treat_plot != "420_28") %>% 
-    mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31")),
-           reef = factor(reef, levels = c("N", "F")),
-           ftemp = factor(ftemp, levels = c("28", "31")),
-           fpco2 = factor(fpco2, levels = c("300", "420", "680", "3300")))
+  # ifelse statement to pull PCs from dataframe or prcomp objects
+  if(class(pca_df) == "prcomp"){
+    pca_dist <- pca_df$x # grab PC1 and PC2 distances from prcomp() object
+  } else {
+    pca_dist <- pca_df # grab PC1 and PC2 distances from data.frame object
+  }
   
+  # combine the datasets
+  dist_df <- cbind(data_df, pca_dist) 
+  
+  # make dataframe of control colonies only
+  control_df <- dist_df %>%
+    filter(dist_df[[control_name]] == list(control_lvl)[[1]]) %>% 
+    rename_with(tolower) %>% # renames all pc's with lowercase 'PC' (just to differentiate from all sample PCs)
+    dplyr::select(colnames(dist_df[colony]), starts_with("pc")) # select just the treatment, colony, and PCs 
+  
+  # add the control PC values to all samples from the same colony
+  dist_df2 <- merge(dist_df, control_df, all=TRUE)
+  
+  
+  
+  ### Calculate sample (PC) distances from control (pc) using all 7 PCs by colony
+  dist_df3 <- dist_df2 %>% 
+    mutate(dist = sqrt( ((PC1 - pc1)^2) + 
+                          ((PC2 - pc2)^2) + 
+                          ((PC3 - pc3)^2) +
+                          ((PC4 - pc4)^2) + 
+                          ((PC5 - pc5)^2) + 
+                          ((PC6 - pc6)^2) +
+                          ((PC7 - pc7)^2)))
+  
+  
+  # modify dataframe to remove the control treatment 
+  dist_df <- dist_df3 %>% 
+    filter(dist_df3[control_name] != list(control_lvl)[[1]], !is.na(pc1))
   
 }
 
@@ -115,8 +125,8 @@ PCAplast <- function(pca, data) {
 
 DistSum <- function(data) {
   data_update <- data %>% 
-    mutate(treat_plot = factor(treat_plot, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
-    group_by(treat_plot, reef, species) %>% 
+    #mutate(treat2 = factor(treat2, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
+    group_by(treat2, reef, species) %>% 
     summarise(mean = mean(dist),
               se = (sd(dist) / sqrt(n()))) 
 }

@@ -218,7 +218,7 @@ for (p in 1:length(param_list)) {
 
 ```{r T90 df setup}
 
-df_withT <- subset(df, T0_T90 == "T90") 
+df_withT <- df %>% filter(T0_T90 == "T90") %>% droplevels()
 df_90 <- subset(df_withT, species != "T") 
 df_90 <- df_90[,-c(18:33)]
 df_90 <- completeFun(df_90, "den")
@@ -872,17 +872,25 @@ Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered 
 ```{r SSID distance analysis, include=FALSE}
 
 ## Calculate the PCA distance with custom function
-sid_dist <- PCAplast(pca = s_pca, data = s_df)
+sid_dist <- PCAplast(pca = s_pca,
+                     data = s_df[,c(1,7,8, 10,11,12,27)],
+                     control_col = "treat2",
+                     control_lvl = "447_28")
+
 sid_dist_sum <- DistSum(data = sid_dist)
 
 
-## Model selection (via AIC)
-ssid_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = sid_dist)
-ssid_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist) # best fit
-ssid_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = sid_dist)
-ssid_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
-ssid_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = sid_dist)
-ssid_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist)
+## Model selection (via AIC) -- check AICc --> try a mixed glm gamma
+## using mixed model, could look at differences by colony
+# with strong random effects of colony??
+# marginal R2 --> fixed v random effect variance: likely more variance at colony level over treatment
+# bootstrap final model for CI/predictions
+ssid_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist) # best fit
+ssid_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 
 # check for best-fit model
 ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
@@ -890,31 +898,65 @@ plot(ssid_plast_aic)
 
 
 ## Best-fit GLM with Gamma log link
-ssid_dist_glm <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = sid_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+ssid_dist_glm <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_glm_out <- summary(ssid_dist_glm) # summary output of the GLM
-ssid_anova_out <- Anova(ssid_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
+library(rcompanion)
+r2_nakagawa(ssid_dist_glm)
+#  Conditional R2: 0.506 -- fixed and random effects
+#     Marginal R2: 0.322 -- fixed effects only
 
 
 
 
+#### Need to be consistent with pCO2 number references:
+# 280 --> 300 uatm = pre-industrial
+# 400 --> 420 uatm = current day
+# 700 --> 680 uatm = end of century
+# 2800 --> 3290 uatm = extreme
 
-#### Can't seem to make bootstrapping work for PSTR so just going to report mean/SE in the plots and then the GLM model output
-### Bootstrapping with boot_predict() function in package finalfit (version 1.0.2)
-#newdata_ssid <- data.frame(reef = sid_dist$reef, fpco2 = sid_dist$fpco2, ftemp = sid_dist$ftemp, treat_plot = sid_dist$treat_plot, dist = sid_dist$dist)
-#
-#ssid_dist_boot <- boot_predict(ssid_dist_glm, newdata = newdata_ssid, R = bootnum, boot_compare = FALSE,  estimate_name = "Predicted plasticity") %>% # compute boot predictions
-#  mutate(plasticity = as.character(`Predicted plasticity`), # create second predicted column for plotting
-#         plasticity = gsub("[()to]", "", plasticity)) %>% # remove characters
-#  separate(plasticity, c("estimate", "lowerci", "rm", "upperci"), " ") %>% # separate into three columns for estimate, lower CI, and upper CI
-#  dplyr::select(-rm) %>% # remove the blank column created
-#  mutate_if(is.character, as.numeric) # convert the esimate/CI from character to numeric
-  
+## check the symbiont bar plot
+
+#ssid_dist_boot_df1500 <- ssid_dist_boot_df
+
+## parametric bootstrap:
+ssid_dist_boot <- bootMer(ssid_dist_glm, function(x) predict(x, type = "response"), nsim = 100)
+ssid_dist_boot_df <- data.frame(estimate = ssid_dist_boot$t0,
+                                t(apply(ssid_dist_boot$t, 2, function(x) quantile(x, probs = c(0.025, .975)))),
+                                ssid_dist_boot[["data"]],
+                                treat = paste(ssid_dist_boot[["data"]][["fpco2"]], ssid_dist_boot[["data"]][["ftemp"]], sep = "_"))
+
+ggplot(data = ssid_dist_boot_df, aes(x = treat, colour = reef)) +
+  theme_bw() +
+  geom_point(aes(y = dist, group = reef), size = 2, alpha = 0.4, position = position_dodge(width = 0.1)) +
+  geom_linerange(aes(ymin = X2.5., ymax = X97.5.), position = position_dodge(width = 0.4)) +
+  geom_point(aes(y = estimate), size = 2, position = position_dodge(width = 0.4)) +
+  #ylim(0, 20) +
+  ggtitle("nsim = 1500")
+
+
+
+
+ssid_dist_boot <- bootMer(ssid_dist_glm, fixef, nsim = 50)
+
+ssid_dist_boot_df <- data.frame(estimate = ssid_dist_boot$t0,
+                                t(apply(ssid_dist_boot$t, 2, function(x) quantile(x, probs = c(0.025, .975)))))
+                                #ssid_dist_boot[["data"]],
+                                #treat = paste(ssid_dist_boot[["data"]][["fpco2"]], ssid_dist_boot[["data"]][["ftemp"]], sep = "_"))
+
+ggplot(data = ssid_dist_boot_df, aes(x = rownames(ssid_dist_boot_df))) +
+  theme_bw() +
+  geom_linerange(aes(ymin = X2.5., ymax = X97.5.), position = position_dodge(width = 0.4)) +
+  geom_point(aes(y = estimate), size = 2, position = position_dodge(width = 0.4)) +
+  #ylim(0, 20) +
+  ggtitle("nsim = 1500")
+
+
 ```
 
 ```{r plots of SSID distances, fig.height = 3.5, fig.width = 6}
 
 ## Plasticity plot
-ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -932,7 +974,6 @@ ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat_p
 
 ## Model output
 ssid_glm_out # summary output of the GLM
-ssid_anova_out # comparison of the 'main effects'
 
 ```
 
