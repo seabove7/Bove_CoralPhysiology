@@ -135,13 +135,13 @@ df$colony <- as.factor(df$colony)
 df$species <- factor(df$species, levels = c("S", "P", "A", "T")) # and reorder these
 
 # replace some pCO2 values with ones we will use moving forward
-df$fpco2 <- gsub("2800", "3300", df$fpco2)
+df$fpco2 <- gsub("2800", "3290", df$fpco2)
 df$fpco2 <- gsub("280", "300", df$fpco2)
 df$fpco2 <- gsub("400", "420", df$fpco2)
 df$fpco2 <- gsub("700", "680", df$fpco2)
 
 # reorder factors for pCO2 and temp
-df$fpco2 <- factor(df$fpco2, c("420", "T0", "300", "680", "3300"))
+df$fpco2 <- factor(df$fpco2, c("420", "T0", "300", "680", "3290"))
 df$ftemp <- factor(df$ftemp, c("28", "T0", "31"))
 
 # calculate phys parameters
@@ -256,7 +256,7 @@ The first two PCs of the combined holobiont physiology explained about 62% of th
 # set up the dataframe
 s_df <- unique(s_df) # remove any duplicate rows
 s_df_l <- gather(s_df, param, value, c(14:17,21:23))
-s_df$fpco2 <- factor(s_df$fpco2, levels = c("300", "420", "680", "3300"))
+s_df$fpco2 <- factor(s_df$fpco2, levels = c("300", "420", "680", "3290"))
 sid_pca_df <- s_df[,c(14:17,21:23)]
 
 # run the adonis
@@ -369,7 +369,7 @@ s_reef_pca <- autoplot(s_pca, data = s_df,
 # set up the dataframe
 p_df <- unique(p_df) # remove duplicate rows
 p_df_l <- gather(p_df, param, value, c(14:16,21:23))
-p_df$fpco2 <- factor(p_df$fpco2, levels = c("300", "420", "680", "3300"))
+p_df$fpco2 <- factor(p_df$fpco2, levels = c("300", "420", "680", "3290"))
 dip_pca_df <- p_df[,c(14:17,21:23)]
 
 # run the adonis
@@ -483,7 +483,7 @@ p_reef_pca <- autoplot(p_pca, data = p_df,
 a_df <- unique(a_df)
 a_df <- a_df[-17,] # we have two from the same colony in 400_28 that are performing similarly so one is being removed (CFAD12)
 a_df_l <- gather(a_df, param, value, c(14:16,21:23))
-a_df$fpco2 <- factor(a_df$fpco2, levels = c("300", "420", "680", "3300"))
+a_df$fpco2 <- factor(a_df$fpco2, levels = c("300", "420", "680", "3290"))
 por_pca_df <- a_df[,c(14:16,18,21:23)]
 
 # run the adonis
@@ -603,7 +603,7 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 
 ```
 
-**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$ C blue; 31$^\circ$ C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$ C blue; 31$^\circ$ C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (300 $\mu$atm light purple; 420 $\mu$atm dark purple; 680 $\mu$atm light orange; 3290 $\mu$atm dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -615,7 +615,7 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 # set up the dataframe
 all_df <- unique(df_90) # remove any duplicate rows
 all_df_l <- gather(all_df, param, value, c(14:17,21:23))
-all_df$fpco2 <- factor(all_df$fpco2, levels = c("300", "420", "680", "3300"))
+all_df$fpco2 <- factor(all_df$fpco2, levels = c("300", "420", "680", "3290"))
 all_pca_df <- all_df[,c(14:17,21:23)]
 
 # run the adonis
@@ -757,7 +757,7 @@ sid_corr_df <- s_df[,c(10:11,14:17,21:23)] %>%
          color = case_when(fpco2 == "300" ~ "#b2abd2",
                             fpco2 == "420" ~ "#5e3c99",
                             fpco2 == "680" ~ "#fdb863",
-                            fpco2 == "3300" ~ "#e66101"))
+                            fpco2 == "3290" ~ "#e66101"))
 
 ## Plot correlation matrix and scatter plot of all SSID physiology  
 png(file = "Figures/Supplemental_Figures/SSID_PhysCorrelations.png", width = 240.57, height = 164.025, units='mm', res = 300)  
@@ -780,7 +780,7 @@ dip_corr_df <- p_df[,c(10:11,14:17,21:23)] %>%
          color = case_when(fpco2 == "300" ~ "#b2abd2",
                             fpco2 == "420" ~ "#5e3c99",
                             fpco2 == "680" ~ "#fdb863",
-                            fpco2 == "3300" ~ "#e66101"))
+                            fpco2 == "3290" ~ "#e66101"))
   
 
 ## Plot correlation matrix and scatter plot of all PSTR physiology
@@ -804,7 +804,7 @@ por_corr_df <- a_df[,c(10:11,14:16,18,21:23)] %>%
          color = case_when(fpco2 == "300" ~ "#b2abd2",
                             fpco2 == "420" ~ "#5e3c99",
                             fpco2 == "680" ~ "#fdb863",
-                            fpco2 == "3300" ~ "#e66101"))
+                            fpco2 == "3290" ~ "#e66101"))
   
 
 ## Plot correlation matrix and scatter plot of all PAST physiology
@@ -822,7 +822,7 @@ dev.off()
 
 ### *Figure 2*
 
-```{r save all species correlation/scatter plots, fig.width = 8, fig.height = 6.4}
+```{r save all species correlation/scatter plots, fig.width = 12, fig.height = 3.3}
 
 ssid_corr_plot <- readPNG("Figures/Supplemental_Figures/SSID_PhysCorrelations.png")
 pstr_corr_plot <- readPNG("Figures/Supplemental_Figures/PSTR_PhysCorrelations.png")
@@ -849,7 +849,7 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
 
 ```
 
-**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by color (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
+**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by color (300 $\mu$atm light purple; 420 $\mu$atm dark purple; 680 $\mu$atm light orange; 3290 $\mu$atm dark orange).
 
 <br/>
 <br/>
@@ -858,12 +858,12 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
-Using PC1 and PC2 for each species, we then calculated the physiological plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (400 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). The main effects of treatment and reef environment were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error. All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Development Team 2016).
+Using PC1 and PC2 for each species, we then calculated the physiological plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (420 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). The main effects of treatment and reef environment were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error. All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Development Team 2016).
 
 <br/>
 
 #### *Results:*
-Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered the physiological plasticity of *S. siderea* (**Figure 3A; Table S3, S4**). Offshore fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 400 $\mu$atm, 31$^\circ$C and 700 $\mu$atm, 28$^\circ$C. Plasticity of *P. strigosa* and *P. astreoides* was not significantly altered by temperature treatment, *p*CO~2~ treatment, or natal reef environment (**Figure 3B, 3C; Table S3, S4**). However, *P. astreoides* exhibited a slight trend in the inshore fragments suggesting potentially higher plasticity with increasing *p*CO~2~ that is not seen in the offshore fragments (**Figure 3C**).
+Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered the physiological plasticity of *S. siderea* (**Figure 3A; Table S3, S4**). Offshore fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C. Plasticity of *P. strigosa* and *P. astreoides* was not significantly altered by temperature treatment, *p*CO~2~ treatment, or natal reef environment (**Figure 3B, 3C; Table S3, S4**). However, *P. astreoides* exhibited a slight trend in the inshore fragments suggesting potentially higher plasticity with increasing *p*CO~2~ that is not seen in the offshore fragments (**Figure 3C**).
 
 <br/>
 
@@ -910,31 +910,7 @@ r2_nakagawa(ssid_dist_glm)
 
 ```{r eval=FALSE, include=FALSE}
 
-#### Need to be consistent with pCO2 number references:
-# 280 --> 300 uatm = pre-industrial
-# 400 --> 420 uatm = current day
-# 700 --> 680 uatm = end of century
-# 2800 --> 3290 uatm = extreme
-
 ## check the symbiont bar plot
-
-#ssid_dist_boot_df1500 <- ssid_dist_boot_df
-
-## parametric bootstrap:
-ssid_dist_boot <- bootMer(ssid_dist_glm, function(x) predict(x, type = "response"), nsim = 100)
-ssid_dist_boot_df <- data.frame(estimate = ssid_dist_boot$t0,
-                                t(apply(ssid_dist_boot$t, 2, function(x) quantile(x, probs = c(0.025, .975)))),
-                                ssid_dist_boot[["data"]],
-                                treat = paste(ssid_dist_boot[["data"]][["fpco2"]], ssid_dist_boot[["data"]][["ftemp"]], sep = "_"))
-
-ggplot(data = ssid_dist_boot_df, aes(x = treat, color = reef)) +
-  theme_bw() +
-  geom_point(aes(y = dist, group = reef), size = 2, alpha = 0.4, position = position_dodge(width = 0.1)) +
-  geom_linerange(aes(ymin = X2.5., ymax = X97.5.), position = position_dodge(width = 0.4)) +
-  geom_point(aes(y = estimate), size = 2, position = position_dodge(width = 0.4)) +
-  #ylim(0, 20) +
-  ggtitle("nsim = 1500")
-
 
 
 
@@ -1121,7 +1097,7 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ```
 
-**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
+**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (300 $\mu$atm light purple, circle; 420 $\mu$atm dark purple, diamond; 680 $\mu$atm light orange, triangle; 3290 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
 
 <br/>
 <br/>
@@ -1342,7 +1318,7 @@ ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 
 
 ```
 
-**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (300 μatm light purple; 420 μatm dark purple; 680 μatm light orange; 3290 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1545,7 +1521,7 @@ ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 
 
 ```
 
-**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (300 μatm light purple; 420 μatm dark purple; 680 μatm light orange; 3290 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1748,7 +1724,7 @@ ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 
 
 ```
 
-**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (300 μatm light purple; 420 μatm dark purple; 680 μatm light orange; 3290 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1793,7 +1769,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, color = ftemp)) +
 
 ![](Figures/Supplemental_Figures/FigureS6_BleachingImages.png)
 
-**Figure S6.** Coral color changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral color over time in either control (400 μatm; 28 °C) or warming (400 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
+**Figure S6.** Coral color changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral color over time in either control (420 μatm; 28 °C) or warming (420 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
 
 <br/>
 <br/>
