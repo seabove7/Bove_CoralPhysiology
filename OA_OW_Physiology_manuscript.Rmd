@@ -164,7 +164,7 @@ df$treat <- gsub("3285_28", 10, df$treat)
 df$treat <- gsub("3309_31", 10, df$treat)
 df$treat <- as.numeric(df$treat) # convert 'treat' column to numerics (again, this is for plotting only)
 
-# inverse of colours (so lower colour depicts more bleached coral)
+# inverse of colors (so lower color depicts more bleached coral)
 df$sum <- (df$sum * -1)
 df$red <- (df$red * -1)
 df$blue_bw5 <- (df$blue_bw5 * -1)
@@ -243,7 +243,7 @@ Principal component analysis (PCA) (function *prcomp*) of scaled and centered ph
 <br/>
 
 #### *Results:*
-Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and colour intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in physiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and colour intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).  
+Two principal components (PCs) explained approximately 66% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal endosymbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and color intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p < 0.001; **Table S2**), while temperature and reef environment were not as strong of drivers in physiological responses (p > 0.01 and p > 0.01, respectively; **Table S2**). For *P. strigosa*, 74% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was clearly reduced under warming and was generally higher in the lower *p*CO~2~ treatments (**Figure 1B**). Treatment temperature (p < 0.001; **Table S2**), *p*CO~2~ (p < 0.01; **Table S2**), and natal reef environment all significantly drove coral holobiont physiology (p < 0.001; **Table S2**). Finally, the first two PCs explained about 59% of the total variance of the *P. astreoides* holobiont response to treatment (**Figure 1C**). Coral holobiont samples separated most clearly along PC1 driven primarily by calcification rate and algal endosymbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and color intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p < 0.001; **Table S2**) and *p*CO~2~ (p < 0.001; **Table S2**) drove separations in *P. astreoides* holobiont physiology, while reef environment was nonsignificant (p = 0.82; **Table S2**).  
 
 The first two PCs of the combined holobiont physiology explained about 62% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied with higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S5**). Despite coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S5**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited similar physiological responses under stress. Further, corals from the inshore reef environment exhibited more constrained physiology than their offshore counterparts (**Figure S7; Table S5**).
 
@@ -282,7 +282,7 @@ s_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[3,1], digits
 
 # temperature
 s_temp_pca <- autoplot(s_pca, data = s_df, 
-         colour = "ftemp",
+         color = "ftemp",
          #shape = "fpco2",
          shape = "ftemp",
          fill = "ftemp",               
@@ -291,25 +291,25 @@ s_temp_pca <- autoplot(s_pca, data = s_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
   #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.30, y = -0.38, label = deparse(s_temp_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("A)   "), italic("S. siderea"))))
 
 # pco2
 s_pco2_pca <- autoplot(s_pca, data = s_df, 
-         colour = "fpco2",
+         color = "fpco2",
          #shape = "ftemp",
          fill = "fpco2",
          shape = "fpco2",
@@ -318,9 +318,9 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
@@ -328,31 +328,31 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
     #scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
     scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
     scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(legend.background = element_rect(fill = "transparent", colour = NA)) +
+    theme(legend.background = element_rect(fill = "transparent", color = NA)) +
     annotate("text", x = -0.30, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3)
 
 # reef
 s_reef_pca <- autoplot(s_pca, data = s_df, 
-         colour = "reef",
+         color = "reef",
          fill = "reef",
          frame = TRUE, 
          frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = -0.6, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("A)   "), italic("S. siderea"))))
 
@@ -395,7 +395,7 @@ p_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3,1], digi
 
 # temperature
 p_temp_pca <- autoplot(p_pca, data = p_df, 
-         colour = "ftemp",
+         color = "ftemp",
          #shape = "fpco2",
          shape = "ftemp",
          fill = "ftemp",               
@@ -404,25 +404,25 @@ p_temp_pca <- autoplot(p_pca, data = p_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = 0.5, 
          loadings.label.vjust = 0.6,
          loadings.label.repel = TRUE) +
   #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.13, y = -0.38, label = deparse(p_temp_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
 # pco2
 p_pco2_pca <- autoplot(p_pca, data = p_df, 
-         colour = "fpco2",
+         color = "fpco2",
          fill = "fpco2",
          #shape = "ftemp",
          shape = "fpco2",
@@ -431,9 +431,9 @@ p_pco2_pca <- autoplot(p_pca, data = p_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = 0.5, 
          loadings.label.vjust = 0.6,
@@ -441,31 +441,31 @@ p_pco2_pca <- autoplot(p_pca, data = p_df,
     #scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
     scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
     scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(legend.background = element_rect(fill = "transparent", colour = NA)) +
+    theme(legend.background = element_rect(fill = "transparent", color = NA)) +
     annotate("text", x = -0.28, y = -0.38, label = deparse(p_pco2_pval), parse = TRUE, size = 3)
 
 # reef
 p_reef_pca <- autoplot(p_pca, data = p_df, 
-         colour = "reef",
+         color = "reef",
          fill = "reef",
          frame = TRUE, 
          frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = -0.6, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.17, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
@@ -509,7 +509,7 @@ a_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(a_pval[3,1], digi
 
 # temperature
 a_temp_pca <- autoplot(a_pca, data = a_df, 
-         colour = "ftemp",
+         color = "ftemp",
          #shape = "fpco2",
          shape = "ftemp",
          fill = "ftemp",               
@@ -518,25 +518,25 @@ a_temp_pca <- autoplot(a_pca, data = a_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = -0.6, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
   #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.22, y = -0.44, label = deparse(a_temp_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
 
 # pco2
 a_pco2_pca <- autoplot(a_pca, data = a_df, 
-         colour = "fpco2",
+         color = "fpco2",
          fill = "fpco2",
          #shape = "ftemp",
          shape = "fpco2",
@@ -545,9 +545,9 @@ a_pco2_pca <- autoplot(a_pca, data = a_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = -0.6, 
          loadings.label.vjust = 0.5,
@@ -555,31 +555,31 @@ a_pco2_pca <- autoplot(a_pca, data = a_df,
     #scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
     scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
     scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(legend.background = element_rect(fill = "transparent", colour = NA)) +
+    theme(legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.167, y = -0.5, label = deparse(a_pco2_pval), parse = TRUE, size = 3)
 
 # reef
 a_reef_pca <- autoplot(a_pca, data = a_df, 
-         colour = "reef",
+         color = "reef",
          fill = "reef",
          frame = TRUE, 
          frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = -0.6, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.245, y = -0.38, label = deparse(a_reef_pval), parse = TRUE, size = 3) +
   ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
 
@@ -645,7 +645,7 @@ all_s_temp_pval <-substitute(italic(P[species~X~temp])==p, list(p = format(all_p
 
 # species
 species_pca_plot <- autoplot(all_pca, data = all_df, 
-                       colour = "species",
+                       color = "species",
                        #shape = "species",
                        #shape = "fpco2",
                        #fill = "species",               
@@ -654,23 +654,23 @@ species_pca_plot <- autoplot(all_pca, data = all_df,
                        frame.level = 0.95, # using 95% CI for all ellipses
                        frame.alpha = 0.01,
                        loadings = TRUE, 
-                       loadings.colour = "black", 
+                       loadings.color = "black", 
                        loadings.label = TRUE,
-                       loadings.label.colour = "black",         
+                       loadings.label.color = "black",         
                        loadings.label.size = 4, 
                        loadings.label.hjust = 1.5, 
                        loadings.label.vjust = 0.5,
                        loadings.label.repel = TRUE) +
-  scale_colour_manual("", labels = c("S. siderea", "P. strigosa", "P. astreoides"), values = c("#867796", "#73CCD2", "#D2D69B")) +
+  scale_color_manual("", labels = c("S. siderea", "P. strigosa", "P. astreoides"), values = c("#867796", "#73CCD2", "#D2D69B")) +
   guides(shape = FALSE, fill = FALSE, color = guide_legend(keyheight = 0.1, nrow = 3, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA), legend.position = c(0.14, 0.9), legend.text = element_text(face = "italic")) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.14, 0.9), legend.text = element_text(face = "italic")) +
   #ggsave("Figures/Final_Figures/FigureX_SpeciesPCA.pdf", width = 6, height = 4.5) +
   #ggsave("Figures/Final_Figures/FigureX_SpeciesPCA.png", width = 6, height = 4.5) +
   annotate("text", x = -0.2, y = -0.108, label = deparse(all_species_pval), parse = TRUE, size = 3)
 
 # temperature
 all_temp_pca <- autoplot(all_pca, data = all_df, 
-                       colour = "ftemp",
+                       color = "ftemp",
                        #shape = "fpco2",
                        shape = "ftemp",
                        fill = "ftemp",               
@@ -679,24 +679,24 @@ all_temp_pca <- autoplot(all_pca, data = all_df,
                        frame.level = 0.95, # using 95% CI for all ellipses
                        frame.alpha = 0.01,
                        loadings = TRUE, 
-                       loadings.colour = "black", 
+                       loadings.color = "black", 
                        loadings.label = TRUE,
-                       loadings.label.colour = "black",         
+                       loadings.label.color = "black",         
                        loadings.label.size = 4, 
                        loadings.label.hjust = 1.5, 
                        loadings.label.vjust = 0.5,
                        loadings.label.repel = TRUE) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.position = c(0.09, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.position = c(0.09, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.21, y = -0.118, label = deparse(all_temp_pval), parse = TRUE, size = 3) +
   annotate("text", x = -0.18, y = -0.14, label = deparse(all_s_temp_pval), parse = TRUE, size = 3)
 
 # pco2
 all_pco2_pca <- autoplot(all_pca, data = all_df, 
-                       colour = "fpco2",
+                       color = "fpco2",
                        #shape = "ftemp",
                        fill = "fpco2",
                        shape = "fpco2",
@@ -705,20 +705,20 @@ all_pco2_pca <- autoplot(all_pca, data = all_df,
                        frame.level = 0.95, # using 95% CI for all ellipses
                        frame.alpha = 0.01,
                        loadings = TRUE, 
-                       loadings.colour = "black", 
+                       loadings.color = "black", 
                        loadings.label = TRUE,
-                       loadings.label.colour = "black",         
+                       loadings.label.color = "black",         
                        loadings.label.size = 4, 
                        loadings.label.hjust = 1.5, 
                        loadings.label.vjust = 0.5,
                        loadings.label.repel = TRUE) +
   scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
   annotate("text", x = -0.20, y = -0.118, label = deparse(all_pco2_pval), parse = TRUE, size = 3) +
   annotate("text", x = -0.18, y = -0.14, label = deparse(all_s_pco2_pval), parse = TRUE, size = 3) +
-  theme(legend.position = c(0.16, 0.9), legend.background = element_rect(fill = "transparent", colour = NA))
+  theme(legend.position = c(0.16, 0.9), legend.background = element_rect(fill = "transparent", color = NA))
 
 ```
 
@@ -744,7 +744,7 @@ Correlations of all physiological parameters were assessed to determine the rela
 <br/>
 
 #### *Results:*
-Correlations of coral holobiont physiological parameters were generally positively related with one another across all three species. Correlations between *S. siderea* holobiont physiological parameters identified 15 significant relationships out of all 21 possible comparisons (**Figure 2A**). Of those significant correlations, six resulted in a Pearson's correlation coefficient (R^2^) equal to or greater than 0.5, with the strongest relationship identified being symbiont density vs chlorophyll a (R^2^ = 0.72). All pairwise physiological parameters were significantly correlated with one another in *P. strigosa* and of those, 14 correlations exhibit moderate (R^2^ > 0.50) positive relationships (**Figure 2B**). Notably, the two strongest correlations were host carbohydrate vs host protein (R^2^ = 0.70) and host carbohydrate vs chlorophyll a (R^2^ = 0.76). Compared to both *S. siderea* and *P. strigosa*, fewer physiological traits were significantly (p < 0.05) correlated with one another in *P. astreoides* (12 significant out of 21 total comparisons; **Figure 2C**). Of the significant correlations, only two pairwise comparisons resulted in a Pearson's correlation coefficient greater than 0.5: chlorophyll a vs colour intensity (R^2^ = 0.57) and host carbohydrate vs host protein (R^2^ = 0.68).
+Correlations of coral holobiont physiological parameters were generally positively related with one another across all three species. Correlations between *S. siderea* holobiont physiological parameters identified 15 significant relationships out of all 21 possible comparisons (**Figure 2A**). Of those significant correlations, six resulted in a Pearson's correlation coefficient (R^2^) equal to or greater than 0.5, with the strongest relationship identified being symbiont density vs chlorophyll a (R^2^ = 0.72). All pairwise physiological parameters were significantly correlated with one another in *P. strigosa* and of those, 14 correlations exhibit moderate (R^2^ > 0.50) positive relationships (**Figure 2B**). Notably, the two strongest correlations were host carbohydrate vs host protein (R^2^ = 0.70) and host carbohydrate vs chlorophyll a (R^2^ = 0.76). Compared to both *S. siderea* and *P. strigosa*, fewer physiological traits were significantly (p < 0.05) correlated with one another in *P. astreoides* (12 significant out of 21 total comparisons; **Figure 2C**). Of the significant correlations, only two pairwise comparisons resulted in a Pearson's correlation coefficient greater than 0.5: chlorophyll a vs color intensity (R^2^ = 0.57) and host carbohydrate vs host protein (R^2^ = 0.68).
 
 <br/>
 
@@ -754,7 +754,7 @@ Correlations of coral holobiont physiological parameters were generally positive
 sid_corr_df <- s_df[,c(10:11,14:17,21:23)] %>% 
   mutate(shape = case_when(ftemp == "28" ~ "19",
                            ftemp == "31" ~ "21"),
-         colour = case_when(fpco2 == "300" ~ "#b2abd2",
+         color = case_when(fpco2 == "300" ~ "#b2abd2",
                             fpco2 == "420" ~ "#5e3c99",
                             fpco2 == "680" ~ "#fdb863",
                             fpco2 == "3300" ~ "#e66101"))
@@ -764,8 +764,8 @@ png(file = "Figures/Supplemental_Figures/SSID_PhysCorrelations.png", width = 240
 
 corrgram(sid_corr_df, order = FALSE, lower.panel = panel.fill.R2, upper.panel = panel.pts.col, text.panel = panel.txt.brdr,
          col.regions = colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
-         color = sid_corr_df$colour, pch = as.numeric(as.character(sid_corr_df$shape)),
-         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
+         color = sid_corr_df$color, pch = as.numeric(as.character(sid_corr_df$shape)),
+         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "color \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
 
 dev.off() 
 
@@ -777,7 +777,7 @@ dev.off()
 dip_corr_df <- p_df[,c(10:11,14:17,21:23)] %>% 
   mutate(shape = case_when(ftemp == "28" ~ "19",
                            ftemp == "31" ~ "21"),
-         colour = case_when(fpco2 == "300" ~ "#b2abd2",
+         color = case_when(fpco2 == "300" ~ "#b2abd2",
                             fpco2 == "420" ~ "#5e3c99",
                             fpco2 == "680" ~ "#fdb863",
                             fpco2 == "3300" ~ "#e66101"))
@@ -788,8 +788,8 @@ png(file = "Figures/Supplemental_Figures/PSTR_PhysCorrelations.png", width = 240
 
 corrgram(dip_corr_df, order = FALSE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
          col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
-         color = dip_corr_df$colour, pch = as.numeric(as.character(dip_corr_df$shape)),
-         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
+         color = dip_corr_df$color, pch = as.numeric(as.character(dip_corr_df$shape)),
+         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "color \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
 
 dev.off() 
 
@@ -801,7 +801,7 @@ dev.off()
 por_corr_df <- a_df[,c(10:11,14:16,18,21:23)] %>% 
   mutate(shape = case_when(ftemp == "28" ~ "19",
                            ftemp == "31" ~ "21"),
-         colour = case_when(fpco2 == "300" ~ "#b2abd2",
+         color = case_when(fpco2 == "300" ~ "#b2abd2",
                             fpco2 == "420" ~ "#5e3c99",
                             fpco2 == "680" ~ "#fdb863",
                             fpco2 == "3300" ~ "#e66101"))
@@ -812,8 +812,8 @@ png(file = "Figures/Supplemental_Figures/PAST_PhysCorrelations.png", width = 240
 
 corrgram(por_corr_df, order = FALSE, lower.panel=panel.fill.R2, upper.panel=panel.pts.col, text.panel=panel.txt.brdr,
          col.regions=colorRampPalette(c("#ffffcc", "#c7e9b4", "#225ea8")), 
-         color = por_corr_df$colour, pch = as.numeric(as.character(por_corr_df$shape)),
-         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "colour \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
+         color = por_corr_df$color, pch = as.numeric(as.character(por_corr_df$shape)),
+         labels = c("symbiont \ndensity", "host \nprotein", "chlorophyll a", "color \nintensity", "calcification \nrate", "host \ncarbohydrate", "host \nlipid")) 
 
 dev.off() 
 
@@ -843,13 +843,13 @@ past_corr_plot <- ggplot() +
   theme_void() + 
   ggtitle(expression(paste(bold("  C)   "), italic("P. asteroides"))))
 
-ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrows = 2) +
-  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 8, height = 6.4) +
-  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.png", width = 8, height = 6.4)
+ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
+  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 12, height = 3.1) +
+  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.png", width = 12, height = 3.1)
 
 ```
 
-**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by colour (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
+**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by color (280 $\mu$atm light purple; 400 $\mu$atm dark purple; 700 $\mu$atm light orange; 2800 $\mu$atm dark orange).
 
 <br/>
 <br/>
@@ -927,7 +927,7 @@ ssid_dist_boot_df <- data.frame(estimate = ssid_dist_boot$t0,
                                 ssid_dist_boot[["data"]],
                                 treat = paste(ssid_dist_boot[["data"]][["fpco2"]], ssid_dist_boot[["data"]][["ftemp"]], sep = "_"))
 
-ggplot(data = ssid_dist_boot_df, aes(x = treat, colour = reef)) +
+ggplot(data = ssid_dist_boot_df, aes(x = treat, color = reef)) +
   theme_bw() +
   geom_point(aes(y = dist, group = reef), size = 2, alpha = 0.4, position = position_dodge(width = 0.1)) +
   geom_linerange(aes(ymin = X2.5., ymax = X97.5.), position = position_dodge(width = 0.4)) +
@@ -958,7 +958,7 @@ ggplot(data = ssid_dist_boot_df, aes(x = rownames(ssid_dist_boot_df))) +
 ```{r plots of SSID distances, fig.height = 3.5, fig.width = 6}
 
 ## Plasticity plot
-ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
+ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -966,7 +966,7 @@ ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, colour = treat2,
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
   labs(y = "PC distance from control", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
@@ -1022,7 +1022,7 @@ r2_nakagawa(pstr_dist_glm)
 ```{r plots of PSTR distances, fig.height = 3.5, fig.width = 6}
 
 ## Plasticity plot
-pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
+pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -1030,7 +1030,7 @@ pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat2,
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
   labs(y = "", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
@@ -1086,7 +1086,7 @@ r2_nakagawa(past_dist_glm)
 ```{r plots of PAST distances, fig.height = 3, fig.width = 10}
 
 ## Plasticity plot
-past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
+past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -1094,7 +1094,7 @@ past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat2,
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
   labs(y = "", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
@@ -1121,7 +1121,7 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ```
 
-**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by colour and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
+**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (280 $\mu$atm light purple, circle; 400 $\mu$atm dark purple, diamond; 700 $\mu$atm light orange, triangle; 2800 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
 
 <br/>
 <br/>
@@ -1151,7 +1151,7 @@ ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, le
 
 ## subset for host or symbiont physiology
 sid_pca_df_host <- s_df[,c(15,22:23)] # host only phys (lipid, protein, carb)
-sid_pca_df_symb <- s_df[,c(14,16,17)] # symbiont only phys (chla, density, colour intensity)
+sid_pca_df_symb <- s_df[,c(14,16,17)] # symbiont only phys (chla, density, color intensity)
 
 
 ## run the adonis for HOST phys
@@ -1176,7 +1176,7 @@ s_pca_symb <- prcomp(sid_pca_df_symb, center = TRUE, scale= TRUE)
 ## Temperature PCAs
 # HOST temperature
 sid_host_temp_pca <- autoplot(s_pca_host, data = s_df, 
-         colour = "ftemp",
+         color = "ftemp",
          #shape = "fpco2",
          shape = "ftemp",
          fill = "ftemp",               
@@ -1185,24 +1185,24 @@ sid_host_temp_pca <- autoplot(s_pca_host, data = s_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   ggtitle("SSID Host")
 
 
 # SYMB temperature
 sid_symb_temp_pca <- autoplot(s_pca_symb, data = s_df, 
-         colour = "ftemp",
+         color = "ftemp",
          #shape = "fpco2",
          shape = "ftemp",
          fill = "ftemp",               
@@ -1211,18 +1211,18 @@ sid_symb_temp_pca <- autoplot(s_pca_symb, data = s_df,
          frame.level = 0.95, # using 95% CI for all ellipses
          frame.alpha = 0.01,
          loadings = TRUE, 
-         loadings.colour = "black", 
+         loadings.color = "black", 
          loadings.label = TRUE,
-         loadings.label.colour = "black",         
+         loadings.label.color = "black",         
          loadings.label.size = 4, 
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   ggtitle("SSID Symbionts")
 
 
@@ -1230,7 +1230,7 @@ sid_symb_temp_pca <- autoplot(s_pca_symb, data = s_df,
 ## pCO2 PCAs
 # HOST pco2
 sid_host_pco2_pca <- autoplot(s_pca_host, data = s_df, 
-                          colour = "fpco2",
+                          color = "fpco2",
                           #shape = "ftemp",
                           fill = "fpco2",
                           shape = "fpco2",
@@ -1239,23 +1239,23 @@ sid_host_pco2_pca <- autoplot(s_pca_host, data = s_df,
                           frame.level = 0.95, # using 95% CI for all ellipses
                           frame.alpha = 0.01,
                           loadings = TRUE, 
-                          loadings.colour = "black", 
+                          loadings.color = "black", 
                           loadings.label = TRUE,
-                          loadings.label.colour = "black",         
+                          loadings.label.color = "black",         
                           loadings.label.size = 4, 
                           loadings.label.hjust = 1.5, 
                           loadings.label.vjust = 0.5,
                           loadings.label.repel = TRUE) +
   scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-  theme(legend.background = element_rect(fill = "transparent", colour = NA))
+  theme(legend.background = element_rect(fill = "transparent", color = NA))
 
 
 # SYMB pco2
 sid_symb_pco2_pca <- autoplot(s_pca_symb, data = s_df, 
-                          colour = "fpco2",
+                          color = "fpco2",
                           #shape = "ftemp",
                           fill = "fpco2",
                           shape = "fpco2",
@@ -1264,65 +1264,65 @@ sid_symb_pco2_pca <- autoplot(s_pca_symb, data = s_df,
                           frame.level = 0.95, # using 95% CI for all ellipses
                           frame.alpha = 0.01,
                           loadings = TRUE, 
-                          loadings.colour = "black", 
+                          loadings.color = "black", 
                           loadings.label = TRUE,
-                          loadings.label.colour = "black",         
+                          loadings.label.color = "black",         
                           loadings.label.size = 4, 
                           loadings.label.hjust = 1.5, 
                           loadings.label.vjust = 0.5,
                           loadings.label.repel = TRUE) +
   scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-  theme(legend.background = element_rect(fill = "transparent", colour = NA))
+  theme(legend.background = element_rect(fill = "transparent", color = NA))
 
 
 
 ## Reef PCAs
 # HOST reef
 sid_host_reef_pca <- autoplot(s_pca_host, data = s_df,  
-                          colour = "reef",
+                          color = "reef",
                           fill = "reef",
                           frame = TRUE, 
                           frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
                           frame.level = 0.95, # using 95% CI for all ellipses
                           frame.alpha = 0.01,
                           loadings = TRUE, 
-                          loadings.colour = "black", 
+                          loadings.color = "black", 
                           loadings.label = TRUE,
-                          loadings.label.colour = "black",         
+                          loadings.label.color = "black",         
                           loadings.label.size = 4, 
                           loadings.label.hjust = -0.6, 
                           loadings.label.vjust = 0.5,
                           loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
 
 # SYMB reef
 sid_symb_reef_pca <- autoplot(s_pca_symb, data = s_df,  
-                          colour = "reef",
+                          color = "reef",
                           fill = "reef",
                           frame = TRUE, 
                           frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
                           frame.level = 0.95, # using 95% CI for all ellipses
                           frame.alpha = 0.01,
                           loadings = TRUE, 
-                          loadings.colour = "black", 
+                          loadings.color = "black", 
                           loadings.label = TRUE,
-                          loadings.label.colour = "black",         
+                          loadings.label.color = "black",         
                           loadings.label.size = 4, 
                           loadings.label.hjust = -0.6, 
                           loadings.label.vjust = 0.5,
                           loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
 ```
@@ -1342,7 +1342,7 @@ ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 
 
 ```
 
-**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, colour intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1354,7 +1354,7 @@ ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 
 
 ## subset for host or symbiont physiology
 dip_pca_df_host <- p_df[,c(15,22:23)] # host only phys (lipid, protein, carb)
-dip_pca_df_symb <- p_df[,c(14,16,17)] # symbiont only phys (chla, density, colour intensity)
+dip_pca_df_symb <- p_df[,c(14,16,17)] # symbiont only phys (chla, density, color intensity)
 
 
 ## run the adonis for HOST phys
@@ -1379,7 +1379,7 @@ p_pca_symb <- prcomp(dip_pca_df_symb, center = TRUE, scale= TRUE)
 ## Temperature PCAs
 # HOST temperature
 dip_host_temp_pca <- autoplot(p_pca_host, data = p_df, 
-                              colour = "ftemp",
+                              color = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
                               fill = "ftemp",               
@@ -1388,24 +1388,24 @@ dip_host_temp_pca <- autoplot(p_pca_host, data = p_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   ggtitle("PSTR Host")
 
 
 # SYMB temperature
 dip_symb_temp_pca <- autoplot(p_pca_symb, data = p_df, 
-                              colour = "ftemp",
+                              color = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
                               fill = "ftemp",               
@@ -1414,18 +1414,18 @@ dip_symb_temp_pca <- autoplot(p_pca_symb, data = p_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   ggtitle("PSTR Symbionts")
 
 
@@ -1433,7 +1433,7 @@ dip_symb_temp_pca <- autoplot(p_pca_symb, data = p_df,
 ## pCO2 PCAs
 # HOST pco2
 dip_host_pco2_pca <- autoplot(p_pca_host, data = p_df, 
-                              colour = "fpco2",
+                              color = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
                               shape = "fpco2",
@@ -1442,23 +1442,23 @@ dip_host_pco2_pca <- autoplot(p_pca_host, data = p_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-  theme(legend.background = element_rect(fill = "transparent", colour = NA))
+  theme(legend.background = element_rect(fill = "transparent", color = NA))
 
 
 # SYMB pco2
 dip_symb_pco2_pca <- autoplot(p_pca_symb, data = p_df, 
-                              colour = "fpco2",
+                              color = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
                               shape = "fpco2",
@@ -1467,65 +1467,65 @@ dip_symb_pco2_pca <- autoplot(p_pca_symb, data = p_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-  theme(legend.background = element_rect(fill = "transparent", colour = NA))
+  theme(legend.background = element_rect(fill = "transparent", color = NA))
 
 
 
 ## Reef PCAs
 # HOST reef
 dip_host_reef_pca <- autoplot(p_pca_host, data = p_df,  
-                              colour = "reef",
+                              color = "reef",
                               fill = "reef",
                               frame = TRUE, 
                               frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = -0.6, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
 
 # SYMB reef
 dip_symb_reef_pca <- autoplot(p_pca_symb, data = p_df,  
-                              colour = "reef",
+                              color = "reef",
                               fill = "reef",
                               frame = TRUE, 
                               frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = -0.6, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
 ```
@@ -1545,7 +1545,7 @@ ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 
 
 ```
 
-**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, colour intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1557,7 +1557,7 @@ ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 
 
 ## subset for host or symbiont physiology
 por_pca_df_host <- a_df[,c(15,22:23)] # host only phys (lipid, protein, carb)
-por_pca_df_symb <- a_df[,c(14,16,18)] # symbiont only phys (chla, density, colour intensity)
+por_pca_df_symb <- a_df[,c(14,16,18)] # symbiont only phys (chla, density, color intensity)
 
 
 ## run the adonis for HOST phys
@@ -1582,7 +1582,7 @@ a_pca_symb <- prcomp(por_pca_df_symb, center = TRUE, scale= TRUE)
 ## Temperature PCAs
 # HOST temperature
 por_host_temp_pca <- autoplot(a_pca_host, data = a_df, 
-                              colour = "ftemp",
+                              color = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
                               fill = "ftemp",               
@@ -1591,24 +1591,24 @@ por_host_temp_pca <- autoplot(a_pca_host, data = a_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   ggtitle("PAST Host")
 
 
 # SYMB temperature
 por_symb_temp_pca <- autoplot(a_pca_symb, data = a_df, 
-                              colour = "ftemp",
+                              color = "ftemp",
                               #shape = "fpco2",
                               shape = "ftemp",
                               fill = "ftemp",               
@@ -1617,18 +1617,18 @@ por_symb_temp_pca <- autoplot(a_pca_symb, data = a_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   ggtitle("PAST Symbionts")
 
 
@@ -1636,7 +1636,7 @@ por_symb_temp_pca <- autoplot(a_pca_symb, data = a_df,
 ## pCO2 PCAs
 # HOST pco2
 por_host_pco2_pca <- autoplot(a_pca_host, data = a_df, 
-                              colour = "fpco2",
+                              color = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
                               shape = "fpco2",
@@ -1645,23 +1645,23 @@ por_host_pco2_pca <- autoplot(a_pca_host, data = a_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-  theme(legend.background = element_rect(fill = "transparent", colour = NA))
+  theme(legend.background = element_rect(fill = "transparent", color = NA))
 
 
 # SYMB pco2
 por_symb_pco2_pca <- autoplot(a_pca_symb, data = a_df, 
-                              colour = "fpco2",
+                              color = "fpco2",
                               #shape = "ftemp",
                               fill = "fpco2",
                               shape = "fpco2",
@@ -1670,65 +1670,65 @@ por_symb_pco2_pca <- autoplot(a_pca_symb, data = a_df,
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = 1.5, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
   scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-  scale_colour_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-  theme(legend.background = element_rect(fill = "transparent", colour = NA))
+  theme(legend.background = element_rect(fill = "transparent", color = NA))
 
 
 
 ## Reef PCAs
 # HOST reef
 por_host_reef_pca <- autoplot(a_pca_host, data = a_df,  
-                              colour = "reef",
+                              color = "reef",
                               fill = "reef",
                               frame = TRUE, 
                               frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = -0.6, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
 
 # SYMB reef
 por_symb_reef_pca <- autoplot(a_pca_symb, data = a_df,  
-                              colour = "reef",
+                              color = "reef",
                               fill = "reef",
                               frame = TRUE, 
                               frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
                               frame.level = 0.95, # using 95% CI for all ellipses
                               frame.alpha = 0.01,
                               loadings = TRUE, 
-                              loadings.colour = "black", 
+                              loadings.color = "black", 
                               loadings.label = TRUE,
-                              loadings.label.colour = "black",         
+                              loadings.label.color = "black",         
                               loadings.label.size = 4, 
                               loadings.label.hjust = -0.6, 
                               loadings.label.vjust = 0.5,
                               loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
 
 ```
@@ -1748,7 +1748,7 @@ ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 
 
 ```
 
-**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, colour intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (280 μatm light purple; 400 μatm dark purple; 700 μatm light orange; 2800 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1768,13 +1768,13 @@ df_withT_phys <- df_withT_phys %>%
 
 
 ## Plot all phys for all species (mean, SE, and raw observations)
-ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
+ggplot(df_withT_phys, aes(x = fpco2, y = value, color = ftemp)) +
   theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(color = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
   geom_point(alpha = 0.2, position = position_dodge(width = 0.3)) +
   stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
   stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2)) +
-  scale_colour_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b"))+
+  scale_color_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b"))+
   facet_grid(param ~ species, scales = "free_y", labeller = label_parsed) +
   guides(color = guide_legend(override.aes = list(linetype = c(0, 0)))) +
   labs(y = "", x = alab) +
@@ -1793,7 +1793,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
 
 ![](Figures/Supplemental_Figures/FigureS6_BleachingImages.png)
 
-**Figure S6.** Coral colour changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral colour over time in either control (400 μatm; 28 °C) or warming (400 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
+**Figure S6.** Coral color changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral color over time in either control (400 μatm; 28 °C) or warming (400 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
 
 <br/>
 <br/>
@@ -1804,24 +1804,24 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, colour = ftemp)) +
 ```{r species PCA by reef plot, fig.width = 5.5, fig.height = 4.5}
 
 autoplot(all_pca, data = all_df, 
-                       colour = "reef",
+                       color = "reef",
                        fill = "reef",
                        frame = TRUE, 
                        frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
                        frame.level = 0.95, # using 95% CI for all ellipses
                        frame.alpha = 0.01,
                        loadings = TRUE, 
-                       loadings.colour = "black", 
+                       loadings.color = "black", 
                        loadings.label = TRUE,
-                       loadings.label.colour = "black",         
+                       loadings.label.color = "black",         
                        loadings.label.size = 4, 
                        loadings.label.hjust = 1.5, 
                        loadings.label.vjust = 0.5,
                        loadings.label.repel = TRUE) +
-  scale_colour_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.position = c(0.11, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", colour = NA)) +
+  theme(legend.position = c(0.11, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.2, y = -0.108, label = deparse(all_reef_pval), parse = TRUE, size = 3) +
   annotate("text", x = -0.2, y = -0.128, label = deparse(all_s_reef_pval), parse = TRUE, size = 3) +
   ggsave("Figures/Supplemental_Figures/FigureS7_speciesPCA_reef.pdf", width = 5.5, height = 4.5) +
@@ -1964,15 +1964,15 @@ symb_dist <- symb_dist %>%
 
 ```{r host v symb plasticity plots, fig.width = 9, fig.height = 9}
 
-host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
+host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
-  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
+  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(color = "black", fill = NA)) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
   geom_point(data = host_dist, aes(x = reef, y = dist), size = 2, alpha = 0.5, position = position_dodge(width = 0.55)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
   labs(y = "Coral host plasticity", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 6)) +
@@ -1980,15 +1980,15 @@ host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, colour = treat2, fill
   facet_wrap(~ species, ncol = 1, labeller = label_parsed)
 
 
-symb_dist_plot <- ggplot(symb_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
+symb_dist_plot <- ggplot(symb_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
-  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
+  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(color = "black", fill = NA)) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
   geom_point(data = symb_dist, aes(x = reef, y = dist), size = 2, alpha = 0.5, position = position_dodge(width = 0.55)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_colour_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
   labs(y = "Algal symbiont plasticity", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 6)) +
