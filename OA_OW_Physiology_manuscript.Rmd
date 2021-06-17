@@ -906,7 +906,9 @@ r2_nakagawa(ssid_dist_glm)
 #     Marginal R2: 0.322 -- fixed effects only
 
 
+```
 
+```{r eval=FALSE, include=FALSE}
 
 #### Need to be consistent with pCO2 number references:
 # 280 --> 300 uatm = pre-industrial
@@ -986,7 +988,11 @@ ssid_glm_out # summary output of the GLM
 ```{r PSTR distance analysis, include=FALSE}
 
 ## Calculate the PCA distance with custom function
-dip_dist <- PCAplast(pca = p_pca, data = p_df)
+dip_dist <- PCAplast(pca = p_pca,
+                     data = p_df[,c(1,7,8, 10,11,12,27)],
+                     control_col = "treat2",
+                     control_lvl = "447_28")
+
 dip_dist_sum <- DistSum(data = dip_dist)
 
 
@@ -1006,14 +1012,13 @@ plot(pstr_plast_aic)
 ## Best-fit GLM with Gamma log link
 pstr_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
 pstr_glm_out <- summary(pstr_dist_glm) # summary output of the GLM
-pstr_anova_out <- Anova(pstr_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
   
 ```{r plots of PSTR distances, fig.height = 3.5, fig.width = 6}
 
 ## Plasticity plot
-pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -1031,7 +1036,6 @@ pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, colour = treat_p
 
 ## Model output
 pstr_glm_out # summary output of the GLM
-pstr_anova_out # comparison of the 'main effects'
 
 ```
 
@@ -1044,7 +1048,11 @@ pstr_anova_out # comparison of the 'main effects'
 ```{r PAST distance analysis, include=FALSE}
 
 ## Calculate the PCA distance with custom function
-por_dist <- PCAplast(pca = a_pca, data = a_df)
+por_dist <- PCAplast(pca = a_pca,
+                     data = a_df[,c(1,7,8, 10,11,12,27)],
+                     control_col = "treat2",
+                     control_lvl = "447_28")
+
 por_dist_sum <- DistSum(data = por_dist)
 
 
@@ -1064,14 +1072,13 @@ plot(past_plast_aic)
 ## Best-fit GLM with Gamma log link
 past_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
 past_glm_out <- summary(past_dist_glm) # summary output of the GLM
-past_anova_out <- Anova(past_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
   
 ```{r plots of PAST distances, fig.height = 3, fig.width = 10}
 
 ## Plasticity plot
-past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -1089,7 +1096,6 @@ past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, colour = treat_p
 
 ## Model output
 past_glm_out # summary output of the GLM
-past_anova_out # comparison of the 'main effects'
 
 ```
 
@@ -1827,31 +1833,49 @@ autoplot(all_pca, data = all_df,
 
 #### SSID
 # host
-ssid_host_dist <- PCAplast(pca = s_pca_host, data = s_df)
+ssid_host_dist <- PCAplast(pca = s_pca_host,
+                           data = s_df[,c(1,7,8, 10,11,12,27)],
+                           control_col = "treat2",
+                           control_lvl = "447_28")
 ssid_host_dist_sum <- DistSum(data = ssid_host_dist)
 
 # symbiont
-ssid_symb_dist <- PCAplast(pca = s_pca_symb, data = s_df)
+ssid_symb_dist <- PCAplast(pca = s_pca_symb, 
+                           data = s_df[,c(1,7,8, 10,11,12,27)],
+                           control_col = "treat2",
+                           control_lvl = "447_28")
 ssid_symb_dist_sum <- DistSum(data = ssid_symb_dist)
 
 
 #### PSTR
 # host
-pstr_host_dist <- PCAplast(pca = p_pca_host, data = p_df)
+pstr_host_dist <- PCAplast(pca = p_pca_host, 
+                           data = p_df[,c(1,7,8, 10,11,12,27)],
+                           control_col = "treat2",
+                           control_lvl = "447_28")
 pstr_host_dist_sum <- DistSum(data = pstr_host_dist)
 
 # symbiont
-pstr_symb_dist <- PCAplast(pca = p_pca_symb, data = p_df)
+pstr_symb_dist <- PCAplast(pca = p_pca_symb, 
+                           data = p_df[,c(1,7,8, 10,11,12,27)],
+                           control_col = "treat2",
+                           control_lvl = "447_28")
 pstr_symb_dist_sum <- DistSum(data = pstr_symb_dist)
 
 
 #### PAST
 # host
-past_host_dist <- PCAplast(pca = a_pca_host, data = a_df)
+past_host_dist <- PCAplast(pca = a_pca_host, 
+                           data = a_df[,c(1,7,8, 10,11,12,27)],
+                           control_col = "treat2",
+                           control_lvl = "447_28")
 past_host_dist_sum <- DistSum(data = past_host_dist)
 
 # symbiont
-past_symb_dist <- PCAplast(pca = a_pca_symb, data = a_df)
+past_symb_dist <- PCAplast(pca = a_pca_symb, 
+                           data = a_df[,c(1,7,8, 10,11,12,27)],
+                           control_col = "treat2",
+                           control_lvl = "447_28")
 past_symb_dist_sum <- DistSum(data = past_symb_dist)
 
 
@@ -1932,7 +1956,7 @@ symb_dist <- symb_dist %>%
 
 ```{r host v symb plasticity plots, fig.width = 9, fig.height = 9}
 
-host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -1948,7 +1972,7 @@ host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, colour = treat_plot, 
   facet_wrap(~ species, ncol = 1, labeller = label_parsed)
 
 
-symb_dist_plot <- ggplot(symb_sum, aes(x = reef, y = mean, colour = treat_plot, fill = treat_plot, shape = treat_plot)) +
+symb_dist_plot <- ggplot(symb_sum, aes(x = reef, y = mean, colour = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
@@ -2075,31 +2099,35 @@ table_s2
 ```{r table S3 for markdown}
 
 ## combine model output per species
-dist_mod_out <- rbind(tidy(ssid_dist_glm), tidy(pstr_dist_glm), tidy(past_dist_glm)) # combine all glm model outputs (the use of tidy() makes a tibble from the GLM)
+dist_mod_out <- data.frame(rbind(ssid_glm_out[["coefficients"]], pstr_glm_out[["coefficients"]], past_glm_out[["coefficients"]])) # combine all glm model outputs (the use of tidy() makes a tibble from the GLM)
+dist_mod_out$treat <- rownames(dist_mod_out) # add column for rownames
 dist_mod_out$species <- c(rep("SSID", 9), rep("PSTR", 6), rep("PAST", 6)) # add column for species ID
+dist_mod_out <- dist_mod_out[,c(5,1:4,6)]
 
 
 ## update formatting of text 
 dist_mod_out <- dist_mod_out %>% 
-  mutate(estimate = round(as.numeric(estimate), 3), # round values
-         std.error = round(as.numeric(std.error), 3),
-         statistic = round(as.numeric(statistic), 2),
-         p.value = round(as.numeric(p.value), 3)) %>% 
-  mutate(term = gsub("21", "-current", term), # rename the treatment IDs
-         term = gsub("22", "-EOC", term),
-         term = gsub("23", "-extreme", term),
-         term = gsub("[0-9]", "", term),
-         term = gsub("fpco", "pCO2", term),
-         term = gsub("ftemp", "temperature (31C)", term),
-         term = gsub("reef", "reef environment (offshore)", term)) %>% 
-  rename(" " = term, # rename columns
-        "Estimate" = estimate,
-        "Standard error" = std.error,
-        "Statistic" = statistic,
-        "P-value" = p.value)
+  mutate(Estimate = round(as.numeric(Estimate), 3), # round values
+         Std..Error = round(as.numeric(Std..Error), 3),
+         t.value = round(as.numeric(t.value), 2),
+         Pr...z.. = round(as.numeric(Pr...z..), 3)) %>% 
+  mutate(treat = gsub("[.]", " ", treat), # rename the treatment IDs
+         treat = gsub(" ", "", treat),
+         treat = gsub("X", "", treat),
+         treat = gsub("21", "-current", treat),
+         treat = gsub("22", "-EOC", treat),
+         treat = gsub("23", "-extreme", treat),
+         treat = gsub("[0-9]", "", treat),
+         treat = gsub("fpco", "pCO2", treat),
+         treat = gsub("ftemp", "temperature (31C)", treat),
+         treat = gsub("reefN", "reef environment (offshore) ", treat)) %>% 
+  rename(" " = treat, # rename columns
+        "Standard error" = Std..Error,
+        "Statistic" = t.value,
+        "P-value" = Pr...z..)
   
 ## combine them with format
-table_s3 <- kable(dist_mod_out[-6], booktabs = TRUE, row.names = FALSE) %>%
+table_s3 <- kable(dist_mod_out[,-6], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 9, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 10, 15, italic = TRUE) %>%
@@ -2117,50 +2145,7 @@ table_s3
 
 ### Table S4
 
-**Table S4.** Type III test of analysis of deviance output based on the plasticity GLM per species in **Table S3**.
-```{r table S4 for markdown}
-
-## combine ANOVA output per species
-anova_mod_out <- rbind(ssid_anova_out, pstr_anova_out, past_anova_out) # combine all ANOVA model outputs
-anova_mod_out$treat <- rownames(anova_mod_out) # add column for rownames
-anova_mod_out$species <- c(rep("SSID", 5), rep("PSTR", 4), rep("PAST", 4)) # add column for species ID
-anova_mod_out <- anova_mod_out[c(5, 1:4, 6)] # reorder columns so treatment is first
-
-
-## update formatting of text 
-anova_mod_out <- anova_mod_out %>% 
-  mutate(`Sum Sq` = round(as.numeric(`Sum Sq`), 2), # round values
-         `F values` = round(as.numeric(`F values`), 1),
-         `Pr(>F)` = round(as.numeric(`Pr(>F)`), 2)) %>% 
-  mutate(treat = gsub("[0-9]", "", treat), # rename the treatment IDs
-         treat = gsub("fpco", "pCO2", treat),
-         treat = gsub("ftemp", "temperature", treat),
-         treat = gsub("reef", "reef environment", treat)) %>% 
-  rename("P-value" = `Pr(>F)`, # rename columns
-         " " = treat,
-         "Sum of Squares" = `Sum Sq`)
-  
-## combine them with format
-table_s4 <- kable(anova_mod_out[-6], booktabs = TRUE, row.names = FALSE) %>%
-  kable_styling(font_size = 12, full_width = FALSE) %>% 
-  pack_rows("Siderastrea Siderea", 1, 5, italic = TRUE) %>%
-  pack_rows("Pseudodiploria strigosa", 6, 9, italic = TRUE) %>%
-  pack_rows("Porites astreoides", 10, 13, italic = TRUE) %>% 
-  row_spec(c(5,9,13), italic = TRUE)
-table_s4
-
-```
-
-<br/>
-<br/>
-
----
-
-<br/>
-
-### Table S5
-
-**Table S5.** PERMANOVA model output across species using the *adonis2* function with 1500 iterations.
+**Table S4.** PERMANOVA model output across species using the *adonis2* function with 1500 iterations.
 ```{r table S5 for markdown}
 
 ## combine model output
@@ -2183,10 +2168,10 @@ all_pca_mod <- all_pca_mod %>%
          "Sum of Squares" = SumOfSqs)
   
 ## combine them with format
-table_s5 <- kable(all_pca_mod, booktabs = TRUE, row.names = FALSE) %>%
+table_s4 <- kable(all_pca_mod, booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   row_spec(c(8:9), italic = TRUE)
-table_s5
+table_s4
 
 ```
 
@@ -2198,9 +2183,9 @@ table_s5
 
 <br/>
 
-### Table S6
+### Table S5
 
-**Table S6.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with 1500 iterations depicted in **Figures S2-S4**.
+**Table S5.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with 1500 iterations depicted in **Figures S2-S4**.
 ```{r table S6 for markdown}
 
 ## combine model output
@@ -2238,14 +2223,14 @@ pca_host_symb_mod_out <- pca_host_symb_mod_out %>%
          "P-value " = `Pr(>F).1`)
   
 ## combine them with format
-table_s6 <- kable(pca_host_symb_mod_out[-12], booktabs = TRUE, row.names = FALSE) %>%
+table_s5 <- kable(pca_host_symb_mod_out[-12], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   add_header_above(c(" " = 1, "Coral host" = 5, "Algal symbionts" = 5)) %>% 
   pack_rows("Siderastrea Siderea", 1, 5, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 6, 10, italic = TRUE) %>%
   pack_rows("Porites astreoides", 11, 15, italic = TRUE) %>% 
   row_spec(c(4:5,9:10,14:15), italic = TRUE)
-table_s6
+table_s5
 
 ```
 
@@ -2262,10 +2247,10 @@ table_s6
 ### Create workbook
 wb <- createWorkbook()
 
-# add 'Table S1' worksheet
-addWorksheet(wb, "Table S1 - Plasticity AIC") 
-writeData(wb, sheet = 1, x = plast_aic)
-setColWidths(wb, sheet = 1, cols = 1:7, widths = "auto")
+## add 'Table S1' worksheet
+#addWorksheet(wb, "Table S1 - Plasticity AIC") 
+#writeData(wb, sheet = 1, x = plast_aic)
+#setColWidths(wb, sheet = 1, cols = 1:7, widths = "auto")
 
 # add 'Table S2' worksheet
 addWorksheet(wb, "Table S2 - PERMANOVA") 
@@ -2278,19 +2263,14 @@ writeData(wb, sheet = 3, x = dist_mod_out)
 setColWidths(wb, sheet = 3, cols = 1:6, widths = "auto")
 
 # add 'Table S4' worksheet
-addWorksheet(wb, "Table S4 - Plasticity ANOVA") 
-writeData(wb, sheet = 4, x = anova_mod_out)
+addWorksheet(wb, "Table S4 - Species PERMANOVA") 
+writeData(wb, sheet = 4, x = all_pca_mod)
 setColWidths(wb, sheet = 4, cols = 1:6, widths = "auto")
 
 # add 'Table S5' worksheet
-addWorksheet(wb, "Table S5 - Species PERMANOVA") 
-writeData(wb, sheet = 5, x = all_pca_mod)
-setColWidths(wb, sheet = 5, cols = 1:6, widths = "auto")
-
-# add 'Table S6' worksheet
-addWorksheet(wb, "Table S6 - HostVsymb PERMANOVA") 
-writeData(wb, sheet = 6, x = pca_host_symb_mod_out)
-setColWidths(wb, sheet = 6, cols = 1:12, widths = "auto")
+addWorksheet(wb, "Table S5 - HostVsymb PERMANOVA") 
+writeData(wb, sheet = 5, x = pca_host_symb_mod_out)
+setColWidths(wb, sheet = 5, cols = 1:12, widths = "auto")
 
 
 # save workbook

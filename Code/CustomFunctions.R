@@ -103,7 +103,8 @@ PCAplast <- function(pca, data, control_col, control_lvl, colony = "colony") {
   
   
   ### Calculate sample (PC) distances from control (pc) using all 7 PCs by colony
-  dist_df3 <- dist_df2 %>% 
+  if("PC7" %in% colnames(dist_df2) ) {
+    dist_df3 <- dist_df2 %>% 
     mutate(dist = sqrt( ((PC1 - pc1)^2) + 
                           ((PC2 - pc2)^2) + 
                           ((PC3 - pc3)^2) +
@@ -111,6 +112,12 @@ PCAplast <- function(pca, data, control_col, control_lvl, colony = "colony") {
                           ((PC5 - pc5)^2) + 
                           ((PC6 - pc6)^2) +
                           ((PC7 - pc7)^2)))
+  } else {
+    dist_df3 <- dist_df2 %>% 
+      mutate(dist = sqrt( ((PC1 - pc1)^2) + 
+                            ((PC2 - pc2)^2) + 
+                            ((PC3 - pc3)^2)))
+  }
   
   
   # modify dataframe to remove the control treatment 
