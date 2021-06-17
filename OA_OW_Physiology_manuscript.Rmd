@@ -897,7 +897,7 @@ ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_m
 plot(ssid_plast_aic)
 
 
-## Best-fit GLM with Gamma log link
+## Best-fit GLMM with Gamma log link
 ssid_dist_glm <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_glm_out <- summary(ssid_dist_glm) # summary output of the GLM
 library(rcompanion)
@@ -997,21 +997,25 @@ dip_dist_sum <- DistSum(data = dip_dist)
 
 
 ## Model selection (via AIC)
-pstr_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist)
-pstr_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
-pstr_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = dip_dist) # best fit but results in singularity for 400_31 so moving forward with mod4
-pstr_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist) # using this model
-pstr_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = dip_dist)
-pstr_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
+#pstr_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
+#pstr_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
+pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 
 # check for best-fit model
-pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, rank = TRUE)
+pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, rank = TRUE)
 plot(pstr_plast_aic)
 
 
-## Best-fit GLM with Gamma log link
-pstr_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = dip_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+## Best-fit GLMM with Gamma log link
+pstr_dist_glm <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 pstr_glm_out <- summary(pstr_dist_glm) # summary output of the GLM
+
+r2_nakagawa(pstr_dist_glm)
+#   Conditional R2: 0.268 -- fixed and random effects
+#      Marginal R2: 0.224 -- fixed effects only
 
 ```
   
@@ -1057,21 +1061,25 @@ por_dist_sum <- DistSum(data = por_dist)
 
 
 ## Model selection (via AIC)
-past_dist_mod <- glm(dist ~ reef * fpco2 * ftemp, family = Gamma(link = "log"), data = por_dist)
-past_dist_mod2 <- glm(dist ~ reef * fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist)
-past_dist_mod3 <- glm(dist ~ reef + fpco2 * ftemp, family = Gamma(link = "log"), data = por_dist)
-past_dist_mod4 <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist) # using this model
-past_dist_mod5 <- glm(dist ~ reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = por_dist)
-past_dist_mod6 <- glm(dist ~ fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist) # best fit but using mod4 to include reef
+past_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
+past_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
+past_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
+past_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
+past_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = por_dist)
+past_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) # best fit
 
 # check for best-fit model
 past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, rank = TRUE)
 plot(past_plast_aic)
 
 
-## Best-fit GLM with Gamma log link
-past_dist_glm <- glm(dist ~ reef + fpco2 + ftemp, family = Gamma(link = "log"), data = por_dist, contrasts = list(reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+## Best-fit GLMM with Gamma log link
+past_dist_glm <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_glm_out <- summary(past_dist_glm) # summary output of the GLM
+
+r2_nakagawa(past_dist_glm)
+#  Conditional R2: 0.485 -- fixed and random effects
+#     Marginal R2: 0.147 -- fixed effects only
 
 ```
   
@@ -2013,31 +2021,33 @@ ggarrange(host_dist_plot, symb_dist_plot, nrow = 1, common.legend = TRUE, legend
 plast_aic <- ssid_plast_aic %>% 
   bind_rows(pstr_plast_aic, past_plast_aic) %>% # combine all PERMANOVA model outputs
   separate(Name, c("Species", NA, "Formula")) %>% # create column for species ID and formula 
-  mutate(Formula = gsub("mod2", Reduce(paste, deparse(ssid_dist_mod2[["formula"]])), Formula), # replace model name with formula
-         Formula = gsub("mod3", Reduce(paste, deparse(ssid_dist_mod3[["formula"]])), Formula),
-         Formula = gsub("mod4", Reduce(paste, deparse(ssid_dist_mod4[["formula"]])), Formula),
-         Formula = gsub("mod5", Reduce(paste, deparse(ssid_dist_mod5[["formula"]])), Formula),
-         Formula = gsub("mod6", Reduce(paste, deparse(ssid_dist_mod6[["formula"]])), Formula),
-         Formula = gsub("mod", Reduce(paste, deparse(ssid_dist_mod[["formula"]])), Formula)) %>% 
+  mutate(Formula = gsub("mod2", Reduce(paste, deparse(ssid_dist_mod2@call[["formula"]])), Formula), # replace model name with model
+         Formula = gsub("mod3", Reduce(paste, deparse(ssid_dist_mod3@call[["formula"]])), Formula),
+         Formula = gsub("mod4", Reduce(paste, deparse(ssid_dist_mod4@call[["formula"]])), Formula),
+         Formula = gsub("mod5", Reduce(paste, deparse(ssid_dist_mod5@call[["formula"]])), Formula),
+         Formula = gsub("mod6", Reduce(paste, deparse(ssid_dist_mod6@call[["formula"]])), Formula),
+         Formula = gsub("mod", Reduce(paste, deparse(ssid_dist_mod@call[["formula"]])), Formula)) %>% 
   mutate(Formula = gsub("fpco2", "pCO2", Formula), # rename the formula components 
          Formula = gsub("ftemp", "temperature", Formula),
          Formula = gsub("reef", "reef environment", Formula),
          Formula = gsub("dist ~ ", "", Formula)) %>% 
-  mutate(AIC = round(AIC, 2), # round the columns
-         BIC = round(BIC, 2),
-         R2_Nagelkerke = round(R2_Nagelkerke, 4),
+  mutate(AIC = round(AIC, 1), # round the columns
+         BIC = round(BIC, 1),
+         R2_conditional = round(R2_conditional, 4),
+         R2_marginal = round(R2_marginal, 4),
          Performance_Score = (100 * round(Performance_Score, 3))) %>% 
   rename(`Performance score` = Performance_Score,
          `Model formula` = Formula,
-         `Nagelkerke R2` = R2_Nagelkerke)
+         `Conditional R2` = R2_conditional,
+         `Marginal R2` = R2_marginal)
   
  
 ## combine them with format
-table_s1 <- kable(plast_aic[c(-1, -3, -7, -8)], booktabs = TRUE, row.names = FALSE) %>%
+table_s1 <- kable(plast_aic[c(-1, -3, -8:-11)], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 6, italic = TRUE) %>%
-  pack_rows("Pseudodiploria strigosa", 7, 12, italic = TRUE) %>%
-  pack_rows("Porites astreoides", 13, 18, italic = TRUE)
+  pack_rows("Pseudodiploria strigosa", 7, 10, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 11, 16, italic = TRUE)
 table_s1
 
 ```
@@ -2095,13 +2105,13 @@ table_s2
 
 ### Table S3
 
-**Table S3.** GLM output from plasticity assessments for each species. The intercept of each model was set as 300 $\mu$atm, 28$^\circ$C, and inshore reef environment.
+**Table S3.** GLMM output from plasticity assessments for each species. The intercept of each model was set as 300 $\mu$atm, 28$^\circ$C, and inshore reef environment.
 ```{r table S3 for markdown}
 
 ## combine model output per species
 dist_mod_out <- data.frame(rbind(ssid_glm_out[["coefficients"]], pstr_glm_out[["coefficients"]], past_glm_out[["coefficients"]])) # combine all glm model outputs (the use of tidy() makes a tibble from the GLM)
 dist_mod_out$treat <- rownames(dist_mod_out) # add column for rownames
-dist_mod_out$species <- c(rep("SSID", 9), rep("PSTR", 6), rep("PAST", 6)) # add column for species ID
+dist_mod_out$species <- c(rep("SSID", 9), rep("PSTR", 5), rep("PAST", 5)) # add column for species ID
 dist_mod_out <- dist_mod_out[,c(5,1:4,6)]
 
 
@@ -2130,8 +2140,8 @@ dist_mod_out <- dist_mod_out %>%
 table_s3 <- kable(dist_mod_out[,-6], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 9, italic = TRUE) %>%
-  pack_rows("Pseudodiploria strigosa", 10, 15, italic = TRUE) %>%
-  pack_rows("Porites astreoides", 16, 21, italic = TRUE)
+  pack_rows("Pseudodiploria strigosa", 10, 14, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 15, 19, italic = TRUE)
 table_s3
 
 ```
@@ -2247,10 +2257,10 @@ table_s5
 ### Create workbook
 wb <- createWorkbook()
 
-## add 'Table S1' worksheet
-#addWorksheet(wb, "Table S1 - Plasticity AIC") 
-#writeData(wb, sheet = 1, x = plast_aic)
-#setColWidths(wb, sheet = 1, cols = 1:7, widths = "auto")
+# add 'Table S1' worksheet
+addWorksheet(wb, "Table S1 - Plasticity AIC") 
+writeData(wb, sheet = 1, x = plast_aic)
+setColWidths(wb, sheet = 1, cols = 1:7, widths = "auto")
 
 # add 'Table S2' worksheet
 addWorksheet(wb, "Table S2 - PERMANOVA") 
