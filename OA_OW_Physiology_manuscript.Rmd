@@ -849,7 +849,7 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
 
 ```
 
-**Figure 2.** Coral holobiont correlation matrices (bottom panel) and scatter plots (top panel) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* depicting pairwise comparisons of physiological parameters within each species. Strength of correlations between parameters is indicated by darker shades of blue in the bottom panel with a higher R^2^ value (Pearson correlation coefficient). Of these correlations, significant correlations are depicted with asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). Scatter plots of physiological parameters are displayed in the top panel with temperature depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ depicted by color (300 $\mu$atm light purple; 420 $\mu$atm dark purple; 680 $\mu$atm light orange; 3290 $\mu$atm dark orange).
+**Figure 2.** Coral holobiont physiological parameter scatter plots (top) and correlation matrices (bottom) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* showing pairwise comparisons of within each species. Scatter plots of each pairwise combination of physiological parameters are displayed on the top with temperature treatment depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ treatment depicted by color (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Strengths of the correlations (R^2^ via Pearson correlation coefficients) between each pairwise combination of physiological parameters are indicated by darker shades of blue on the bottom with significance depicted by asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). R^2^ and significance levels correspond to the scatter plot at the intersection between two physiological parameters. 
 
 <br/>
 <br/>
@@ -988,9 +988,10 @@ pstr_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gam
 #pstr_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
 #pstr_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
 pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod7 <- glmer(dist ~ fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 
 # check for best-fit model
-pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, rank = TRUE)
+pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, pstr_dist_mod7, rank = TRUE)
 plot(pstr_plast_aic)
 
 
