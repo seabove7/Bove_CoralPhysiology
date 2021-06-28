@@ -137,3 +137,11 @@ DistSum <- function(data) {
     summarise(mean = mean(dist),
               se = (sd(dist) / sqrt(n()))) 
 }
+
+DistSum_noRZ <- function(data) {
+  data_update <- data %>% 
+    #mutate(treat2 = factor(treat2, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
+    group_by(treat2, species) %>% 
+    summarise(mean = mean(dist),
+              se = (sd(dist) / sqrt(n()))) 
+}

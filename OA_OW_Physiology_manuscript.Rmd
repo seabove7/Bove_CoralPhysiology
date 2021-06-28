@@ -230,7 +230,7 @@ a_df <- subset(df_90, species == "A")
 ## Principal component analyses {.tabset}
 
 #### *Methods:*
-Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal endosymbiont chlorophyll a, algal endosymbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al. (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, and reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")`). An additional PERMANOVA was conducted on the combined physiology from all three species to compare species responses combined with treatments and reef environment. 
+Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal symbiont chlorophyll a, algal symbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")` (Oksanen et al., 2020)).
 
 <br/>
   
@@ -743,7 +743,7 @@ The first two PCs of the combined holobiont physiology explained about `r round(
 ## Correlation assessments {.tabset}
 
 #### *Methods:*
-Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species, redargless of temperature and *p*CO~2~ treatment. The Pearson correlation coefficient (R^2^) of each comparison was calculated using the corrgram package (version `r packageVersion("corrgram")`) and the significance was calculated using the *cor.test* function. These relationships were then visualized through simple scatterplots.
+Correlations of all physiological parameters were assessed to determine the relationships between parameters within each species. The Pearson correlation coefficient (R^2^) of each comparison was calculated using the corrgram package (version `r packageVersion("corrgram")` (Wright, 2018)) and the significance was calculated using the *cor.test* function. These relationships were then visualized through simple scatterplots.
 
 <br/>
 
@@ -849,7 +849,7 @@ ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
 
 ```
 
-**Figure 2.** Coral holobiont physiological parameter scatter plots (top) and correlation matrices (bottom) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* showing pairwise comparisons of within each species. Scatter plots of each pairwise combination of physiological parameters are displayed on the top with temperature treatment depicted by shape (28$^\circ$C filled points; 31$^\circ$C open points) and *p*CO~2~ treatment depicted by color (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Strengths of the correlations (R^2^ via Pearson correlation coefficients) between each pairwise combination of physiological parameters are indicated by darker shades of blue on the bottom with significance depicted by asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). R^2^ and significance levels correspond to the scatter plot at the intersection between two physiological parameters. 
+**Figure 2.** Coral holobiont physiological parameter scatter plots (top) and correlation matrices (bottom) for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* showing pairwise comparisons of within each species. Scatter plots of each pairwise combination of physiological parameters are displayed on the top with temperature treatment depicted by shape (28$^\circ$C closed points; 31$^\circ$C open points) and *p*CO~2~ treatment depicted by color (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Strengths of the correlations (R^2^ via Pearson correlation coefficients) between each pairwise combination of physiological parameters are indicated by darker shades of blue on the bottom with significance depicted by asterisks according to significance level (\* p < 0.05; \*\* p < 0.01; \*\*\* p < 0.001). R^2^ and significance levels correspond to the scatter plot at the intersection between two physiological parameters. 
 
 <br/>
 <br/>
@@ -872,7 +872,8 @@ Compared to both *S. siderea* and *P. strigosa*, fewer physiological traits were
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
-Using PC1 and PC2 for each species, we then calculated the physiological plasticity of each experimental fragment. Plasticity was calculated as the PC distance between an experimental fragment and the control (420 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear models (function *glm*) with a Gamma distribution and log-link. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). The main effects of treatment and reef environment were assessed with an ANOVA (package *car*; version `r packageVersion("car")`) with a type III error. All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Development Team 2016).
+Physiological plasticity of each experimental fragment was calculated for each species using all seven PCs calculated above as the distance between an experimental fragment and the control (420 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear mixed effects models (function *lmer*) with a Gamma distribution and log-link and a random effect for colony. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). Because only a total of five colonies of *P. strigosa* remained in the control treatment at the end of the experiment (N~offshore~ = 3, N~inshore~ = 2), these samples were pooled across reef environments for this analysis. All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Team, 2018) and the accompanying data and code can be freely accessed on GitHub ([](github.com/seabove7/Bove_CoralPhysiology)) and Zenodo (*DOI here when close to finished*).
+
 
 <br/>
 
@@ -919,36 +920,46 @@ r2_nakagawa(ssid_dist_glm)
 
 ```{r eval=FALSE, include=FALSE}
 
-## check the symbiont bar plot
-
-
-
-ssid_dist_boot <- bootMer(ssid_dist_glm, predict, nsim = 50)
-
-ssid_dist_boot_df <- data.frame(estimate = ssid_dist_boot$t0,
-                                t(apply(ssid_dist_boot$t, 2, function(x) quantile(x, probs = c(0.025, .975)))),
-                                ssid_dist_boot[["data"]],
-                                treat = paste(ssid_dist_boot[["data"]][["fpco2"]], ssid_dist_boot[["data"]][["ftemp"]], sep = "_"))
-
-ggplot(data = ssid_dist_boot_df, aes(x = rownames(ssid_dist_boot_df))) +
-  theme_bw() +
-  geom_linerange(aes(ymin = X2.5., ymax = X97.5.), position = position_dodge(width = 0.4)) +
-  geom_point(aes(y = estimate), size = 2, position = position_dodge(width = 0.4)) +
-  #ylim(0, 20) +
-  ggtitle("nsim = 50")
-
+## This is a bootstrap function that will sample WITH replacement (explained step by step within the function) -- for GLMER object
+bootFUN <- function(model, newdata) {
+  nr <- nrow(model@frame) # count number of rows in the model (# of observations)
+  data <- model@frame # pull data from model
+  data2 <- data.frame(data[sample(1:nr, replace = TRUE), ]) # random sample of numbers from 1 - nr (# of rows) to select data from
+  update <- update(model, data = data2) # rerun the model using the 'new' dataset from the random smapling above
+  predict(update, newdata, type = "response", re.form = NA) # predicts response variable with model and updated data 
+}
 
 ```
 
-```{r plots of SSID distances, fig.height = 3.5, fig.width = 6}
+```{r SSID plasticity bootstrapping, eval=FALSE, include=FALSE}
+
+## Pull the treatment and distance data from the model
+newdata_ssid <- data.frame(ssid_dist_glm@frame[-1])
+
+## Bootstrap distances using custom bootstrap function
+ssid_boot_out <- replicate(bootnum, bootFUN(model = ssid_dist_glm, newdata = newdata_ssid)) 
+
+## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
+ssid_boot <- cbind(sid_dist, as.data.frame(t(apply(ssid_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
+colnames(ssid_boot)[23:25] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+
+## save as rda object
+save(ssid_boot, file = "Data/SSID_PlastBoot.rda")
+
+```
+
+```{r plots of SSID distances}
+
+## Load boot data
+load(file = "Data/SSID_PlastBoot.rda")
 
 ## Plasticity plot
-ssid_plast_plot <- ggplot(sid_dist_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
+ssid_plast_plot <- ggplot(ssid_boot, aes(x = reef, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = sid_dist, aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
+  geom_point(data = ssid_boot, aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
+  geom_linerange(aes(ymin = lowerci, ymax =upperci), alpha = 0.8, size = 1, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
@@ -978,7 +989,9 @@ dip_dist <- PCAplast(pca = p_pca,
                      control_col = "treat2",
                      control_lvl = "447_28")
 
-dip_dist_sum <- DistSum(data = dip_dist)
+dip_dist <- dip_dist %>% filter(fpco2 != "420") %>%  droplevels()
+
+dip_dist_sum <- DistSum_noRZ(data = dip_dist)
 
 
 ## Model selection (via AIC)
@@ -987,12 +1000,15 @@ pstr_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gam
 pstr_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 #pstr_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
 #pstr_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
-pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
+pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # best fit model
 pstr_dist_mod7 <- glmer(dist ~ fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 
 # check for best-fit model
-pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, pstr_dist_mod7, rank = TRUE)
+pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, pstr_dist_mod7, rank = TRUE)
 plot(pstr_plast_aic)
+
+
+### Because N=2 inshore and N=3 offshore for PSTR, going to pool these by RZ for plasticity here
 
 
 ## Best-fit GLMM with Gamma log link
@@ -1005,22 +1021,42 @@ r2_nakagawa(pstr_dist_glm)
 
 ```
   
-```{r plots of PSTR distances, fig.height = 3.5, fig.width = 6}
+```{r PSTR plasticity bootstrapping, eval=FALSE, include=FALSE}
+
+## Pull the treatment and distance data from the model
+newdata_pstr <- data.frame(pstr_dist_glm@frame[-1])
+
+## Bootstrap distances using custom bootstrap function
+pstr_boot_out <- replicate(bootnum, bootFUN(model = pstr_dist_glm, newdata = newdata_pstr)) 
+
+## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
+pstr_boot <- cbind(dip_dist, as.data.frame(t(apply(pstr_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
+colnames(pstr_boot)[23:25] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+
+## save as rda object
+save(pstr_boot, file = "Data/PSTR_PlastBoot.rda")
+
+```
+  
+```{r plots of PSTR distances}
+
+## Load boot data
+load(file = "Data/PSTR_PlastBoot.rda")
 
 ## Plasticity plot
-pstr_plast_plot <- ggplot(dip_dist_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
+pstr_plast_plot <- ggplot(pstr_boot, aes(x = species, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = dip_dist, aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
+  geom_point(data = pstr_boot, aes(x = species, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
+  geom_linerange(aes(ymin = lowerci, ymax =upperci), alpha = 0.8, size = 1, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
-  scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
+  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_fill_manual(values = c("#b2abd2", "white", "#fdb863", "white", "#e66101", "white")) + 
   labs(y = "", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
-  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
+  scale_x_discrete(labels = c("P" = " Reefs pooled")) +
   ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
 
@@ -1099,15 +1135,15 @@ past_glm_out # summary output of the GLM
 
 ### **Figure 3**
 
-```{r plot and save all species plasticity, fig.width = 13, fig.height = 4}
+```{r plot and save all species plasticity, fig.width = 11, fig.height = 4}
 
-ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRUE, legend = "right", ncol = 3) +
-  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.pdf", width = 13, height = 4) +
-  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.png", width = 13, height = 4)
+ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRUE, legend = "right", ncol = 3, widths = c(1, 0.6, 1)) +
+  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.pdf", width = 11, height = 4) +
+  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.png", width = 11, height = 4)
 
 ```
 
-**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (300 $\mu$atm light purple, circle; 420 $\mu$atm dark purple, diamond; 680 $\mu$atm light orange, triangle; 3290 $\mu$atm dark orange, square) and temperature is represented as either filled (28$^\circ$C) or open (31$^\circ$C) symbols.
+**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (300 $\mu$atm light purple, circle; 420 $\mu$atm dark purple, diamond; 680 $\mu$atm light orange, triangle; 3290 $\mu$atm dark orange, square) and temperature is represented as either closed (28$^\circ$C) or open (31$^\circ$C) symbols.
 
 <br/>
 <br/>
