@@ -181,8 +181,8 @@ df2_T90$treat2 <- paste0(df2_T90$fpco2, df2_T90$temp)
 
 ## Performing the parametric bootstrapping of the model:
 bootnum = 1500 # set number of iterations (we used 2000) between 999 and 9999
-seed = 3 # seed to make results replicatable (our seed was 3)
-set.seed(3)
+seed = 7 # seed to make results replicatable (our seed was 3)
+set.seed(7)
 
 ```
 
@@ -926,7 +926,7 @@ bootFUN <- function(model, newdata) {
   data <- model@frame # pull data from model
   data2 <- data.frame(data[sample(1:nr, replace = TRUE), ]) # random sample of numbers from 1 - nr (# of rows) to select data from
   update <- update(model, data = data2) # rerun the model using the 'new' dataset from the random smapling above
-  predict(update, newdata, type = "response", re.form = NA) # predicts response variable with model and updated data 
+  predict(update, newdata, type = "response", re.form = NA, allow.new.levels=TRUE) # predicts response variable with model and updated data 
 }
 
 ```
@@ -1157,7 +1157,7 @@ past_glm_out # summary output of the GLM
 
 ```{r plot and save all species plasticity, fig.width = 11, fig.height = 4}
 
-ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRUE, legend = "right", ncol = 3, widths = c(1, 0.6, 1)) +
+ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRUE, legend = "right", ncol = 3, widths = c(1, 0.6, 0.6)) +
   ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.pdf", width = 11, height = 4) +
   ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.png", width = 11, height = 4)
 
