@@ -128,6 +128,8 @@ PCAplast <- function(pca, data, control_col, control_lvl, colony = "colony") {
 
 
 
+################################################################################
+
 ### Summary function for plotting plasticity
 
 DistSum <- function(data) {
@@ -138,10 +140,16 @@ DistSum <- function(data) {
               se = (sd(dist) / sqrt(n()))) 
 }
 
-DistSum_noRZ <- function(data) {
-  data_update <- data %>% 
-    #mutate(treat2 = factor(treat2, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
-    group_by(treat2, species) %>% 
-    summarise(mean = mean(dist),
-              se = (sd(dist) / sqrt(n()))) 
+
+
+################################################################################
+
+### Custom function for bootstrapping with replacement GLMER model
+
+bootFUN <- function(model, newdata) {
+  nr <- nrow(model@frame) # count number of rows in the model (# of observations)
+  data <- model@frame # pull data from model
+  data2 <- data.frame(data[sample(1:nr, replace = TRUE), ]) # random sample of numbers from 1 - nr (# of rows) to select data from
+  update <- update(model, data = data2) # rerun the model using the 'new' dataset from the random smapling above
+  predict(update, newdata, type = "response", re.form = NA, allow.new.levels=TRUE) # predicts response variable with model and updated data 
 }

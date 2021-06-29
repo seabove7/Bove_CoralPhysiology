@@ -75,6 +75,7 @@ library(performance)
 library(MASS)
 library(png)
 library(car)
+library(rcompanion)
 
 ## Source the custom functions necessary for running this script
 source("Code/CustomFunctions.R")
@@ -872,7 +873,7 @@ Compared to both *S. siderea* and *P. strigosa*, fewer physiological traits were
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
-Physiological plasticity of each experimental fragment was calculated for each species using all seven PCs calculated above as the distance between an experimental fragment and the control (420 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear mixed effects models (function *lmer*) with a Gamma distribution and log-link and a random effect for colony. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). Because only a total of five colonies of *P. strigosa* remained in the control treatment at the end of the experiment (N~offshore~ = 3, N~inshore~ = 2), these samples were pooled across reef environments for this analysis. All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Team, 2018) and the accompanying data and code can be freely accessed on GitHub ([](github.com/seabove7/Bove_CoralPhysiology)) and Zenodo (*DOI here when close to finished*).
+Physiological plasticity of each experimental fragment was calculated for each species using all seven PCs calculated above as the distance between an experimental fragment and the control (420 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear mixed effects models (function *lmer*) with a Gamma distribution and log-link and a random effect for colony. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). Natal reef environment was only a significant predictor of plasticity in *S. siderea* so samples were pooled across reef environments for both *P. strigosa* and *P. astreoides*. Parametric bootstraps were performed to model mean response and 95% confidence intervals with 1500 iterations and significant effects were identified as non-overlapping confidence intervals. Marginal and conditional R^2^ values were calculated using the *r2_nakagawa* function in the rcompanion package (version `r packageVersion("rcompanion")` (Mangiafico, 2021)). All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Team, 2018) and the accompanying data and code can be freely accessed on GitHub  ([github.com/seabove7/Bove_CoralPhysiology](github.com/seabove7/Bove_CoralPhysiology)) and Zenodo (*DOI here when close to finished*).
 
 
 <br/>
@@ -887,14 +888,9 @@ sid_dist <- PCAplast(pca = s_pca,
                      control_col = "treat2",
                      control_lvl = "447_28")
 
-sid_dist_sum <- DistSum(data = sid_dist)
-
-
-## Model selection (via AIC) -- check AICc --> try a mixed glm gamma
-## using mixed model, could look at differences by colony
 # with strong random effects of colony??
 # marginal R2 --> fixed v random effect variance: likely more variance at colony level over treatment
-# bootstrap final model for CI/predictions
+
 ssid_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist) # best fit
 ssid_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
@@ -910,24 +906,22 @@ plot(ssid_plast_aic)
 ## Best-fit GLMM with Gamma log link
 ssid_dist_glm <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_glm_out <- summary(ssid_dist_glm) # summary output of the GLM
-library(rcompanion)
+
+
+## conditional and marginal R2
 r2_nakagawa(ssid_dist_glm)
 #  Conditional R2: 0.506 -- fixed and random effects
 #     Marginal R2: 0.322 -- fixed effects only
 
+## Below info taken from appendix 3 of Gok A, Ngendahimana DK, Fagerholm CL, French RH, Sun J, Bruckman LS (2017) Predictive models of poly(ethylene-terephthalate) film degradation under multi-factor accelerated weathering exposures. PLoS ONE 12(5): e0177614. https://doi.org/10.1371/journal.pone.0177614
 
-```
-
-```{r}
-
-## This is a bootstrap function that will sample WITH replacement (explained step by step within the function)
-bootFUN <- function(model, newdata) {
-  nr <- nrow(model@frame) # count number of rows in the model (# of observations)
-  data <- model@frame # pull data from model
-  data2 <- data.frame(data[sample(1:nr, replace = TRUE), ]) # random sample of numbers from 1 - nr (# of rows) to select data from
-  update <- update(model, data = data2) # rerun the model using the 'new' dataset from the random smapling above
-  predict(update, newdata, type = "response", re.form = NA, allow.new.levels=TRUE) # predicts response variable with model and updated data 
-}
+# "Marginal and conditional are R2 values for generalized mixed-effects models
+# calculated using the r.squaredGLMM function of the MuMIn [1] package that
+# implements a method developed by Nakagawa and Schielzeth [2]. Marginal R2
+# provides the variance explained only by fixed effects and conditional R2
+# provides the variance explained by the entire model, i.e., both fixed effects 
+# and random effects. Fitted R2 is analogous to adjusted R2 generalized for 
+# measuring explained variation in linear mixed-effects models [3]."
 
 ```
 
@@ -958,9 +952,9 @@ ssid_plast_plot <- ggplot(ssid_boot, aes(x = reef, y = estimate, color = treat2,
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = ssid_boot, aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_linerange(aes(ymin = lowerci, ymax =upperci), alpha = 0.8, size = 1, position = position_dodge(width = 0.55)) +
-  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
+  geom_point(aes(x = reef, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.55)) +
+  geom_linerange(aes(ymin = lowerci, ymax =upperci), size = 1, position = position_dodge(width = 0.55)) +
+  geom_point(size = 3, alpha = 0.8, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
@@ -970,8 +964,9 @@ ssid_plast_plot <- ggplot(ssid_boot, aes(x = reef, y = estimate, color = treat2,
   ggtitle(expression(paste(bold("A)   "), italic("S. siderea"))))
   
 
-## Model output
-ssid_glm_out # summary output of the GLM
+## Model output and R2
+ssid_glm_out # summary output of the GLMER
+r2_nakagawa(ssid_dist_glm) # conditional and marginal R2
 
 ```
 
@@ -991,8 +986,6 @@ dip_dist <- PCAplast(pca = p_pca,
 
 dip_dist <- dip_dist %>% filter(fpco2 != "420") %>%  droplevels()
 
-dip_dist_sum <- DistSum_noRZ(data = dip_dist)
-
 
 ## Model selection (via AIC)
 pstr_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
@@ -1001,10 +994,10 @@ pstr_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gam
 #pstr_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
 #pstr_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
 pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # best fit model
-pstr_dist_mod7 <- glmer(dist ~ fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
+
 
 # check for best-fit model
-pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, pstr_dist_mod7, rank = TRUE)
+pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, rank = TRUE)
 plot(pstr_plast_aic)
 
 
@@ -1015,6 +1008,7 @@ plot(pstr_plast_aic)
 pstr_dist_glm <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 pstr_glm_out <- summary(pstr_dist_glm) # summary output of the GLM
 
+## conditional and marginal R2
 r2_nakagawa(pstr_dist_glm)
 #   Conditional R2: 0.268 -- fixed and random effects
 #      Marginal R2: 0.224 -- fixed effects only
@@ -1048,9 +1042,9 @@ pstr_plast_plot <- ggplot(pstr_boot, aes(x = species, y = estimate, color = trea
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = pstr_boot, aes(x = species, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_linerange(aes(ymin = lowerci, ymax =upperci), alpha = 0.8, size = 1, position = position_dodge(width = 0.55)) +
-  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
+  geom_point(aes(x = species, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.55)) +
+  geom_linerange(aes(ymin = lowerci, ymax =upperci), size = 1, position = position_dodge(width = 0.55)) +
+  geom_point(size = 3, alpha = 0.8, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_color_manual(values = c("#b2abd2", "#b2abd2", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "#fdb863", "white", "#e66101", "white")) + 
@@ -1060,8 +1054,9 @@ pstr_plast_plot <- ggplot(pstr_boot, aes(x = species, y = estimate, color = trea
   ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
 
-## Model output
+## Model output and R2
 pstr_glm_out # summary output of the GLM
+r2_nakagawa(pstr_dist_glm) # conditional and marginal R2
 
 ```
 
@@ -1078,8 +1073,6 @@ por_dist <- PCAplast(pca = a_pca,
                      data = a_df[,c(1,7,8, 10,11,12,27)],
                      control_col = "treat2",
                      control_lvl = "447_28")
-
-por_dist_sum <- DistSum(data = por_dist)
 
 
 ## Model selection (via AIC)
@@ -1099,6 +1092,7 @@ plot(past_plast_aic)
 past_dist_glm <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_glm_out <- summary(past_dist_glm) # summary output of the GLM
 
+## conditional and marginal R2
 r2_nakagawa(past_dist_glm)
 #  Conditional R2: 0.485 -- fixed and random effects
 #     Marginal R2: 0.147 -- fixed effects only
@@ -1132,9 +1126,9 @@ past_plast_plot <- ggplot(past_boot, aes(x = species, y = estimate, color = trea
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = past_boot, aes(x = species, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_linerange(aes(ymin = lowerci, ymax =upperci), alpha = 0.8, size = 1, position = position_dodge(width = 0.55)) +
-  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
+  geom_point(aes(x = species, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.55)) +
+  geom_linerange(aes(ymin = lowerci, ymax =upperci), size = 1, position = position_dodge(width = 0.55)) +
+  geom_point(size = 3, alpha = 0.8, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
@@ -1144,8 +1138,9 @@ past_plast_plot <- ggplot(past_boot, aes(x = species, y = estimate, color = trea
   ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
 
 
-## Model output
+## Model output and R2
 past_glm_out # summary output of the GLM
+r2_nakagawa(past_dist_glm) # conditional and marginal R2
 
 ```
 
@@ -1163,13 +1158,15 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 ```
 
-**Figure 3.** Assessment of physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* in experimental treatments and by natal reef environment. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (300 $\mu$atm light purple, circle; 420 $\mu$atm dark purple, diamond; 680 $\mu$atm light orange, triangle; 3290 $\mu$atm dark orange, square) and temperature is represented as either closed (28$^\circ$C) or open (31$^\circ$C) symbols.
+**Figure 3.** Holobiont physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. Natal reef environment is depicted along the x axis for *S. siderea*, however, *P. strigosa* and and *P. astreoides* samples were pooled by reef environment. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange) and temperature is represented as either closed (28 $^\circ$C) or open (31 $^\circ$C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
 
 <br/>
 <br/>
 
 
-### *Results:*
+### **Results**
+
+#### *Coral holobiont physiological plasticity*
 Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered the physiological plasticity of *S. siderea* (**Figure 3A; Table S3, S4**). Offshore fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C. Plasticity of *P. strigosa* and *P. astreoides* was not significantly altered by temperature treatment, *p*CO~2~ treatment, or natal reef environment (**Figure 3B, 3C; Table S3, S4**). However, *P. astreoides* exhibited a slight trend in the inshore fragments suggesting potentially higher plasticity with increasing *p*CO~2~ that is not seen in the offshore fragments (**Figure 3C**).
 
 <br/>
@@ -2082,8 +2079,8 @@ plast_aic <- ssid_plast_aic %>%
          Formula = gsub("dist ~ ", "", Formula)) %>% 
   mutate(AIC = round(AIC, 1), # round the columns
          BIC = round(BIC, 1),
-         R2_conditional = round(R2_conditional, 4),
-         R2_marginal = round(R2_marginal, 4),
+         R2_conditional = round(R2_conditional, 3),
+         R2_marginal = round(R2_marginal, 3),
          Performance_Score = (100 * round(Performance_Score, 3))) %>% 
   rename(`Performance score` = Performance_Score,
          `Model formula` = Formula,
@@ -2096,7 +2093,8 @@ table_s1 <- kable(plast_aic[c(-1, -3, -8:-11)], booktabs = TRUE, row.names = FAL
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 6, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 7, 10, italic = TRUE) %>%
-  pack_rows("Porites astreoides", 11, 16, italic = TRUE)
+  pack_rows("Porites astreoides", 11, 16, italic = TRUE) %>% 
+  row_spec(c(1,10,15), bold = TRUE, background = "lightgrey")
 table_s1
 
 ```
