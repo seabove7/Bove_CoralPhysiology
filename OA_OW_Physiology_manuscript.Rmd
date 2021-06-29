@@ -918,9 +918,9 @@ r2_nakagawa(ssid_dist_glm)
 
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 
-## This is a bootstrap function that will sample WITH replacement (explained step by step within the function) -- for GLMER object
+## This is a bootstrap function that will sample WITH replacement (explained step by step within the function)
 bootFUN <- function(model, newdata) {
   nr <- nrow(model@frame) # count number of rows in the model (# of observations)
   data <- model@frame # pull data from model
@@ -1004,7 +1004,7 @@ pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link
 pstr_dist_mod7 <- glmer(dist ~ fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 
 # check for best-fit model
-pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod4, pstr_dist_mod5, pstr_dist_mod6, pstr_dist_mod7, rank = TRUE)
+pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, pstr_dist_mod7, rank = TRUE)
 plot(pstr_plast_aic)
 
 
@@ -1104,23 +1104,43 @@ r2_nakagawa(past_dist_glm)
 #     Marginal R2: 0.147 -- fixed effects only
 
 ```
+
+```{r PAST plasticity bootstrapping, eval=FALSE, include=FALSE}
+
+## Pull the treatment and distance data from the model
+newdata_past <- data.frame(past_dist_glm@frame[-1])
+
+## Bootstrap distances using custom bootstrap function
+past_boot_out <- replicate(bootnum, bootFUN(model = past_dist_glm, newdata = newdata_past)) 
+
+## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
+past_boot <- cbind(por_dist, as.data.frame(t(apply(past_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
+colnames(past_boot)[23:25] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+
+## save as rda object
+save(past_boot, file = "Data/PAST_PlastBoot.rda")
+
+```  
   
-```{r plots of PAST distances, fig.height = 3, fig.width = 10}
+```{r plots of PAST distances}
+
+## Load boot data
+load(file = "Data/PAST_PlastBoot.rda")
 
 ## Plasticity plot
-past_plast_plot <- ggplot(por_dist_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
+past_plast_plot <- ggplot(past_boot, aes(x = species, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = por_dist, aes(x = reef, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
+  geom_point(data = past_boot, aes(x = species, y = dist), size = 2, alpha = 0.7, position = position_dodge(width = 0.55)) +
+  geom_linerange(aes(ymin = lowerci, ymax =upperci), alpha = 0.8, size = 1, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
   labs(y = "", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
-  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
+  scale_x_discrete(labels = c("A" = " Reefs pooled")) +
   ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
 
 
@@ -2140,7 +2160,7 @@ table_s2
 ## combine model output per species
 dist_mod_out <- data.frame(rbind(ssid_glm_out[["coefficients"]], pstr_glm_out[["coefficients"]], past_glm_out[["coefficients"]])) # combine all glm model outputs (the use of tidy() makes a tibble from the GLM)
 dist_mod_out$treat <- rownames(dist_mod_out) # add column for rownames
-dist_mod_out$species <- c(rep("SSID", 9), rep("PSTR", 5), rep("PAST", 5)) # add column for species ID
+dist_mod_out$species <- c(rep("SSID", 9), rep("PSTR", 4), rep("PAST", 5)) # add column for species ID
 dist_mod_out <- dist_mod_out[,c(5,1:4,6)]
 
 
@@ -2169,8 +2189,8 @@ dist_mod_out <- dist_mod_out %>%
 table_s3 <- kable(dist_mod_out[,-6], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 9, italic = TRUE) %>%
-  pack_rows("Pseudodiploria strigosa", 10, 14, italic = TRUE) %>%
-  pack_rows("Porites astreoides", 15, 19, italic = TRUE)
+  pack_rows("Pseudodiploria strigosa", 10, 13, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 14, 18, italic = TRUE)
 table_s3
 
 ```
