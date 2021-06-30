@@ -143,19 +143,20 @@ df$den <- (df$den / 1000000) # adjust symbiont density to display 10^6 cells
 df$chla <- (df$chla / df$SA) # standardize chla to surface area
 df$host <- df$pro + df$carb + df$lipid # calculate total host energy reserves (sum of carb, protein, lipids)
 df$treat[df$T0_T90 == "T0"] <- "T0" # replace T0 'treat' with T0 text
-df$treat <- factor(df$treat, c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31")) # adjust treatment levels
+df$treat <- factor(df$treat, levels = c("T0", "288_28", "311_31", "447_28", "405_31", "673_28", "701_31", "3285_28", "3309_31"),
+                   labels = c("T0", "300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3290_28", "3290_31")) # adjust treatment levels
 
 # add a new treat column for plotting (replacing actual treatment with number for better plotting - see plot XX)
 df$treat2 <- df$treat
 df$treat <- gsub("T0", 2, df$treat)
-df$treat <- gsub("288_28", 4, df$treat)
-df$treat <- gsub("311_31", 4, df$treat)
-df$treat <- gsub("447_28", 6, df$treat)
-df$treat <- gsub("405_31", 6, df$treat)
-df$treat <- gsub("673_28", 8, df$treat)
-df$treat <- gsub("701_31", 8, df$treat)
-df$treat <- gsub("3285_28", 10, df$treat)
-df$treat <- gsub("3309_31", 10, df$treat)
+df$treat <- gsub("300_28", 4, df$treat)
+df$treat <- gsub("300_31", 4, df$treat)
+df$treat <- gsub("420_28", 6, df$treat)
+df$treat <- gsub("420_31", 6, df$treat)
+df$treat <- gsub("680_28", 8, df$treat)
+df$treat <- gsub("680_31", 8, df$treat)
+df$treat <- gsub("3290_28", 10, df$treat)
+df$treat <- gsub("3290_31", 10, df$treat)
 df$treat <- as.numeric(df$treat) # convert 'treat' column to numerics (again, this is for plotting only)
 
 # inverse of colors (so lower color depicts more bleached coral)
@@ -887,7 +888,7 @@ Physiological plasticity of each experimental fragment was calculated for each s
 sid_dist <- PCAplast(pca = s_pca,
                      data = s_df[,c(1,7,8, 10,11,12,27)],
                      control_col = "treat2",
-                     control_lvl = "447_28")
+                     control_lvl = "420_28")
 
 # with strong random effects of colony??
 # marginal R2 --> fixed v random effect variance: likely more variance at colony level over treatment
@@ -947,6 +948,8 @@ save(ssid_boot, file = "Data/SSID_PlastBoot.rda")
 
 ## Load boot data
 load(file = "Data/SSID_PlastBoot.rda")
+ssid_boot$treat2 <- paste(ssid_boot$fpco2, ssid_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
+
 
 ## Plasticity plot
 ssid_plast_plot <- ggplot(ssid_boot, aes(x = reef, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
@@ -983,7 +986,7 @@ r2_nakagawa(ssid_dist_glm) # conditional and marginal R2
 dip_dist <- PCAplast(pca = p_pca,
                      data = p_df[,c(1,7,8, 10,11,12,27)],
                      control_col = "treat2",
-                     control_lvl = "447_28")
+                     control_lvl = "420_28")
 
 dip_dist <- dip_dist %>% filter(fpco2 != "420") %>%  droplevels()
 
@@ -1037,6 +1040,8 @@ save(pstr_boot, file = "Data/PSTR_PlastBoot.rda")
 
 ## Load boot data
 load(file = "Data/PSTR_PlastBoot.rda")
+pstr_boot$treat2 <- paste(pstr_boot$fpco2, pstr_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
+
 
 ## Plasticity plot
 pstr_plast_plot <- ggplot(pstr_boot, aes(x = species, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
@@ -1073,7 +1078,7 @@ r2_nakagawa(pstr_dist_glm) # conditional and marginal R2
 por_dist <- PCAplast(pca = a_pca,
                      data = a_df[,c(1,7,8, 10,11,12,27)],
                      control_col = "treat2",
-                     control_lvl = "447_28")
+                     control_lvl = "420_28")
 
 
 ## Model selection (via AIC)
@@ -1121,6 +1126,8 @@ save(past_boot, file = "Data/PAST_PlastBoot.rda")
 
 ## Load boot data
 load(file = "Data/PAST_PlastBoot.rda")
+past_boot$treat2 <- paste(past_boot$fpco2, past_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
+
 
 ## Plasticity plot
 past_plast_plot <- ggplot(past_boot, aes(x = species, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
@@ -1168,7 +1175,9 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 ### **Results**
 
 #### *Coral holobiont physiological plasticity*
-Natal reef environment (p < 0.05) and *p*CO~2~ (p < 0.05) significantly altered the physiological plasticity of *S. siderea* (**Figure 3A; Table S3, S4**). Offshore fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C. Plasticity of *P. strigosa* and *P. astreoides* was not significantly altered by temperature treatment, *p*CO~2~ treatment, or natal reef environment (**Figure 3B, 3C; Table S3, S4**). However, *P. astreoides* exhibited a slight trend in the inshore fragments suggesting potentially higher plasticity with increasing *p*CO~2~ that is not seen in the offshore fragments (**Figure 3C**).
+
+Physiological plasticity of offshore *S. siderea* fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C (**Figure 3A**). Further, offshore *S. siderea* fragments exhibited higher plasticity in the extreme *p*CO~2~ treatment than in inshore fragments reared in the pre-industrial, current-day, and extreme *p*CO~2~ treatments, regardless of temperature (**Figure 3A; Table S3**). Plasticity of *P. strigosa* and *P. astreoides* was not clearly different between colonies based on natal reef environments (see **Table S1**). No clear differences in physiological plasticity in response to treatment were identified in *P.strigosa* (**Figure 3B; Table S3**), however, this is likely due to reduced sample sizes in this analysis as a result of only five colonies (N~offshore~ = 3, N~inshore~ = 2) present in the control treatment for distance calculations. Elevated temperatures generally resulted in higher plasticity of *P. astreoides* compared to control temperatures (**Figure 3C; Table S3**), however, this trend was not clearly different within each *p*CO~2~ treatment. Physiological plasticity of *P. astreoides* was significantly lower in both the pre-industrial and end-of-century *p*CO~2~ treatments at control temperatures than that measured in the extreme *p*CO~2~ treatment combined with the elevated temperature. 
+
 
 <br/>
 <br/>
@@ -1797,87 +1806,6 @@ ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 
 
 ### Figure S5
 
-```{r all coral physiology plot, fig.width = 10, fig.height = 13}
-
-## subset for the physiology parameters per species and convert from wide to long format
-df_withT_phys <- gather(df_withT, param, value, c(14:17, 34, 38:39, 42))[,-13:-33]
-
-# reorder the parameters and assign labels for plotting
-df_withT_phys <- df_withT_phys %>% 
-  mutate(param = factor(param, levels = c("carb", "lipid", "pro", "host", "chla", "den", "red", "sum"), labels = c(expression(paste("Carbohydrate (mg cm"^-2,")")), expression(paste("Lipid (mg cm"^-2,")")), expression(paste("Protein (mg cm"^-2,")")), expression(paste("Total Host (mg cm"^-2,")")), expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")")), expression(paste("Density (10"^6,"cells cm"^-2,")")), expression(paste("Red"," channel")), expression(paste("Sum"," channel")))),
-         species = factor(species, levels = c("S", "P", "A", "T"), labels = c(expression(paste(bold("A)  "), italic("Siderastrea siderea"))), expression(paste(bold("B)  "), italic("Pseudodiploria strigosa"))), expression(paste(bold("C)  "), italic("Porites astreoides"))), expression(paste(bold("D)  "), italic("Undaria tenuifolia"))))))
-
-
-## Plot all phys for all species (mean, SE, and raw observations)
-ggplot(df_withT_phys, aes(x = fpco2, y = value, color = ftemp)) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
-  geom_point(alpha = 0.2, position = position_dodge(width = 0.3)) +
-  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
-  stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2)) +
-  scale_color_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b"))+
-  facet_grid(param ~ species, scales = "free_y", labeller = label_parsed) +
-  guides(color = guide_legend(override.aes = list(linetype = c(0, 0)))) +
-  labs(y = "", x = alab) +
-  ggsave("Figures/Supplemental_Figures/FigureS5_AllPhysiology.pdf", width = 10, height = 13) +
-  ggsave("Figures/Supplemental_Figures/FigureS5_AllPhysiology.png", width = 10, height = 13) 
-
-```
-
-**Figure S5.** Mean ($\pm$SE) physiological parameter (each row) measured for (**A**) *S. siderea*, (**B**) *P. strigosa*, (**C**) *P. astreoides*, and (**D**) *U. tenuifolia* at the completion of the 93-day experimental period. *p*CO~2~ treatment is represented along the x axis and the temperature is depicted by color (28$^\circ$C blue; 31$^\circ$C red).
-
-<br/>
-<br/>
-
-
-### Figure S6
-
-![](Figures/Supplemental_Figures/FigureS6_BleachingImages.png)
-
-**Figure S6.** Coral color changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral color over time in either control (420 μatm; 28 °C) or warming (420 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
-
-<br/>
-<br/>
-
-
-### Figure S7
-
-```{r species PCA by reef plot, fig.width = 5.5, fig.height = 4.5, fig.align = 'center'}
-
-autoplot(all_pca, data = all_df, 
-                       colour = "reef",
-                       fill = "reef",
-                       frame = TRUE, 
-                       frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-                       frame.level = 0.95, # using 95% CI for all ellipses
-                       frame.alpha = 0.01,
-                       loadings = TRUE, 
-                       loadings.colour = "grey29", 
-                       loadings.label = TRUE,
-                       loadings.label.colour = "black",         
-                       loadings.label.size = 4, 
-                       loadings.label.hjust = 1.5, 
-                       loadings.label.vjust = 0.5,
-                       loadings.label.repel = TRUE) +
-  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.position = c(0.11, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.2, y = -0.108, label = deparse(all_reef_pval), parse = TRUE, size = 3) +
-  annotate("text", x = -0.2, y = -0.128, label = deparse(all_s_reef_pval), parse = TRUE, size = 3) +
-  ggsave("Figures/Supplemental_Figures/FigureS7_speciesPCA_reef.pdf", width = 5.5, height = 4.5) +
-  ggsave("Figures/Supplemental_Figures/FigureS7_speciesPCA_reef.png", width = 5.5, height = 4.5)
-
-```
-
-**Figure S7.** Principal component analysis (PCA) comparing the coral holobiont of all three species at the end of the experiment depicted reef environment. Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
-
-<br/>
-<br/>
-
-
-### Figure S8
-
 ```{r host v symb plasticity distance calculations }
 
 #### SSID
@@ -1885,13 +1813,13 @@ autoplot(all_pca, data = all_df,
 ssid_host_dist <- PCAplast(pca = s_pca_host,
                            data = s_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
-                           control_lvl = "447_28")
+                           control_lvl = "420_28")
 
 # symbiont
 ssid_symb_dist <- PCAplast(pca = s_pca_symb, 
                            data = s_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
-                           control_lvl = "447_28")
+                           control_lvl = "420_28")
 
 
 #### PSTR
@@ -1899,13 +1827,13 @@ ssid_symb_dist <- PCAplast(pca = s_pca_symb,
 pstr_host_dist <- PCAplast(pca = p_pca_host, 
                            data = p_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
-                           control_lvl = "447_28")
+                           control_lvl = "420_28")
 
 # symbiont
 pstr_symb_dist <- PCAplast(pca = p_pca_symb, 
                            data = p_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
-                           control_lvl = "447_28")
+                           control_lvl = "420_28")
 
 
 #### PAST
@@ -1913,13 +1841,13 @@ pstr_symb_dist <- PCAplast(pca = p_pca_symb,
 past_host_dist <- PCAplast(pca = a_pca_host, 
                            data = a_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
-                           control_lvl = "447_28")
+                           control_lvl = "420_28")
 
 # symbiont
 past_symb_dist <- PCAplast(pca = a_pca_symb, 
                            data = a_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
-                           control_lvl = "447_28")
+                           control_lvl = "420_28")
 
 
 #### Combined data by host or symbiont
@@ -2018,15 +1946,97 @@ ggplot(comb_boot, aes(x = part, y = estimate, color = treat2, fill = treat2, sha
   #scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
   #facet_grid(species ~ part, labeller = label_parsed) +
   facet_grid( ~ species, labeller = label_parsed) +  
-  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.pdf", width = 11, height = 3.5) +
-  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.png", width = 11, height = 3.5)
+  ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.pdf", width = 11, height = 3.5) +
+  ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.png", width = 11, height = 3.5)
 
 ```
 
-Figure SX. Coral host vs. algal symbiont physiological plasticity of (A) S. siderea, (B) P. strigosa, and (C) P. astreoides after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 μatm], light purple; current day [420 μatm], dark purple; end-of-century [680 μatm], light orange; extreme [3290 μatm], dark orange) and temperature is represented as either closed (28 °C) or open (31 °C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
+**Figure S5.** Coral host vs. algal symbiont physiological plasticity of (A) S. siderea, (B) P. strigosa, and (C) P. astreoides after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 μatm], light purple; current day [420 μatm], dark purple; end-of-century [680 μatm], light orange; extreme [3290 μatm], dark orange) and temperature is represented as either closed (28 °C) or open (31 °C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
 
 <br/>
 <br/>
+
+
+### Figure S6
+
+```{r all coral physiology plot, fig.width = 10, fig.height = 13}
+
+## subset for the physiology parameters per species and convert from wide to long format
+df_withT_phys <- gather(df_withT, param, value, c(14:17, 34, 38:39, 42))[,-13:-33]
+
+# reorder the parameters and assign labels for plotting
+df_withT_phys <- df_withT_phys %>% 
+  mutate(param = factor(param, levels = c("carb", "lipid", "pro", "host", "chla", "den", "red", "sum"), labels = c(expression(paste("Carbohydrate (mg cm"^-2,")")), expression(paste("Lipid (mg cm"^-2,")")), expression(paste("Protein (mg cm"^-2,")")), expression(paste("Total Host (mg cm"^-2,")")), expression(paste("Chlorophyll a ("*mu,"g cm"^-2,")")), expression(paste("Density (10"^6,"cells cm"^-2,")")), expression(paste("Red"," channel")), expression(paste("Sum"," channel")))),
+         species = factor(species, levels = c("S", "P", "A", "T"), labels = c(expression(paste(bold("A)  "), italic("Siderastrea siderea"))), expression(paste(bold("B)  "), italic("Pseudodiploria strigosa"))), expression(paste(bold("C)  "), italic("Porites astreoides"))), expression(paste(bold("D)  "), italic("Undaria tenuifolia"))))))
+
+
+## Plot all phys for all species (mean, SE, and raw observations)
+ggplot(df_withT_phys, aes(x = fpco2, y = value, color = ftemp)) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.position = c(0.96, 0.982), legend.background = element_rect(fill = NA)) + 
+  geom_point(alpha = 0.2, position = position_dodge(width = 0.3)) +
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0, position = position_dodge(width = 0.2)) +
+  stat_summary(fun = "mean", size = 0.3, position = position_dodge(width = 0.2)) +
+  scale_color_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b"))+
+  facet_grid(param ~ species, scales = "free_y", labeller = label_parsed) +
+  guides(color = guide_legend(override.aes = list(linetype = c(0, 0)))) +
+  labs(y = "", x = alab) +
+  ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.pdf", width = 10, height = 13) +
+  ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.png", width = 10, height = 13) 
+
+```
+
+**Figure S6.** Mean ($\pm$SE) physiological parameter (each row) measured for (**A**) *S. siderea*, (**B**) *P. strigosa*, (**C**) *P. astreoides*, and (**D**) *U. tenuifolia* at the completion of the 93-day experimental period. *p*CO~2~ treatment is represented along the x axis and the temperature is depicted by color (28$^\circ$C blue; 31$^\circ$C red).
+
+<br/>
+<br/>
+
+
+### Figure S7
+
+![](Figures/Supplemental_Figures/FigureS7_BleachingImages.png)
+
+**Figure S7.** Coral color changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral color over time in either control (420 μatm; 28 °C) or warming (420 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
+
+<br/>
+<br/>
+
+
+### Figure S8
+
+```{r species PCA by reef plot, fig.width = 5.5, fig.height = 4.5, fig.align = 'center'}
+
+autoplot(all_pca, data = all_df, 
+                       colour = "reef",
+                       fill = "reef",
+                       frame = TRUE, 
+                       frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
+                       frame.level = 0.95, # using 95% CI for all ellipses
+                       frame.alpha = 0.01,
+                       loadings = TRUE, 
+                       loadings.colour = "grey29", 
+                       loadings.label = TRUE,
+                       loadings.label.colour = "black",         
+                       loadings.label.size = 4, 
+                       loadings.label.hjust = 1.5, 
+                       loadings.label.vjust = 0.5,
+                       loadings.label.repel = TRUE) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  theme(legend.position = c(0.11, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
+  annotate("text", x = -0.2, y = -0.108, label = deparse(all_reef_pval), parse = TRUE, size = 3) +
+  annotate("text", x = -0.2, y = -0.128, label = deparse(all_s_reef_pval), parse = TRUE, size = 3) +
+  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.pdf", width = 5.5, height = 4.5) +
+  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.png", width = 5.5, height = 4.5)
+
+```
+
+**Figure S8.** Principal component analysis (PCA) comparing the coral holobiont of all three species at the end of the experiment depicted reef environment. Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+
+<br/>
+<br/>
+
 
 
 ## Supplemental Tables{.tabset} 
