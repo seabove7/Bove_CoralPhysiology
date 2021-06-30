@@ -949,6 +949,7 @@ save(ssid_boot, file = "Data/SSID_PlastBoot.rda")
 ## Load boot data
 load(file = "Data/SSID_PlastBoot.rda")
 ssid_boot$treat2 <- paste(ssid_boot$fpco2, ssid_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
+ssid_boot$treat2 <- factor(ssid_boot$treat2, levels = c("300_28", "300_31", "420_31", "680_28", "680_31", "3290_28", "3290_31")) # adjust treatment levels
 
 
 ## Plasticity plot
@@ -1041,6 +1042,7 @@ save(pstr_boot, file = "Data/PSTR_PlastBoot.rda")
 ## Load boot data
 load(file = "Data/PSTR_PlastBoot.rda")
 pstr_boot$treat2 <- paste(pstr_boot$fpco2, pstr_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
+pstr_boot$treat2 <- factor(pstr_boot$treat2, levels = c("300_28", "300_31", "680_28", "680_31", "3290_28", "3290_31")) # adjust treatment levels
 
 
 ## Plasticity plot
@@ -1127,6 +1129,7 @@ save(past_boot, file = "Data/PAST_PlastBoot.rda")
 ## Load boot data
 load(file = "Data/PAST_PlastBoot.rda")
 past_boot$treat2 <- paste(past_boot$fpco2, past_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
+past_boot$treat2 <- factor(past_boot$treat2, levels = c("300_28", "300_31", "420_31", "680_28", "680_31", "3290_28", "3290_31")) # adjust treatment levels
 
 
 ## Plasticity plot
@@ -1176,7 +1179,11 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 #### *Coral holobiont physiological plasticity*
 
-Physiological plasticity of offshore *S. siderea* fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C (**Figure 3A**). Further, offshore *S. siderea* fragments exhibited higher plasticity in the extreme *p*CO~2~ treatment than in inshore fragments reared in the pre-industrial, current-day, and extreme *p*CO~2~ treatments, regardless of temperature (**Figure 3A; Table S3**). Plasticity of *P. strigosa* and *P. astreoides* was not clearly different between colonies based on natal reef environments (see **Table S1**). No clear differences in physiological plasticity in response to treatment were identified in *P.strigosa* (**Figure 3B; Table S3**), however, this is likely due to reduced sample sizes in this analysis as a result of only five colonies (N~offshore~ = 3, N~inshore~ = 2) present in the control treatment for distance calculations. Elevated temperatures generally resulted in higher plasticity of *P. astreoides* compared to control temperatures (**Figure 3C; Table S3**), however, this trend was not clearly different within each *p*CO~2~ treatment. Physiological plasticity of *P. astreoides* was significantly lower in both the pre-industrial and end-of-century *p*CO~2~ treatments at control temperatures than that measured in the extreme *p*CO~2~ treatment combined with the elevated temperature. 
+Physiological plasticity of offshore *S. siderea* fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C (**Figure 3A**). Further, offshore *S. siderea* fragments exhibited higher plasticity in the extreme *p*CO~2~ treatment than in inshore fragments reared in the pre-industrial, current-day, and extreme *p*CO~2~ treatments, regardless of temperature (**Figure 3A; Table S3**).  
+
+Plasticity of *P. strigosa* and *P. astreoides* was not clearly different between colonies based on natal reef environments (see **Table S1**). No clear differences in physiological plasticity in response to treatment were identified in *P.strigosa* (**Figure 3B; Table S3**), however, this is likely due to reduced sample sizes in this analysis as a result of only five colonies (N~offshore~ = 3, N~inshore~ = 2) present in the control treatment for distance calculations.  
+
+Elevated temperatures generally resulted in higher plasticity of *P. astreoides* compared to control temperatures (**Figure 3C; Table S3**), however, this trend was not clearly different within each *p*CO~2~ treatment. Physiological plasticity of *P. astreoides* was significantly lower in both the pre-industrial and end-of-century *p*CO~2~ treatments at control temperatures than that measured in the extreme *p*CO~2~ treatment combined with the elevated temperature. 
 
 
 <br/>
@@ -1951,7 +1958,7 @@ ggplot(comb_boot, aes(x = part, y = estimate, color = treat2, fill = treat2, sha
 
 ```
 
-**Figure S5.** Coral host vs. algal symbiont physiological plasticity of (A) S. siderea, (B) P. strigosa, and (C) P. astreoides after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 μatm], light purple; current day [420 μatm], dark purple; end-of-century [680 μatm], light orange; extreme [3290 μatm], dark orange) and temperature is represented as either closed (28 °C) or open (31 °C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
+**Figure S5.** Coral host vs. algal symbiont physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 μatm], light purple; current day [420 μatm], dark purple; end-of-century [680 μatm], light orange; extreme [3290 μatm], dark orange) and temperature is represented as either closed (28 °C) or open (31 °C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
 
 <br/>
 <br/>
