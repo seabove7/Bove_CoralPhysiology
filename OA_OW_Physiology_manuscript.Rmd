@@ -76,6 +76,7 @@ library(MASS)
 library(png)
 library(car)
 library(rcompanion)
+library(janitor)
 
 ## Source the custom functions necessary for running this script
 source("Code/CustomFunctions.R")
@@ -589,7 +590,7 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
 
 ```
 
-**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$ C blue; 31$^\circ$ C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (300 $\mu$atm light purple; 420 $\mu$atm dark purple; 680 $\mu$atm light orange; 3290 $\mu$atm dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$C blue; 31$^\circ$C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1203,12 +1204,12 @@ sid_pca_df_symb <- s_df[,c(14,16,17)] # symbiont only phys (chla, density, color
 ## run the adonis for HOST phys
 #s_pca_host_mod <- adonis2(sid_pca_df_host ~ reef * ftemp * fpco2, data = s_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 s_pca_host_mod <- adonis2(sid_pca_df_host ~ fpco2 + ftemp + reef, data = s_df, method = 'eu', permutations = bootnum)
-s_pca_host_mod # view SSID adonis output
+#s_pca_host_mod # view SSID adonis output
 
 ## run the adonis for SYMB phys
 #s_pca_symb_mod <- adonis2(sid_pca_df_symb ~ reef * ftemp * fpco2, data = s_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 s_pca_symb_mod <- adonis2(sid_pca_df_symb ~ fpco2 + ftemp + reef, data = s_df, method = 'eu', permutations = bootnum)
-s_pca_symb_mod # view SSID adonis output
+#s_pca_symb_mod # view SSID adonis output
 
 
 ## perform principal component analysis (PCA)
@@ -1243,7 +1244,7 @@ sid_host_temp_pca <- autoplot(s_pca_host, data = s_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  ggtitle("SSID Host")
+  ggtitle(expression(paste(italic("S. siderea")," host")))
 
 
 # SYMB temperature
@@ -1269,7 +1270,7 @@ sid_symb_temp_pca <- autoplot(s_pca_symb, data = s_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  ggtitle("SSID Symbionts")
+  ggtitle(expression(paste(italic("S. siderea")," symbionts")))
 
 
 
@@ -1345,8 +1346,7 @@ sid_host_reef_pca <- autoplot(s_pca_host, data = s_df,
   scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) 
 
 
 # SYMB reef
@@ -1368,8 +1368,7 @@ sid_symb_reef_pca <- autoplot(s_pca_symb, data = s_df,
   scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) 
 
 ```
 
@@ -1388,7 +1387,7 @@ ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 
 
 ```
 
-**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (300 μatm light purple; 420 μatm dark purple; 680 μatm light orange; 3290 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1406,12 +1405,12 @@ dip_pca_df_symb <- p_df[,c(14,16,17)] # symbiont only phys (chla, density, color
 ## run the adonis for HOST phys
 #s_pca_host_mod <- adonis2(dip_pca_df_host ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 p_pca_host_mod <- adonis2(dip_pca_df_host ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
-p_pca_host_mod # view PSTR adonis output
+#p_pca_host_mod # view PSTR adonis output
 
 ## run the adonis for SYMB phys
 #s_pca_symb_mod <- adonis2(dip_pca_df_symb ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 p_pca_symb_mod <- adonis2(dip_pca_df_symb ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
-p_pca_symb_mod # view PSTR adonis output
+#p_pca_symb_mod # view PSTR adonis output
 
 
 ## perform principal component analysis (PCA)
@@ -1446,7 +1445,7 @@ dip_host_temp_pca <- autoplot(p_pca_host, data = p_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  ggtitle("PSTR Host")
+  ggtitle(expression(paste(italic("P. strigosa")," host")))
 
 
 # SYMB temperature
@@ -1472,7 +1471,7 @@ dip_symb_temp_pca <- autoplot(p_pca_symb, data = p_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  ggtitle("PSTR Symbionts")
+  ggtitle(expression(paste(italic("P. strigosa")," symbionts")))
 
 
 
@@ -1548,8 +1547,7 @@ dip_host_reef_pca <- autoplot(p_pca_host, data = p_df,
   scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA))
 
 
 # SYMB reef
@@ -1571,8 +1569,7 @@ dip_symb_reef_pca <- autoplot(p_pca_symb, data = p_df,
   scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) 
 
 ```
 
@@ -1591,7 +1588,7 @@ ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 
 
 ```
 
-**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (300 μatm light purple; 420 μatm dark purple; 680 μatm light orange; 3290 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1609,12 +1606,12 @@ por_pca_df_symb <- a_df[,c(14,16,18)] # symbiont only phys (chla, density, color
 ## run the adonis for HOST phys
 #s_pca_host_mod <- adonis2(por_pca_df_host ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 a_pca_host_mod <- adonis2(por_pca_df_host ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
-a_pca_host_mod # view PAST adonis output
+#a_pca_host_mod # view PAST adonis output
 
 ## run the adonis for SYMB phys
 #s_pca_symb_mod <- adonis2(por_pca_df_symb ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 a_pca_symb_mod <- adonis2(por_pca_df_symb ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
-a_pca_symb_mod # view PAST adonis output
+#a_pca_symb_mod # view PAST adonis output
 
 
 ## perform principal component analysis (PCA)
@@ -1649,7 +1646,7 @@ por_host_temp_pca <- autoplot(a_pca_host, data = a_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  ggtitle("PAST Host")
+  ggtitle(expression(paste(italic("P. astreoides")," host")))
 
 
 # SYMB temperature
@@ -1675,7 +1672,7 @@ por_symb_temp_pca <- autoplot(a_pca_symb, data = a_df,
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  ggtitle("PAST Symbionts")
+  ggtitle(expression(paste(italic("P. astreoides")," symbionts")))
 
 
 
@@ -1751,8 +1748,7 @@ por_host_reef_pca <- autoplot(a_pca_host, data = a_df,
   scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA))
 
 
 # SYMB reef
@@ -1774,8 +1770,7 @@ por_symb_reef_pca <- autoplot(a_pca_symb, data = a_df,
   scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.3, y = -0.38, label = deparse(s_reef_pval), parse = TRUE, size = 3)
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA))
 
 ```
 
@@ -1794,7 +1789,7 @@ ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 
 
 ```
 
-**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28 °C blue; 31 °C red), pCO2 (300 μatm light purple; 420 μatm dark purple; 680 μatm light orange; 3290 μatm dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -1829,7 +1824,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, color = ftemp)) +
 
 ```
 
-**Figure S5.** Mean ($\pm$SE) physiological parameter (each row) measured for (**A**) *S. siderea*, (**B**) *P. strigosa*, (**C**) *P. astreoides*, and (**D**) *U. tenuifolia* at the completion of the 93-day experimental period. 
+**Figure S5.** Mean ($\pm$SE) physiological parameter (each row) measured for (**A**) *S. siderea*, (**B**) *P. strigosa*, (**C**) *P. astreoides*, and (**D**) *U. tenuifolia* at the completion of the 93-day experimental period. *p*CO~2~ treatment is represented along the x axis and the temperature is depicted by color (28$^\circ$C blue; 31$^\circ$C red).
 
 <br/>
 <br/>
@@ -1847,7 +1842,7 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, color = ftemp)) +
 
 ### Figure S7
 
-```{r species PCA by reef plot, fig.width = 5.5, fig.height = 4.5}
+```{r species PCA by reef plot, fig.width = 5.5, fig.height = 4.5, fig.align = 'center'}
 
 autoplot(all_pca, data = all_df, 
                        colour = "reef",
@@ -1891,14 +1886,12 @@ ssid_host_dist <- PCAplast(pca = s_pca_host,
                            data = s_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
                            control_lvl = "447_28")
-ssid_host_dist_sum <- DistSum(data = ssid_host_dist)
 
 # symbiont
 ssid_symb_dist <- PCAplast(pca = s_pca_symb, 
                            data = s_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
                            control_lvl = "447_28")
-ssid_symb_dist_sum <- DistSum(data = ssid_symb_dist)
 
 
 #### PSTR
@@ -1907,14 +1900,12 @@ pstr_host_dist <- PCAplast(pca = p_pca_host,
                            data = p_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
                            control_lvl = "447_28")
-pstr_host_dist_sum <- DistSum(data = pstr_host_dist)
 
 # symbiont
 pstr_symb_dist <- PCAplast(pca = p_pca_symb, 
                            data = p_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
                            control_lvl = "447_28")
-pstr_symb_dist_sum <- DistSum(data = pstr_symb_dist)
 
 
 #### PAST
@@ -1923,24 +1914,20 @@ past_host_dist <- PCAplast(pca = a_pca_host,
                            data = a_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
                            control_lvl = "447_28")
-past_host_dist_sum <- DistSum(data = past_host_dist)
 
 # symbiont
 past_symb_dist <- PCAplast(pca = a_pca_symb, 
                            data = a_df[,c(1,7,8, 10,11,12,27)],
                            control_col = "treat2",
                            control_lvl = "447_28")
-past_symb_dist_sum <- DistSum(data = past_symb_dist)
 
 
 #### Combined data by host or symbiont
 ## Host:
 host_dist <- rbind(ssid_host_dist, pstr_host_dist, past_host_dist)
-host_sum <- rbind(ssid_host_dist_sum, pstr_host_dist_sum, past_host_dist_sum)
 
 ## Symbionts:
 symb_dist <- rbind(ssid_symb_dist, pstr_symb_dist, past_symb_dist)
-symb_sum <- rbind(ssid_symb_dist_sum, pstr_symb_dist_sum, past_symb_dist_sum)
 
 ```
 
@@ -1955,102 +1942,88 @@ combined_dist <- rbind(host_dist, symb_dist)
 
 
 
-
 ## Model selection (via AIC)
-comb_dist_mod  <- glm(dist ~ species * part * reef * fpco2 * ftemp, family = Gamma(link = "log"), data = combined_dist)
-comb_dist_mod2 <- glm(dist ~ species * part * reef * fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist)
-comb_dist_mod3 <- glm(dist ~ species * part * reef + fpco2 * ftemp, family = Gamma(link = "log"), data = combined_dist)
-comb_dist_mod4 <- glm(dist ~ species * reef + part + fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist) # best fit (AIC)
-comb_dist_mod5 <- glm(dist ~ species * part * reef * (fpco2 + ftemp), family = Gamma(link = "log"), data = combined_dist)
-comb_dist_mod6 <- glm(dist ~ species * part * fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist)
-comb_dist_mod7 <- glm(dist ~ reef * species * part * (fpco2 + ftemp), family = Gamma(link = "log"), data = combined_dist) 
-comb_dist_mod8 <- glm(dist ~ reef * species * part * (fpco2 + ftemp), family = Gamma(link = "log"), data = combined_dist) 
+comb_dist_mod  <- glmer(dist ~ species * part * reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod2 <- glmer(dist ~ species * part * reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod3 <- glmer(dist ~ species * part * reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod4 <- glmer(dist ~ species * reef + part + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = combined_dist) # best fit
+comb_dist_mod5 <- glmer(dist ~ species * part * reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod6 <- glmer(dist ~ species * part * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod7 <- glmer(dist ~ reef * species * part * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod8 <- glmer(dist ~ reef * species * part * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
+comb_dist_mod9 <- glmer(dist ~ species * part * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = combined_dist) # close second fit
+comb_dist_mod10 <- glmer(dist ~ species * part * (fpco2 + ftemp) + reef + (1 | colony), family = Gamma(link = "log"), data = combined_dist) 
+comb_dist_mod11 <- glmer(dist ~ species * part * (fpco2 + ftemp + reef) + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
 
 # check for best-fit model
-comb_plast_aic <- compare_performance(comb_dist_mod, comb_dist_mod2, comb_dist_mod3, comb_dist_mod4, comb_dist_mod5, comb_dist_mod6, comb_dist_mod7, comb_dist_mod8, rank = TRUE)
-plot(comb_plast_aic)
+comb_plast_aic <- compare_performance(comb_dist_mod, comb_dist_mod2, comb_dist_mod3, comb_dist_mod4, comb_dist_mod5, comb_dist_mod6, comb_dist_mod7, comb_dist_mod8, comb_dist_mod9, comb_dist_mod10, comb_dist_mod11, rank = TRUE)
+#plot(comb_plast_aic)
 
 
-## Best-fit GLM with Gamma log link
-comb_dist_glm <- glm(dist ~ species * reef + part + fpco2 + ftemp, family = Gamma(link = "log"), data = combined_dist, contrasts = list(species=contr.sum, part=contr.sum, reef=contr.sum, fpco2=contr.sum, ftemp=contr.sum))
+## Best-fit GLMM with Gamma log link
+comb_dist_glm <- glmer(dist ~ species * part * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
 comb_glm_out <- summary(comb_dist_glm) # summary output of the GLM
-comb_anova_out <- Anova(comb_dist_glm, type = "III", test.statistic = "F") # comparison of the 'main effects'
 
 ```
 
+```{r plasticity of host v symb bootstrapping, eval=FALSE, include=FALSE}
+
+## Pull the treatment and distance data from the model
+newdata_comb <- data.frame(comb_dist_glm@frame[-1])
+
+## Bootstrap distances using custom bootstrap function
+comb_boot_out <- replicate(bootnum, bootFUN(model = comb_dist_glm, newdata = newdata_comb)) 
+
+## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
+comb_boot <- cbind(combined_dist, as.data.frame(t(apply(comb_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
+colnames(comb_boot)[16:18] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+
+## save as rda object
+save(comb_boot, file = "Data/HostVSymb_PlastBoot.rda")
+
+```
 
 ```{r species labels for distance plots}
 
+## Load bootstrap data from above
+load(file = "Data/HostVSymb_PlastBoot.rda")
+
 ## Adding pretty species labels for all dataframes
-host_sum <- host_sum %>% 
+comb_boot <- comb_boot %>% 
   mutate(species = factor(species, levels = c("S", "P", "A"), 
-                          labels = c(expression(italic("Siderastrea siderea")), 
-                                     expression(italic("Pseudodiploria strigosa")), 
-                                     expression(italic("Porites astreoides")))))
-
-host_dist <- host_dist %>% 
-  mutate(species = factor(species, levels = c("S", "P", "A"), 
-                          labels = c(expression(italic("Siderastrea siderea")), 
-                                     expression(italic("Pseudodiploria strigosa")), 
-                                     expression(italic("Porites astreoides")))))
-
-symb_sum <- symb_sum %>% 
-  mutate(species = factor(species, levels = c("S", "P", "A"), 
-                          labels = c(expression(italic("Siderastrea siderea")), 
-                                     expression(italic("Pseudodiploria strigosa")), 
-                                     expression(italic("Porites astreoides")))))
-
-symb_dist <- symb_dist %>% 
-  mutate(species = factor(species, levels = c("S", "P", "A"), 
-                          labels = c(expression(italic("Siderastrea siderea")), 
-                                     expression(italic("Pseudodiploria strigosa")), 
-                                     expression(italic("Porites astreoides")))))
+                          labels = c(expression(bold("A) ")~ italic(" Siderastrea siderea")), 
+                                     expression(bold("B) ")~ italic(" Pseudodiploria strigosa")), 
+                                     expression(bold("C) ")~ italic(" Porites astreoides")))),
+         part = factor(part, levels = c("host", "symb"),
+                       labels = c("Coral host",
+                                  "Algal symbiont")))
 
 ```
 
-```{r host v symb plasticity plots, fig.width = 9, fig.height = 9}
+```{r host v symb plasticity plots, fig.width = 11, fig.height = 3.5}
 
-host_dist_plot <- ggplot(host_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
-  theme_pubr() +
-  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
+## Plot host v symbiont plasticity per species
+ggplot(comb_boot, aes(x = part, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
+  theme_bw() +
+  theme(legend.title = element_blank(), axis.ticks.x = element_blank(),  legend.position = "right", panel.grid = element_blank(), strip.background = element_blank(), strip.text.x = element_text(size = 12)) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = host_dist, aes(x = reef, y = dist), size = 2, alpha = 0.5, position = position_dodge(width = 0.55)) +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
-  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
+  geom_point(aes(x = part, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.7)) +
+  geom_linerange(aes(ymin = lowerci, ymax = upperci), size = 1, position = position_dodge(width = 0.7)) +
+  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.7)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
-  labs(y = "Coral host plasticity", x = "") +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 6)) +
-  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
-  facet_wrap(~ species, ncol = 1, labeller = label_parsed)
-
-
-symb_dist_plot <- ggplot(symb_sum, aes(x = reef, y = mean, color = treat2, fill = treat2, shape = treat2)) +
-  theme_pubr() +
-  theme(legend.title = element_blank(), axis.ticks.x = element_blank(), strip.background = element_rect(colour = "black", fill = NA)) +
-  guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(data = symb_dist, aes(x = reef, y = dist), size = 2, alpha = 0.5, position = position_dodge(width = 0.55)) +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), alpha = 0.8, size = 1, width = 0, position = position_dodge(width = 0.55)) +
-  geom_point(size = 3, stroke = 1, position = position_dodge(width = 0.55)) +
-  scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
-  scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
-  labs(y = "Algal symbiont plasticity", x = "") +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 6)) +
-  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
-  facet_wrap(~ species, ncol = 1, labeller = label_parsed)
-
-
-########### Full plot:
-
-ggarrange(host_dist_plot, symb_dist_plot, nrow = 1, common.legend = TRUE, legend = "right", labels = "AUTO") +
-  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.pdf", width = 9, height = 9) +
-  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.png", width = 9, height = 9)
-
+  labs(y = "PC distance from control", x = "") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
+  #scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
+  #facet_grid(species ~ part, labeller = label_parsed) +
+  facet_grid( ~ species, labeller = label_parsed) +  
+  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.pdf", width = 11, height = 3.5) +
+  ggsave("Figures/Supplemental_Figures/FigureS8_hostVsymb_plasticity.png", width = 11, height = 3.5)
 
 ```
 
+Figure SX. Coral host vs. algal symbiont physiological plasticity of (A) S. siderea, (B) P. strigosa, and (C) P. astreoides after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 μatm], light purple; current day [420 μatm], dark purple; end-of-century [680 μatm], light orange; extreme [3290 μatm], dark orange) and temperature is represented as either closed (28 °C) or open (31 °C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
 
 <br/>
 <br/>
@@ -2156,10 +2129,14 @@ table_s2
 ```{r table S3 for markdown}
 
 ## combine model output per species
-dist_mod_out <- data.frame(rbind(ssid_glm_out[["coefficients"]], pstr_glm_out[["coefficients"]], past_glm_out[["coefficients"]])) # combine all glm model outputs (the use of tidy() makes a tibble from the GLM)
-dist_mod_out$treat <- rownames(dist_mod_out) # add column for rownames
-dist_mod_out$species <- c(rep("SSID", 9), rep("PSTR", 4), rep("PAST", 5)) # add column for species ID
-dist_mod_out <- dist_mod_out[,c(5,1:4,6)]
+dist_mod_out <- rbind.fill(data.frame(treat = rownames(ssid_glm_out[["coefficients"]]), ssid_glm_out[["coefficients"]]),
+                           data.frame(treat = rownames(data.frame(unlist(r2_nakagawa(ssid_dist_glm)))), Estimate = unlist(r2_nakagawa(ssid_dist_glm))),
+                           data.frame(treat = rownames(pstr_glm_out[["coefficients"]]), pstr_glm_out[["coefficients"]]),
+                           data.frame(treat = rownames(data.frame(unlist(r2_nakagawa(pstr_dist_glm)))), Estimate = unlist(r2_nakagawa(pstr_dist_glm))),
+                           data.frame(treat = rownames(past_glm_out[["coefficients"]]), past_glm_out[["coefficients"]]),
+                           data.frame(treat = rownames(data.frame(unlist(r2_nakagawa(past_dist_glm)))), Estimate = unlist(r2_nakagawa(past_dist_glm))) )
+dist_mod_out$species <- c(rep("SSID", 11), rep("PSTR", 6), rep("PAST", 7)) # add column for species ID\
+
 
 
 ## update formatting of text 
@@ -2170,14 +2147,15 @@ dist_mod_out <- dist_mod_out %>%
          Pr...z.. = round(as.numeric(Pr...z..), 3)) %>% 
   mutate(treat = gsub("[.]", " ", treat), # rename the treatment IDs
          treat = gsub(" ", "", treat),
-         treat = gsub("X", "", treat),
-         treat = gsub("21", "-current", treat),
-         treat = gsub("22", "-EOC", treat),
-         treat = gsub("23", "-extreme", treat),
+         treat = gsub("2420", "-current", treat),
+         treat = gsub("2680", "-EOC", treat),
+         treat = gsub("23290", "-extreme", treat),
          treat = gsub("[0-9]", "", treat),
          treat = gsub("fpco", "pCO2", treat),
          treat = gsub("ftemp", "temperature (31C)", treat),
-         treat = gsub("reefN", "reef environment (offshore) ", treat)) %>% 
+         treat = gsub("reefN", "reef environment (offshore)", treat),
+         treat = gsub("R_conditionalConditionalR", "Conditional R2", treat),
+         treat = gsub("R_marginalMarginalR", "Marginal R2", treat)) %>% 
   rename(" " = treat, # rename columns
         "Standard error" = Std..Error,
         "Statistic" = t.value,
@@ -2186,9 +2164,10 @@ dist_mod_out <- dist_mod_out %>%
 ## combine them with format
 table_s3 <- kable(dist_mod_out[,-6], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
-  pack_rows("Siderastrea Siderea", 1, 9, italic = TRUE) %>%
-  pack_rows("Pseudodiploria strigosa", 10, 13, italic = TRUE) %>%
-  pack_rows("Porites astreoides", 14, 18, italic = TRUE)
+  pack_rows("Siderastrea Siderea", 1, 11, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 12, 17, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 18, 24, italic = TRUE) %>% 
+  row_spec(c(10:11,16:17,23:24), italic = TRUE)
 table_s3
 
 ```

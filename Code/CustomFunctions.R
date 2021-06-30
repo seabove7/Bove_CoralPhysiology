@@ -130,20 +130,6 @@ PCAplast <- function(pca, data, control_col, control_lvl, colony = "colony") {
 
 ################################################################################
 
-### Summary function for plotting plasticity
-
-DistSum <- function(data) {
-  data_update <- data %>% 
-    #mutate(treat2 = factor(treat2, levels = c("300_28", "300_31", "420_28", "420_31", "680_28", "680_31", "3300_28", "3300_31"))) %>% 
-    group_by(treat2, reef, species) %>% 
-    summarise(mean = mean(dist),
-              se = (sd(dist) / sqrt(n()))) 
-}
-
-
-
-################################################################################
-
 ### Custom function for bootstrapping with replacement GLMER model
 
 bootFUN <- function(model, newdata) {
