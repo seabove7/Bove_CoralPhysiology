@@ -621,13 +621,13 @@ all_pca <- prcomp(all_pca_df, center = TRUE, scale= TRUE)
 ```{r all PCA plot, fig.height=8, fig.width=8}
 
 # create labels for p values calculated above
-all_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(all_pval[1,1], digits = 2)))
-all_temp_pval <-substitute(italic(P[temp])==p, list(p = format(all_pval[2,1], digits = 3)))
-all_reef_pval <-substitute(italic(P[reef])==p, list(p = format(all_pval[3,1], digits = 2)))
-all_species_pval <-substitute(italic(P[species])==p, list(p = format(all_pval[4,1], digits = 2)))
-all_s_pco2_pval <-substitute(italic(P[species~X~pCO[2]])==p, list(p = format(all_pval[5,1], digits = 2)))
+all_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(all_pval[1,1], digits = 1)))
+all_temp_pval <-substitute(italic(P[temp])==p, list(p = format(all_pval[2,1], digits = 2)))
+all_reef_pval <-substitute(italic(P[reef])==p, list(p = format(all_pval[3,1], digits = 1)))
+all_species_pval <-substitute(italic(P[species])==p, list(p = format(all_pval[4,1], digits = 1)))
+all_s_pco2_pval <-substitute(italic(P[species~X~pCO[2]])==p, list(p = format(all_pval[5,1], digits = 1)))
 all_s_reef_pval <-substitute(italic(P[species~X~reef])==p, list(p = format(all_pval[6,1], digits = 2)))
-all_s_temp_pval <-substitute(italic(P[species~X~temp])==p, list(p = format(all_pval[7,1], digits = 3)))
+all_s_temp_pval <-substitute(italic(P[species~X~temp])==p, list(p = format(all_pval[7,1], digits = 1)))
 
 
 # species
@@ -650,10 +650,10 @@ species_pca_plot <- autoplot(all_pca, data = all_df,
                        loadings.label.repel = TRUE) +
   scale_color_manual("", labels = c("S. siderea", "P. strigosa", "P. astreoides"), values = c("#867796", "#73CCD2", "#D2D69B")) +
   guides(shape = FALSE, fill = FALSE, color = guide_legend(keyheight = 0.1, nrow = 3, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.14, 0.9), legend.text = element_text(face = "italic")) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.16, 0.9), legend.text = element_text(face = "italic")) +
   #ggsave("Figures/Final_Figures/FigureX_SpeciesPCA.pdf", width = 6, height = 4.5) +
   #ggsave("Figures/Final_Figures/FigureX_SpeciesPCA.png", width = 6, height = 4.5) +
-  annotate("text", x = -0.2, y = -0.108, label = deparse(all_species_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.18, y = -0.108, label = deparse(all_species_pval), parse = TRUE, size = 3)
 
 # temperature
 all_temp_pca <- autoplot(all_pca, data = all_df, 
@@ -677,9 +677,9 @@ all_temp_pca <- autoplot(all_pca, data = all_df,
   scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
   scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.position = c(0.09, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.21, y = -0.118, label = deparse(all_temp_pval), parse = TRUE, size = 3) +
-  annotate("text", x = -0.18, y = -0.14, label = deparse(all_s_temp_pval), parse = TRUE, size = 3)
+  theme(legend.position = c(0.11, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
+  annotate("text", x = -0.19, y = -0.118, label = deparse(all_temp_pval), parse = TRUE, size = 3) +
+  annotate("text", x = -0.17, y = -0.14, label = deparse(all_s_temp_pval), parse = TRUE, size = 3)
 
 # pco2
 all_pco2_pca <- autoplot(all_pca, data = all_df, 
@@ -703,17 +703,17 @@ all_pco2_pca <- autoplot(all_pca, data = all_df,
   scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
   guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-  annotate("text", x = -0.20, y = -0.118, label = deparse(all_pco2_pval), parse = TRUE, size = 3) +
-  annotate("text", x = -0.18, y = -0.14, label = deparse(all_s_pco2_pval), parse = TRUE, size = 3) +
-  theme(legend.position = c(0.16, 0.9), legend.background = element_rect(fill = "transparent", color = NA))
+  annotate("text", x = -0.19, y = -0.118, label = deparse(all_pco2_pval), parse = TRUE, size = 3) +
+  annotate("text", x = -0.17, y = -0.14, label = deparse(all_s_pco2_pval), parse = TRUE, size = 3) +
+  theme(legend.position = c(0.18, 0.9), legend.background = element_rect(fill = "transparent", color = NA))
 
 ```
 
-```{r species PCA plot, fig.width = 15, fig.height = 4.7}
+```{r species PCA plot, fig.width = 13, fig.height = 4}
 
 ggarrange(species_pca_plot, all_pco2_pca, all_temp_pca, nrow =1, labels = "AUTO") +
-  ggsave("Figures/Final_Figures/Figure4_PhysPCA.pdf", width = 15, height = 4.7) +
-  ggsave("Figures/Final_Figures/Figure4_PhysPCA.png", width = 15, height = 4.7)
+  ggsave("Figures/Final_Figures/Figure4_PhysPCA.pdf", width = 13, height = 4) +
+  ggsave("Figures/Final_Figures/Figure4_PhysPCA.png", width = 13, height = 4)
 
 ```
 

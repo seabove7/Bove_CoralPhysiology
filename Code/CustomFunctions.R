@@ -102,7 +102,7 @@ PCAplast <- function(pca, data, control_col, control_lvl, colony = "colony") {
   
   
   
-  ### Calculate sample (PC) distances from control (pc) using all 7 PCs by colony
+  ### Calculate sample (PC) distances from control (pc) using all 7 (or 3) PCs by colony
   if("PC7" %in% colnames(dist_df2) ) {
     dist_df3 <- dist_df2 %>% 
     mutate(dist = sqrt( ((PC1 - pc1)^2) + 
