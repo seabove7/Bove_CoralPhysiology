@@ -2033,7 +2033,7 @@ Figure SX. Coral host vs. algal symbiont physiological plasticity of (A) S. side
 
 ### Table S1
 
-**Table S1.** Model performance comparisons of generalized linear models (GLM) for plasticity assessments to select the best-fit model per species using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model per species. The performance score computes indices of model performance for all models per species at once for comparison across models.
+**Table S1.** Model performance comparisons of generalized linear mixed effects models (GLMM) for plasticity assessments to select the best-fit model per species using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model per species. The performance score computes indices of model performance for all models per species at once for comparison across models. The models highlighted in grey were used for bootstrapping estimates and 95% confidence intervals. 
 ```{r table S1 for markdown}
 
 ## Make table S1 with correct labels
@@ -2182,7 +2182,7 @@ table_s3
 ### Table S4
 
 **Table S4.** PERMANOVA model output across species using the *adonis2* function with 1500 iterations.
-```{r table S5 for markdown}
+```{r table S4 for markdown}
 
 ## combine model output
 all_pca_mod$treat <- rownames(all_pca_mod) # add column for rownames
@@ -2222,7 +2222,7 @@ table_s4
 ### Table S5
 
 **Table S5.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with 1500 iterations depicted in **Figures S2-S4**.
-```{r table S6 for markdown}
+```{r table S5 for markdown}
 
 ## combine model output
 pca_host_mod_out <- rbind(s_pca_host_mod, p_pca_host_mod, a_pca_host_mod) # combine all PERMANOVA model outputs
@@ -2276,6 +2276,106 @@ table_s5
 
 ---
 
+### Table S6
+
+**Table S6.** Model performance comparisons of generalized linear mixed effects models (GLMM) for plasticity assessments to select the best-fit model comparing host and symbiont using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model. The performance score computes indices of model performance for all models per species at once for comparison across models. The models highlighted in grey were used for bootstrapping estimates and 95% confidence intervals. 
+```{r table S6 for markdown}
+
+## Make table S1 with correct labels
+comb_plast_aic <- comb_plast_aic %>% 
+  #bind_rows(pstr_plast_aic, past_plast_aic) %>% # combine all PERMANOVA model outputs
+  separate(Name, c(NA, NA, "Formula")) %>% # create column for species ID and formula 
+  mutate(Formula = gsub("mod2", Reduce(paste, deparse(comb_dist_mod2@call[["formula"]])), Formula), # replace model name with model
+         Formula = gsub("mod3", Reduce(paste, deparse(comb_dist_mod3@call[["formula"]])), Formula),
+         Formula = gsub("mod4", Reduce(paste, deparse(comb_dist_mod4@call[["formula"]])), Formula),
+         Formula = gsub("mod5", Reduce(paste, deparse(comb_dist_mod5@call[["formula"]])), Formula),
+         Formula = gsub("mod6", Reduce(paste, deparse(comb_dist_mod6@call[["formula"]])), Formula),
+         Formula = gsub("mod7", Reduce(paste, deparse(comb_dist_mod7@call[["formula"]])), Formula),
+         Formula = gsub("mod8", Reduce(paste, deparse(comb_dist_mod8@call[["formula"]])), Formula),
+         Formula = gsub("mod9", Reduce(paste, deparse(comb_dist_mod9@call[["formula"]])), Formula),
+         Formula = gsub("mod10", Reduce(paste, deparse(comb_dist_mod10@call[["formula"]])), Formula),
+         Formula = gsub("mod11", Reduce(paste, deparse(comb_dist_mod11@call[["formula"]])), Formula),
+         Formula = gsub("mod", Reduce(paste, deparse(comb_dist_mod@call[["formula"]])), Formula)) %>% 
+  mutate(Formula = gsub("fpco2", "pCO2", Formula), # rename the formula components 
+         Formula = gsub("ftemp", "temperature", Formula),
+         Formula = gsub("reef", "reef environment", Formula),
+         Formula = gsub("dist ~ ", "", Formula)) %>% 
+  mutate(AIC = round(AIC, 1), # round the columns
+         BIC = round(BIC, 1),
+         R2_conditional = round(R2_conditional, 3),
+         R2_marginal = round(R2_marginal, 3),
+         Performance_Score = (100 * round(Performance_Score, 3))) %>% 
+  rename(`Performance score` = Performance_Score,
+         `Model formula` = Formula,
+         `Conditional R2` = R2_conditional,
+         `Marginal R2` = R2_marginal)
+  
+ 
+## combine them with format
+table_s6 <- kable(comb_plast_aic[c(-2, -4, -7:-10)], booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  row_spec(6, bold = TRUE, background = "lightgrey")
+table_s6
+
+```
+
+<br/>
+<br/>
+
+---
+
+<br/>
+
+### Table S7
+
+**Table S7.** GLMM output from plasticity assessments for coral host vs. algal symbiont for each species. The intercept of each model was set as coral host, *S. siderea*, 300 $\mu$atm, and 28$^\circ$C.
+```{r table S7 for markdown}
+
+## combine model output per species
+comb_dist_mod_out <- rbind.fill(data.frame(treat = rownames(comb_glm_out[["coefficients"]]),
+                                      comb_glm_out[["coefficients"]]),
+                           data.frame(treat = rownames(data.frame(unlist(r2_nakagawa(comb_dist_glm)))),
+                                      Estimate = unlist(r2_nakagawa(comb_dist_glm))))
+
+
+## update formatting of text 
+comb_dist_mod_out <- comb_dist_mod_out %>% 
+  mutate(Estimate = round(as.numeric(Estimate), 3), # round values
+         Std..Error = round(as.numeric(Std..Error), 3),
+         t.value = round(as.numeric(t.value), 2),
+         Pr...z.. = round(as.numeric(Pr...z..), 3)) %>% 
+  mutate(treat = gsub("[.]", " ", treat), # rename the treatment IDs
+         treat = gsub(" ", "", treat),
+         treat = gsub("2420", "-current", treat),
+         treat = gsub("2680", "-EOC", treat),
+         treat = gsub("23290", "-extreme", treat),
+         treat = gsub("[0-9]", "", treat),
+         treat = gsub("fpco", "pCO2", treat),
+         treat = gsub("ftemp", "temperature (31C)", treat),
+         treat = gsub("speciesP", "PSTR", treat),
+         treat = gsub("speciesA", "PAST", treat),
+         treat = gsub("partsymb", "symbionts", treat),
+         treat = gsub("R_conditionalConditionalR", "Conditional R2", treat),
+         treat = gsub("R_marginalMarginalR", "Marginal R2", treat)) %>% 
+  rename(" " = treat, # rename columns
+        "Standard error" = Std..Error,
+        "Statistic" = t.value,
+        "P-value" = Pr...z..)
+  
+## combine them with format
+table_s7 <- kable(comb_dist_mod_out, booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  row_spec(31:32, italic = TRUE)
+table_s7
+
+```
+
+
+<br/>
+<br/>
+
+---
+
 <br/>
 
 ```{r excel WB, message=FALSE, warning=FALSE}
@@ -2307,6 +2407,16 @@ setColWidths(wb, sheet = 4, cols = 1:6, widths = "auto")
 addWorksheet(wb, "Table S5 - HostVsymb PERMANOVA") 
 writeData(wb, sheet = 5, x = pca_host_symb_mod_out)
 setColWidths(wb, sheet = 5, cols = 1:12, widths = "auto")
+
+# add 'Table S6' worksheet
+addWorksheet(wb, "Table S6 - HostVsymb Plast AIC") 
+writeData(wb, sheet = 6, x = pca_host_symb_mod_out)
+setColWidths(wb, sheet = 6, cols = 1:7, widths = "auto")
+
+# add 'Table S7' worksheet
+addWorksheet(wb, "Table S7 - HostVsymb Plast GLM") 
+writeData(wb, sheet = 7, x = pca_host_symb_mod_out)
+setColWidths(wb, sheet = 7, cols = 1:6, widths = "auto")
 
 
 # save workbook
