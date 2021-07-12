@@ -11,6 +11,10 @@ Global change driven by anthropogenic carbon emissions is altering ecosystems at
 
 **Citation:**  
 
+**Zenodo DOI:** [10.5281/zenodo.5093907](https://doi.org/10.5281/zenodo.5093907)
+
+[![DOI](https://zenodo.org/badge/209146824.svg)](https://zenodo.org/badge/latestdoi/209146824)
+
 ---
 
 #### Repository contains the following:
