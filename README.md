@@ -1,6 +1,8 @@
 # *Global change differentially modulates coral physiology and suggests future shifts in Caribbean reef assemblages*
 
-GitHub repository containing data and code accompanying the OA/OW Coral Physiology manuscript (Bove et al XXX; DOI: XXX)
+<p align="center">
+<img src="https://user-images.githubusercontent.com/45176386/125361215-0320f800-e33b-11eb-9d81-72ebf66590e2.jpg" width = "500" />
+</p>
 
 **Authors:** Colleen B Bove, Sarah W Davies, Justin B Ries, James Umbanhowar, Bailey C Thomasson, Elizabeth B Farquhar, Jessica A McCoppin, and Karl D Castillo
 
