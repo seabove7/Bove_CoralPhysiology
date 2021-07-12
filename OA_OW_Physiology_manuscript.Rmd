@@ -713,8 +713,8 @@ all_pco2_pca <- autoplot(all_pca, data = all_df,
 ```{r species PCA plot, fig.width = 13, fig.height = 4}
 
 ggarrange(species_pca_plot, all_pco2_pca, all_temp_pca, nrow =1, labels = "AUTO") +
-  ggsave("Figures/Final_Figures/Figure4_PhysPCA.pdf", width = 13, height = 4) +
-  ggsave("Figures/Final_Figures/Figure4_PhysPCA.png", width = 13, height = 4)
+  ggsave("Figures/Final_Figures/Figure4_SpeciesPCA.pdf", width = 13, height = 4) +
+  ggsave("Figures/Final_Figures/Figure4_SpeciesPCA.png", width = 13, height = 4)
 
 ```
 
