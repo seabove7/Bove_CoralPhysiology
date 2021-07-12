@@ -1,33 +1,48 @@
-# *TITLE WILL GO HERE*
+# *Global change differentially modulates coral physiology and suggests future shifts in Caribbean reef assemblages*
 
 GitHub repository containing data and code accompanying the OA/OW Coral Physiology manuscript (Bove et al XXX; DOI: XXX)
 
-**Authors:** Colleen B Bove, Sarah W Davies, Justin B Ries, James Umbanhowar, Bailey C Thomasson, Elizabeth Farquhar, Jess McCoppin, and Karl D Castillo
+**Authors:** Colleen B Bove, Sarah W Davies, Justin B Ries, James Umbanhowar, Bailey C Thomasson, Elizabeth B Farquhar, Jessica A McCoppin, and Karl D Castillo
 
 **Abstract:**  
-*Text will go here*
+Global change driven by anthropogenic carbon emissions is altering ecosystems at unprecedented rates, especially coral reefs, whose symbiosis with algal endosymbionts ise particularly vulnerable to increasing ocean temperatures and altered carbonate chemistry. Here, we assess the physiological responses of the coral holobiont (animal host + algal symbiont) of three Caribbean coral species from two reef environments after exposure to simulated ocean warming (28, 31 °C), acidification (300 - 3290 µatm), and the combination of stressors for 93 days. We used multidimensional analyses to assess how multiple coral holobiont physiological parameters respond to ocean acidification and warming. Our results demonstrate significantly diminishing holobiont physiology in *S. siderea* and *P. astreoides* in response to projected ocean acidification, while future warming elicited severe declines in *P. strigosa*. Offshore *S. siderea* fragments exhibited higher physiological plasticity than inshore counterparts, suggesting that this offshore population has the capacity to modulate their physiology in response to changing conditions, but at a cost to the holobiont. Plasticity of *P. strigosa* and *P. astreoides* was not clearly different between natal reef environments, however, temperature evoked a greater plastic response in both species. Interestingly, while these species exhibit unique physiological responses to ocean acidification and warming, when data from all three species are modeled together, convergent stress responses to these conditions are observed, highlighting the overall sensitivities of tropical corals to these stressors. Our results demonstrate that while ocean warming is a severe acute stressor that will have dire consequences for coral reefs globally, chronic exposure to acidification may also impact coral physiology to a greater extent than previously assumed. The variety of responses to global change we observe across species will likely manifest in altered Caribbean reef assemblages in the future. 
 
 **Citation:**  
-*Text will go here*
 
+---
 
 #### Repository contains the following:
 1. R markdown script and html output with all code and analyses included in manuscript (*OA_OW_Physiology_manuscript*)
-2. Data
-   * Raw_data
+2. [Data](https://github.com/seabove7/Bove_CoralPhysiology/tree/master/Data)
+   * [Raw_data](https://github.com/seabove7/Bove_CoralPhysiology/tree/master/Data/Raw_data)
       * All coral holobiont physiology data and experimental conditions used in analyses (*phys_all_23March2021.csv*)
       * Net calcification rates reported previously for these samples in [Bove et al 2019](https://github.com/seabove7/proc-b-2019) (*net_calc.csv*)
-   * Supplemental
+   * [Supplemental](https://github.com/seabove7/Bove_CoralPhysiology/tree/master/Data/Supplemental)
       * Supplemental tables as an excel file produced in the markdown file (*Supplemental_Tables.xlsx*)
-3. Figures
-   * Manuscript
+3. [Figures](https://github.com/seabove7/Bove_CoralPhysiology/tree/master/Figures)
+   * [Final_Figures](https://github.com/seabove7/Bove_CoralPhysiology/tree/master/Figures/Final_Figures)
       * Figure1_PhysPCA (*PNG and PDF versions*)
       * Figure2_PhysCorrelations (*PNG and PDF versions*)      
       * Figure3_PhysPlasticity (*PNG and PDF versions*)
-   * Supplemental
+      * Figure4_SpeciesPCA (*PNG and PDF versions*)
+   * [Supplemental](https://github.com/seabove7/Bove_CoralPhysiology/tree/master/Figures/Supplemental_Figures)
       * FigureS1_PhysPCA_RZ (*PNG and PDF versions*)
-3. Code
-   * R script containing custom functions needed for Rmarkdown code ()
+      * FigureS2_SSID_PCA_hostVsymb (*PNG and PDF versions*)
+      * FigureS3_PSTR_PCA_hostVsymb (*PNG and PDF versions*)
+      * FigureS4_PAST_PCA_hostVsymb (*PNG and PDF versions*)
+      * FigureS5_hostVsymb_plasticity (*PNG and PDF versions*)
+      * FigureS6_AllPhysiology (*PNG and PDF versions*)
+      * FigureS7_BleachingImages (*PNG only*)
+      * FigureS8_speciesPCA_reef (*PNG and PDF versions*)
+      * PAST_PhysCorrelations (*used in creation of main Figure 2*)
+      * PSTR_PhysCorrelations (*used in creation of main Figure 2*)
+      * SSID_PhysCorrelations (*used in creation of main Figure 2*)
+3. [Code](https://github.com/seabove7/Bove_CoralPhysiology/tree/master/Code)
+   * R script containing custom functions needed for Rmarkdown code (*CustomFunctions.R*)
    * Custom python script used for white correction of photos for colour analysis (Written by [Matthew Kendall](https://github.com/matt-kendall)) (*whiteCorrection.py*)
    * MATLAB Macros required for the colour intensity analysis used here that was modified from [Winters et al 2009](https://www.tau.ac.il/lifesci/departments/zoology/members/loya/documents/206Winters.pdf) (*Macros folder*)
    * README with instructions for use of the whiteCorrection.py script and protocol for colour correction (*README.md*)
+
+---
+
+#### Protocols for [Carbohydrate](dx.doi.org/10.17504/protocols.io.bvb9n2r6) and [Lipid](dx.doi.org/10.17504/protocols.io.bvcfn2tn) assays can be accessed on [protocols.io](protocols.io).
