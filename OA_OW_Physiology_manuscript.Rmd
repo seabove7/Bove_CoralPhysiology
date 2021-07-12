@@ -940,14 +940,14 @@ ssid_boot <- cbind(sid_dist, as.data.frame(t(apply(ssid_boot_out, 1, function(x)
 colnames(ssid_boot)[23:25] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
-save(ssid_boot, file = "Data/SSID_PlastBoot.rda")
+save(ssid_boot, file = "Data/Bootstrap/SSID_PlastBoot.rda")
 
 ```
 
 ```{r plots of SSID distances}
 
 ## Load boot data
-load(file = "Data/SSID_PlastBoot.rda")
+load(file = "Data/Bootstrap/SSID_PlastBoot.rda")
 ssid_boot$treat2 <- paste(ssid_boot$fpco2, ssid_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
 ssid_boot$treat2 <- factor(ssid_boot$treat2, levels = c("300_28", "300_31", "420_31", "680_28", "680_31", "3290_28", "3290_31")) # adjust treatment levels
 
@@ -1040,7 +1040,7 @@ save(pstr_boot, file = "Data/PSTR_PlastBoot.rda")
 ```{r plots of PSTR distances}
 
 ## Load boot data
-load(file = "Data/PSTR_PlastBoot.rda")
+load(file = "Data/Bootstrap/PSTR_PlastBoot.rda")
 pstr_boot$treat2 <- paste(pstr_boot$fpco2, pstr_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
 pstr_boot$treat2 <- factor(pstr_boot$treat2, levels = c("300_28", "300_31", "680_28", "680_31", "3290_28", "3290_31")) # adjust treatment levels
 
@@ -1127,7 +1127,7 @@ save(past_boot, file = "Data/PAST_PlastBoot.rda")
 ```{r plots of PAST distances}
 
 ## Load boot data
-load(file = "Data/PAST_PlastBoot.rda")
+load(file = "Data/Bootstrap/PAST_PlastBoot.rda")
 past_boot$treat2 <- paste(past_boot$fpco2, past_boot$ftemp, sep = "_") # need to rename treatments with the mean pCO2, not temp-specific ones
 past_boot$treat2 <- factor(past_boot$treat2, levels = c("300_28", "300_31", "420_31", "680_28", "680_31", "3290_28", "3290_31")) # adjust treatment levels
 
@@ -1914,14 +1914,14 @@ comb_boot <- cbind(combined_dist, as.data.frame(t(apply(comb_boot_out, 1, functi
 colnames(comb_boot)[16:18] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
-save(comb_boot, file = "Data/HostVSymb_PlastBoot.rda")
+save(comb_boot, file = "Data/Bootstrap/HostVSymb_PlastBoot.rda")
 
 ```
 
 ```{r species labels for distance plots}
 
 ## Load bootstrap data from above
-load(file = "Data/HostVSymb_PlastBoot.rda")
+load(file = "Data/Bootstrap/HostVSymb_PlastBoot.rda")
 
 ## Adding pretty species labels for all dataframes
 comb_boot <- comb_boot %>% 
