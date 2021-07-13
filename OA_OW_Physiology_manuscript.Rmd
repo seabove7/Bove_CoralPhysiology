@@ -1419,12 +1419,12 @@ dip_pca_df_symb <- p_df[,c(14,16,17)] # symbiont only phys (chla, density, color
 
 
 ## run the adonis for HOST phys
-#s_pca_host_mod <- adonis2(dip_pca_df_host ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
+#p_pca_host_mod <- adonis2(dip_pca_df_host ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 p_pca_host_mod <- adonis2(dip_pca_df_host ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
 #p_pca_host_mod # view PSTR adonis output
 
 ## run the adonis for SYMB phys
-#s_pca_symb_mod <- adonis2(dip_pca_df_symb ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
+#p_pca_symb_mod <- adonis2(dip_pca_df_symb ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 p_pca_symb_mod <- adonis2(dip_pca_df_symb ~ fpco2 + ftemp + reef, data = p_df, method = 'eu', permutations = bootnum)
 #p_pca_symb_mod # view PSTR adonis output
 
@@ -1620,12 +1620,12 @@ por_pca_df_symb <- a_df[,c(14,16,18)] # symbiont only phys (chla, density, color
 
 
 ## run the adonis for HOST phys
-#s_pca_host_mod <- adonis2(por_pca_df_host ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
+#a_pca_host_mod <- adonis2(por_pca_df_host ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 a_pca_host_mod <- adonis2(por_pca_df_host ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
 #a_pca_host_mod # view PAST adonis output
 
 ## run the adonis for SYMB phys
-#s_pca_symb_mod <- adonis2(por_pca_df_symb ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
+#a_pca_symb_mod <- adonis2(por_pca_df_symb ~ reef * ftemp * fpco2, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
 a_pca_symb_mod <- adonis2(por_pca_df_symb ~ fpco2 + ftemp + reef, data = a_df, method = 'eu', permutations = bootnum)
 #a_pca_symb_mod # view PAST adonis output
 
@@ -2427,12 +2427,12 @@ setColWidths(wb, sheet = 5, cols = 1:12, widths = "auto")
 
 # add 'Table S6' worksheet
 addWorksheet(wb, "Table S6 - HostVsymb Plast AIC") 
-writeData(wb, sheet = 6, x = pca_host_symb_mod_out)
+writeData(wb, sheet = 6, x = comb_plast_aic)
 setColWidths(wb, sheet = 6, cols = 1:7, widths = "auto")
 
 # add 'Table S7' worksheet
 addWorksheet(wb, "Table S7 - HostVsymb Plast GLM") 
-writeData(wb, sheet = 7, x = pca_host_symb_mod_out)
+writeData(wb, sheet = 7, x = comb_dist_mod_out)
 setColWidths(wb, sheet = 7, cols = 1:6, widths = "auto")
 
 
