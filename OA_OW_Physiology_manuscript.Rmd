@@ -113,8 +113,7 @@ date <- Sys.Date()
 
 ```{r original dataframe adjustment, include=FALSE}
 
-df <- read_csv("Data/Raw_data/phys_all_23March2021.csv") # read in full dataframe
-df$X1 <- NULL
+df <- read_csv("Data/Raw_data/phys_all_23March2021.csv")[-1] # read in full dataframe
 
 # rename a couple columns
 names(df)[38]<-"carb"
@@ -289,11 +288,11 @@ s_temp_pca <- autoplot(s_pca, data = s_df,
   #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
   scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "transparent"))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.30, y = -0.38, label = deparse(s_temp_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(bold("A)   "), italic("S. siderea"))))
+  ggtitle(expression(paste(italic("S. siderea"))))
 
 # pco2
 s_pco2_pca <- autoplot(s_pca, data = s_df, 
@@ -402,11 +401,11 @@ p_temp_pca <- autoplot(p_pca, data = p_df,
   #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
   scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "transparent"))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.13, y = -0.38, label = deparse(p_temp_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
+  ggtitle(expression(paste(italic("P. strigosa"))))
 
 
 # pco2
@@ -517,11 +516,11 @@ a_temp_pca <- autoplot(a_pca, data = a_df,
   #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
   scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
   scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", NA))+
+  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "transparent"))+
   guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.22, y = -0.44, label = deparse(a_temp_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
+  ggtitle(expression(paste(italic("P. astreoides"))))
 
 # pco2
 a_pco2_pca <- autoplot(a_pca, data = a_df, 
@@ -582,19 +581,20 @@ a_reef_pca <- autoplot(a_pca, data = a_df,
 
 ```{r PCA plot, fig.height=7, fig.width=13}
 
-temp_PCA <- ggarrange(s_temp_pca, p_temp_pca, a_temp_pca, ncol = 3, common.legend = TRUE, legend = "right")
-pCO2_PCA <- ggarrange(s_pco2_pca, p_pco2_pca, a_pco2_pca, ncol = 3, common.legend = TRUE, legend = "right")
+temp_PCA <- ggarrange(s_temp_pca, p_temp_pca, a_temp_pca, ncol = 3, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
+pCO2_PCA <- ggarrange(s_pco2_pca, p_pco2_pca, a_pco2_pca, ncol = 3, common.legend = TRUE, legend = "bottom", labels = c("D", "E", "F"))
 
-ggarrange(temp_PCA, pCO2_PCA, nrow = 2) +
-  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 13, height = 7.5) +
-  ggsave("Figures/Final_Figures/Figure1_PhysPCA.png", width = 13, height = 7.5)
+ggarrange(temp_PCA, pCO2_PCA, nrow = 2) 
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 13, height = 8.5)
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.png", width = 13, height = 8.5)
 
 ```
 
-**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$C blue; 31$^\circ$C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure 1.** Principal component analysis (PCA) of all coral holobiont physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$C blue; 31$^\circ$C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters (rate = calcification rate; den = symbiont density; chla = chlorophyll a; pro = protein; carb = carbohydrate; lipid = lipid; sum/red = color intensity) and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
+
 
 ### **Figure 4**
 
@@ -652,8 +652,6 @@ species_pca_plot <- autoplot(all_pca, data = all_df,
   scale_color_manual("", labels = c("S. siderea", "P. strigosa", "P. astreoides"), values = c("#867796", "#73CCD2", "#D2D69B")) +
   guides(shape = FALSE, fill = FALSE, color = guide_legend(keyheight = 0.1, nrow = 3, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.16, 0.9), legend.text = element_text(face = "italic")) +
-  #ggsave("Figures/Final_Figures/FigureX_SpeciesPCA.pdf", width = 6, height = 4.5) +
-  #ggsave("Figures/Final_Figures/FigureX_SpeciesPCA.png", width = 6, height = 4.5) +
   annotate("text", x = -0.18, y = -0.108, label = deparse(all_species_pval), parse = TRUE, size = 3)
 
 # temperature
@@ -712,8 +710,8 @@ all_pco2_pca <- autoplot(all_pca, data = all_df,
 
 ```{r species PCA plot, fig.width = 13, fig.height = 4}
 
-ggarrange(species_pca_plot, all_pco2_pca, all_temp_pca, nrow =1, labels = "AUTO") +
-  ggsave("Figures/Final_Figures/Figure4_SpeciesPCA.pdf", width = 13, height = 4) +
+ggarrange(species_pca_plot, all_pco2_pca, all_temp_pca, nrow =1, labels = "AUTO")
+  ggsave("Figures/Final_Figures/Figure4_SpeciesPCA.pdf", width = 13, height = 4)
   ggsave("Figures/Final_Figures/Figure4_SpeciesPCA.png", width = 13, height = 4)
 
 ```
@@ -846,8 +844,8 @@ past_corr_plot <- ggplot() +
   theme_void() + 
   ggtitle(expression(paste(bold("  C)   "), italic("P. asteroides"))))
 
-ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1) +
-  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 12, height = 3.1) +
+ggarrange(ssid_corr_plot, pstr_corr_plot, past_corr_plot, nrow = 1)
+  ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.pdf", width = 12, height = 3.1)
   ggsave("Figures/Final_Figures/Figure2_PhysCorrelations.png", width = 12, height = 3.1)
 
 ```
@@ -886,7 +884,7 @@ Physiological plasticity of each experimental fragment was calculated for each s
 
 ## Calculate the PCA distance with custom function
 sid_dist <- PCAplast(pca = s_pca,
-                     data = s_df[,c(1,7,8, 10,11,12,27)],
+                     data = s_df[,c(1,7,8, 10,11,12,27,2)],
                      control_col = "treat2",
                      control_lvl = "420_28")
 
@@ -895,25 +893,26 @@ sid_dist <- PCAplast(pca = s_pca,
 
 ssid_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist) # best fit
+ssid_dist_mod2b <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 
 # check for best-fit model
-ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
+ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod2b, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
 plot(ssid_plast_aic)
 
 
 ## Best-fit GLMM with Gamma log link
-ssid_dist_glm <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_glm <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = sid_dist)
 ssid_glm_out <- summary(ssid_dist_glm) # summary output of the GLM
 
 
 ## conditional and marginal R2
 r2_nakagawa(ssid_dist_glm)
-#  Conditional R2: 0.506 -- fixed and random effects
-#     Marginal R2: 0.322 -- fixed effects only
+#  Conditional R2: 0.542 -- fixed and random effects
+#     Marginal R2: 0.307 -- fixed effects only
 
 ## Below info taken from appendix 3 of Gok A, Ngendahimana DK, Fagerholm CL, French RH, Sun J, Bruckman LS (2017) Predictive models of poly(ethylene-terephthalate) film degradation under multi-factor accelerated weathering exposures. PLoS ONE 12(5): e0177614. https://doi.org/10.1371/journal.pone.0177614
 
@@ -937,7 +936,7 @@ ssid_boot_out <- replicate(bootnum, bootFUN(model = ssid_dist_glm, newdata = new
 
 ## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
 ssid_boot <- cbind(sid_dist, as.data.frame(t(apply(ssid_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
-colnames(ssid_boot)[23:25] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+colnames(ssid_boot)[24:26] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
 save(ssid_boot, file = "Data/Bootstrap/SSID_PlastBoot.rda")
@@ -985,7 +984,7 @@ r2_nakagawa(ssid_dist_glm) # conditional and marginal R2
 
 ## Calculate the PCA distance with custom function
 dip_dist <- PCAplast(pca = p_pca,
-                     data = p_df[,c(1,7,8, 10,11,12,27)],
+                     data = p_df[,c(1,7,8, 10,11,12,27,2)],
                      control_col = "treat2",
                      control_lvl = "420_28")
 
@@ -999,6 +998,7 @@ pstr_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gam
 #pstr_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
 #pstr_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
 pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # best fit model
+#pstr_dist_mod6b <- glmer(dist ~ fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = dip_dist) # singular
 
 
 # check for best-fit model
@@ -1078,7 +1078,7 @@ r2_nakagawa(pstr_dist_glm) # conditional and marginal R2
 
 ## Calculate the PCA distance with custom function
 por_dist <- PCAplast(pca = a_pca,
-                     data = a_df[,c(1,7,8, 10,11,12,27)],
+                     data = a_df[,c(1,7,8, 10,11,12,27, 2)],
                      control_col = "treat2",
                      control_lvl = "420_28")
 
@@ -1090,9 +1090,11 @@ past_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gam
 past_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) # best fit
+past_dist_mod6b <- glmer(dist ~ fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist) 
+
 
 # check for best-fit model
-past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, rank = TRUE)
+past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, past_dist_mod6b, rank = TRUE)
 plot(past_plast_aic)
 
 
@@ -1163,13 +1165,13 @@ r2_nakagawa(past_dist_glm) # conditional and marginal R2
 
 ```{r plot and save all species plasticity, fig.width = 11, fig.height = 4}
 
-ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRUE, legend = "right", ncol = 3, widths = c(1, 0.6, 0.6)) +
-  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.pdf", width = 11, height = 4) +
+ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRUE, legend = "right", ncol = 3, widths = c(1, 0.6, 0.6))
+  ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.pdf", width = 11, height = 4)
   ggsave("Figures/Final_Figures/Figure3_PhysPlasticity.png", width = 11, height = 4)
 
 ```
 
-**Figure 3.** Holobiont physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. Natal reef environment is depicted along the x axis for *S. siderea*, however, *P. strigosa* and and *P. astreoides* samples were pooled by reef environment. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange) and temperature is represented as either closed (28 $^\circ$C) or open (31 $^\circ$C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
+**Figure 3.** Holobiont physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. Natal reef environment is depicted along the x axis for *S. siderea*, however, *P. strigosa* and and *P. astreoides* samples were pooled by reef environment. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange) and temperature is represented as either closed (28 $^\circ$C) or open (31 $^\circ$C) symbols. The current day at 28 °C treatment is not depicted here since plasticity is represented as the distance from this treatment (420 μatm at 28 °C). Symbols and bars indicate modeled means and 95% confidence intervals.
 
 <br/>
 <br/>
@@ -1196,8 +1198,8 @@ Elevated temperatures generally resulted in higher plasticity of *P. astreoides*
 
 ```{r PCA plot reefs, fig.height = 3.8, fig.width = 13}
 
-ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "right") +
-  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.pdf", width = 13, height = 3.8) +
+ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "right")
+  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.pdf", width = 13, height = 3.8)
   ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA_RZ.png", width = 13, height = 3.8)
 
 ```
@@ -1396,8 +1398,8 @@ ssid_host_symb_pco2 <- ggarrange(sid_host_pco2_pca, sid_symb_pco2_pca,ncol = 2, 
 ssid_host_symb_reef <- ggarrange(sid_host_reef_pca, sid_symb_reef_pca,ncol = 2, common.legend = TRUE, legend = "right")  # reef
 
 ## Add all together for final figure:
-ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 3) +
-  ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.pdf", width = 9, height = 10) +
+ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 3)
+  ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.pdf", width = 9, height = 10)
   ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.png", width = 9, height = 10)
 
 
@@ -1597,8 +1599,8 @@ PSTR_host_symb_pco2 <- ggarrange(dip_host_pco2_pca, dip_symb_pco2_pca,ncol = 2, 
 PSTR_host_symb_reef <- ggarrange(dip_host_reef_pca, dip_symb_reef_pca,ncol = 2, common.legend = TRUE, legend = "right")  # reef
 
 ## Add all together for final figure:
-ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 3) +
-  ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.pdf", width = 9, height = 10) +
+ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 3)
+  ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.pdf", width = 9, height = 10)
   ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.png", width = 9, height = 10)
 
 
@@ -1798,8 +1800,8 @@ PAST_host_symb_pco2 <- ggarrange(por_host_pco2_pca, por_symb_pco2_pca,ncol = 2, 
 PAST_host_symb_reef <- ggarrange(por_host_reef_pca, por_symb_reef_pca,ncol = 2, common.legend = TRUE, legend = "right")  # reef
 
 ## Add all together for final figure:
-ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 3) +
-  ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.pdf", width = 9, height = 10) +
+ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 3)
+  ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.pdf", width = 9, height = 10)
   ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.png", width = 9, height = 10)
 
 
@@ -1952,9 +1954,10 @@ ggplot(comb_boot, aes(x = part, y = estimate, color = treat2, fill = treat2, sha
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
   #scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
   #facet_grid(species ~ part, labeller = label_parsed) +
-  facet_grid( ~ species, labeller = label_parsed) +  
-  ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.pdf", width = 11, height = 3.5) +
-  ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.png", width = 11, height = 3.5)
+  facet_grid( ~ species, labeller = label_parsed)
+
+ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.pdf", width = 11, height = 3.5)
+ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.png", width = 11, height = 3.5)
 
 ```
 
@@ -1987,9 +1990,10 @@ ggplot(df_withT_phys, aes(x = fpco2, y = value, color = ftemp)) +
   scale_color_manual("", labels = c("28 °C", "31 °C"), values = c("#4393c3", "#b2182b"))+
   facet_grid(param ~ species, scales = "free_y", labeller = label_parsed) +
   guides(color = guide_legend(override.aes = list(linetype = c(0, 0)))) +
-  labs(y = "", x = alab) +
-  ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.pdf", width = 10, height = 13) +
-  ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.png", width = 10, height = 13) 
+  labs(y = "", x = alab)
+
+ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.pdf", width = 10, height = 13)
+ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.png", width = 10, height = 13) 
 
 ```
 
@@ -2033,9 +2037,10 @@ autoplot(all_pca, data = all_df,
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.position = c(0.11, 0.9), legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
   annotate("text", x = -0.2, y = -0.108, label = deparse(all_reef_pval), parse = TRUE, size = 3) +
-  annotate("text", x = -0.2, y = -0.128, label = deparse(all_s_reef_pval), parse = TRUE, size = 3) +
-  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.pdf", width = 5.5, height = 4.5) +
-  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.png", width = 5.5, height = 4.5)
+  annotate("text", x = -0.2, y = -0.128, label = deparse(all_s_reef_pval), parse = TRUE, size = 3)
+
+ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.pdf", width = 5.5, height = 4.5)
+ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.png", width = 5.5, height = 4.5)
 
 ```
 
