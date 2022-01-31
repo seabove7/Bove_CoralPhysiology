@@ -232,7 +232,7 @@ a_df <- subset(df_90, species == "A")
 ## Principal component analyses {.tabset}
 
 #### *Methods:*
-Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal symbiont chlorophyll a, algal symbiont cell density, holobiont calcification rate as previously for the same samples in Bove et al (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")` (Oksanen et al., 2020)).
+Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal symbiont chlorophyll a, algal symbiont cell density, calcification rate as previously for the same samples in Bove et al (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")` (Oksanen et al., 2020)).
 
 <br/>
   
@@ -247,8 +247,8 @@ s_df$fpco2 <- factor(s_df$fpco2, levels = c("300", "420", "680", "3290"))
 sid_pca_df <- s_df[,c(14:17,21:23)]
 
 # run the adonis
-#s_pca_mod <- adonis2(sid_pca_df ~ reef * ftemp * fpco2, data = s_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-s_pca_mod <- adonis2(sid_pca_df ~ fpco2 + ftemp + reef, data = s_df, method = 'eu', permutations = bootnum)
+#s_pca_mod <- adonis2(sid_pca_df ~ reef * ftemp * fpco2, data = s_df, method = 'eu', permutations = bootnum) # below is the model with non sig interactions removed:
+s_pca_mod <- adonis2(sid_pca_df ~ fpco2 + ftemp + reef, data = s_df, method = 'eu', permutations = bootnum, by = "margin")
 s_pca_mod # view SSID adonis output
 
 # extract pvalues
@@ -386,7 +386,7 @@ dip_pca_df <- p_df[,c(14:17,21:23)]
 
 # run the adonis
 #p_pca_mod <- adonis2(dip_pca_df ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-p_pca_mod <- adonis2(dip_pca_df ~ reef + ftemp + fpco2, data = p_df, method = 'eu', permutations = bootnum)
+p_pca_mod <- adonis2(dip_pca_df ~ reef + ftemp + fpco2, data = p_df, method = 'eu', permutations = bootnum, by = "margin")
 p_pca_mod # view PSTR adonis output
 
 # extract pvalues
@@ -527,7 +527,7 @@ por_pca_df <- a_df[,c(14:16,18,21:23)]
 
 # run the adonis
 #a_pca_mod <- adonis2(por_pca_df ~ fpco2 * ftemp * reef, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
-a_pca_mod <- adonis2(por_pca_df ~ reef + ftemp + fpco2, data = a_df, method = 'eu', permutations = bootnum)
+a_pca_mod <- adonis2(por_pca_df ~ reef + ftemp + fpco2, data = a_df, method = 'eu', permutations = bootnum, by = "margin")
 a_pca_mod # view PAST adonis output
 
 # extract pvalues
@@ -794,55 +794,6 @@ ggarrange(species_pca_plot, all_pco2_pca, all_temp_pca, nrow =1, labels = "AUTO"
 ```
 
 **Figure 4.** Principal component analysis (PCA) comparing the coral holobiont of all three species at the end of the experiment depicted by (**A**) species, (**B**) *p*CO~2~ treatment, and (**C**) temperature treatment. Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
-
-### PCA all species at control
-
-
-```{r all control PCA}
-
-# set up the dataframe
-all_df_cntrl <- filter(all_df, pco2 == 447)
-all_cntrl_pca <- all_df_cntrl[,c(14:17,21:23)]
-
-# run the adonis
-#all_pca_mod <- adonis2(all_pca_df ~ reef * ftemp * fpco2 * species, data = all_df, method = 'eu', permutations = bootnum) # below is the model with non sig interactions removed:
-all_pca_cntrl_mod <- adonis2(all_cntrl_pca ~ species, data = all_df_cntrl, method = 'eu', permutations = bootnum)
-all_pca_cntrl_mod # view all adonis output
-
-# extract pvalues
-all_pval <- all_pca_cntrl_mod["Pr(>F)"]
-
-# perform principal component analysis (PCA)
-all_cntrl_pca <- prcomp(all_cntrl_pca, center = TRUE, scale= TRUE)
-
-```
-
-```{r all control PCA plot, fig.height=6, fig.width=6}
-
-# PCA plot of all species at control treatment only
-autoplot(all_cntrl_pca, data = all_df_cntrl, 
-                       colour = "species",
-                       #shape = "species",
-                       #shape = "fpco2",
-                       #fill = "species",               
-                       frame = TRUE, 
-                       frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-                       frame.level = 0.95, # using 95% CI for all ellipses
-                       frame.alpha = 0.01,
-                       loadings = TRUE, 
-                       loadings.colour = "grey29", 
-                       loadings.label = TRUE,
-                       loadings.label.colour = "black",         
-                       loadings.label.size = 4, 
-                       loadings.label.hjust = 1.5, 
-                       loadings.label.vjust = 0.5,
-                       loadings.label.repel = TRUE) +
-  scale_color_manual("", labels = c("S. siderea", "P. strigosa", "P. astreoides"), values = c("#867796", "#73CCD2", "#D2D69B")) +
-  guides(shape = FALSE, fill = FALSE, color = guide_legend(keyheight = 0.1, nrow = 3, byrow = TRUE, override.aes = list(linetype = c(0, 0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.16, 0.9), legend.text = element_text(face = "italic")) 
-
-```
-
 
 <br/>
 <br/>
@@ -1328,7 +1279,7 @@ Elevated temperatures generally resulted in higher plasticity of *P. astreoides*
 
 ### Figure S1
 
-```{r PCA plot reefs, fig.height = 3.8, fig.width = 13}
+```{r PCA plot reefs, fig.height = 8, fig.width = 13}
 
 reef_pca_all <- ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.legend = TRUE, legend = "bottom")
 trt_pca_all <- ggarrange(s_pt_pca, p_pt_pca, a_pt_pca, ncol = 3, common.legend = TRUE, legend = "bottom", labels = c("D)", "E)", "F)"))
@@ -2012,7 +1963,7 @@ combined_dist <- rbind(host_dist, symb_dist)
 
 ```
 
-```{r host v symb plasticity analyses, eval=FALSE, include=FALSE}
+```{r host v symb plasticity analyses}
 
 ## Model selection (via AIC)
 comb_dist_mod  <- glmer(dist ~ species * part * reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
@@ -2156,9 +2107,9 @@ ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.png", width = 10, he
 
 ### Figure S8
 
-```{r species PCA by reef plot, fig.width = 5.5, fig.height = 4.5, fig.align = 'center'}
+```{r species PCA by reef plot}
 
-autoplot(all_pca, data = all_df, 
+all_reef_pca <- autoplot(all_pca, data = all_df, 
                        colour = "reef",
                        fill = "reef",
                        frame = TRUE, 
@@ -2180,12 +2131,43 @@ autoplot(all_pca, data = all_df,
   annotate("text", x = -0.2, y = -0.108, label = deparse(all_reef_pval), parse = TRUE, size = 3) +
   annotate("text", x = -0.2, y = -0.128, label = deparse(all_s_reef_pval), parse = TRUE, size = 3)
 
-ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.pdf", width = 5.5, height = 4.5)
-ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.png", width = 5.5, height = 4.5)
+
+# pco2 * temp
+all_df$pco2_f <- factor(all_df$pco2, labels = c("pre industrial; 28C", "pre industrial; 31C", "current; 31C", "current; 28C", "end-of-century; 28C", "end-of-century; 31C", "extreme; 28C", "extreme; 31C"))
+all_pt_pca <- autoplot(all_pca, data = all_df,
+         colour = "pco2_f",
+         fill = "pco2_f",
+         shape = "pco2_f",
+         frame = TRUE, 
+         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
+         frame.level = 0.95, # using 95% CI for all ellipses
+         frame.alpha = 0.01,
+         frame.size = 5,
+         loadings = TRUE, 
+         loadings.colour = "grey29", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
+         loadings.label.repel = TRUE) +
+  scale_fill_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
+  scale_colour_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
+  scale_shape_manual("", values = c(19, 19, 17, 17, 15, 15, 8, 8)) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.5, ncol = 1, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = "right")
 
 ```
 
-**Figure S8.** Principal component analysis (PCA) comparing the coral holobiont of all three species at the end of the experiment depicted reef environment. Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+```{r save fig s8, fig.width = 10, fig.height = 4.5, fig.align = 'center'}
+
+ggarrange(all_reef_pca, all_pt_pca, ncol = 2, labels = "AUTO", widths = c(0.6, 1))
+  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA.pdf", width = 10, height = 4.5)
+  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA.png", width = 10, height = 4.5)
+
+```
+
+**Figure S8.** Principal component analysis (PCA) comparing the physiology of all three species at the end of the experiment depicted by (**A**) reef environment and (**B**) combined *p*CO~2~ and temperature treatment. Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
@@ -2203,10 +2185,12 @@ ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA_reef.png", width = 5.5,
 plast_aic <- ssid_plast_aic %>% 
   bind_rows(pstr_plast_aic, past_plast_aic) %>% # combine all PERMANOVA model outputs
   separate(Name, c("Species", NA, "Formula")) %>% # create column for species ID and formula 
-  mutate(Formula = gsub("mod2", Reduce(paste, deparse(ssid_dist_mod2@call[["formula"]])), Formula), # replace model name with model
+  mutate(Formula = gsub("mod2b", Reduce(paste, deparse(ssid_dist_mod2b@call[["formula"]])), Formula), # replace model name with model
+         Formula = gsub("mod2", Reduce(paste, deparse(ssid_dist_mod2@call[["formula"]])), Formula),
          Formula = gsub("mod3", Reduce(paste, deparse(ssid_dist_mod3@call[["formula"]])), Formula),
          Formula = gsub("mod4", Reduce(paste, deparse(ssid_dist_mod4@call[["formula"]])), Formula),
          Formula = gsub("mod5", Reduce(paste, deparse(ssid_dist_mod5@call[["formula"]])), Formula),
+         Formula = gsub("mod6b", Reduce(paste, deparse(past_dist_mod6b@call[["formula"]])), Formula),
          Formula = gsub("mod6", Reduce(paste, deparse(ssid_dist_mod6@call[["formula"]])), Formula),
          Formula = gsub("mod", Reduce(paste, deparse(ssid_dist_mod@call[["formula"]])), Formula)) %>% 
   mutate(Formula = gsub("fpco2", "pCO2", Formula), # rename the formula components 
@@ -2227,10 +2211,10 @@ plast_aic <- ssid_plast_aic %>%
 ## combine them with format
 table_s1 <- kable(plast_aic[c(-1, -3, -8:-11)], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
-  pack_rows("Siderastrea Siderea", 1, 6, italic = TRUE) %>%
-  pack_rows("Pseudodiploria strigosa", 7, 10, italic = TRUE) %>%
-  pack_rows("Porites astreoides", 11, 16, italic = TRUE) %>% 
-  row_spec(c(1,10,15), bold = TRUE, background = "lightgrey")
+  pack_rows("Siderastrea Siderea", 1, 7, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 8, 11, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 12, 18, italic = TRUE) %>% 
+  row_spec(c(2,11,17), bold = TRUE, background = "lightgrey")
 table_s1
 
 ```
@@ -2344,7 +2328,7 @@ table_s3
 
 ### Table S4
 
-**Table S4.** PERMANOVA model output across species using the *adonis2* function with 1500 iterations.
+**Table S4.** PERMANOVA model output across species using the *adonis2* function with `r bootnum` iterations.
 ```{r table S4 for markdown}
 
 ## combine model output
@@ -2384,7 +2368,7 @@ table_s4
 
 ### Table S5
 
-**Table S5.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with 1500 iterations depicted in **Figures S2-S4**.
+**Table S5.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with `r bootnum` iterations depicted in **Figures S2-S4**.
 ```{r table S5 for markdown}
 
 ## combine model output
