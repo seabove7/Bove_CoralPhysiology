@@ -36,10 +36,23 @@ options(warn = -1)
 
 ```
 
-```{r packages, include=FALSE}
+```{r install missing packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
+## install packages from source code
+#install.packages("devtools") # if you need to install this package
 #library("devtools")
-#install_github("vqv/ggbiplot") # need this to download ggbiplot if not already installed
+#install_github("vqv/ggbiplot")
+#install_github("cran/rcompanion") 
+
+
+### Used packages that need to be installed to run code (and can be sourced easier from CRAN):
+needed_packages <- c("knitr", "readr", "broom", "ggplot2", "dplyr", "ggbiplot", "tidyr", "corrgram", "openxlsx", "plotly", "tidyverse", "vegan", "shiny", "Rmisc", "cowplot", "ggfortify", "finalfit", "kableExtra", "readr", "lmerTest", "vroom", "ggpubr", "magick", "Hmisc", "corrplot", "gridGraphics", "grid", "RColorBrewer", "wesanderson", "performance", "MASS", "png", "car", "rcompanion", "janitor") # Specify necessary packages
+
+not_installed <- needed_packages[!(needed_packages %in% installed.packages()[ , "Package"])] # Extract not installed packages) # Install not installed packages
+
+```
+
+```{r load packages, message=FALSE, warning=FALSE, include=FALSE}
 
 ## Packages to load
 library(knitr)
@@ -1118,7 +1131,7 @@ pstr_boot <- cbind(dip_dist, as.data.frame(t(apply(pstr_boot_out, 1, function(x)
 colnames(pstr_boot)[10:12] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
-save(pstr_boot, file = "Data/PSTR_PlastBoot.rda")
+save(pstr_boot, file = "Data/Bootstrap/PSTR_PlastBoot.rda")
 
 ```
   
@@ -1211,7 +1224,7 @@ past_boot <- cbind(por_dist, as.data.frame(t(apply(past_boot_out, 1, function(x)
 colnames(past_boot)[10:12] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
-save(past_boot, file = "Data/PAST_PlastBoot.rda")
+save(past_boot, file = "Data/Bootstrap/PAST_PlastBoot.rda")
 
 ```  
   
@@ -1284,6 +1297,57 @@ Elevated temperatures generally resulted in higher plasticity of *P. astreoides*
 
 
 ## Supplemental Figures{.tabset}
+
+### Figure SXX
+
+![](Figures/Supplemental_Figures/FigureSXX_TankArray.jpg)
+
+**Figure SXX.** Diagram showing allocation of coral fragments for a single species throughout experimental tank array. Color represent a different colony and shape represents reef environment. Four colonies (two from each reef environment) are reared within each tank (grey box), with three tanks comprising a treatment (white box). This is repeated for each *p*CO~2~ treatment at both temperatures. This same experimental design was used for all species. Figure taken from Bove et al. 2019.
+
+<br/>
+<br/>
+
+
+### Figure SXX
+
+```{r water chem through time}
+
+## Read in the water chem values from the experiment
+chem <- read.csv("Data/Raw_data/Exp_waterchem.csv") %>% 
+  mutate(date = as.Date(date, format = "%m/%d/%Y"), # convert date to date format)
+         pco2 = factor(pco2, labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century", "end-of-century", "extreme", "extreme")), # convert to factors
+         temp = factor(temp, labels = c("28C", "31C"))) %>% 
+  group_by(date, pco2, temp, param, treat) %>% 
+  summarise(mean = mean(value),
+            sd = sd(value),
+            n = n())
+  
+
+dodge <- position_dodge(width = 7)
+labels <- c(alk = "A)  Total alkalinity", co2 = "B)  CO2", co3 = "C)  CO3", dic = "D)  DIC", hco3 = "E)  HCO3", mpco2 = "F)  CO2 seawater", mtemp = "G)  Temperature (C)", pHc = "H)  pH calculated", pHm = "I)  pH measured", sal = "J)  Salinity", sat = "K)  Aragonite saturation state")
+
+
+ggplot(data = chem, aes(x = date, y = mean, colour = pco2, shape = temp, group = treat)) +
+  geom_point(size = 3, position = dodge) +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd, group = treat), width = 0, size = 0.5, position = dodge, colour = "black") +
+  #scale_y_continuous(trans = 'log2') +
+  scale_shape_manual(values = c(17, 16)) +
+  scale_color_manual(values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) + 
+  facet_wrap(~ param, ncol = 3, scales = "free_y", labeller = labeller(param = labels)) +
+  theme_classic() +
+  labs(x = "", y = "") +
+  theme(legend.position = c(0.83, 0.11), legend.box = "horizontal", legend.title = element_blank())
+
+ggsave("Figures/Supplemental_Figures/FigureSXX_waterchem.pdf", width = 12, height = 8)  
+ggsave("Figures/Supplemental_Figures/FigureSXX_waterchem.png", width = 12, height = 8)
+
+```
+
+**Figure SXX.** Calculated and measured seawater parameters over the entire experimental period. 
+
+<br/>
+<br/>
+
 
 ### Figure S1
 
@@ -2203,9 +2267,67 @@ ggarrange(all_reef_pca, all_pt_pca, ncol = 2, labels = "AUTO", widths = c(0.6, 1
 
 ## Supplemental Tables{.tabset} 
 
+### Table SX
+
+**Table SXX.** Number samples per species per treatment assessed in physiological and plasticity analyses. Note that plasticity sample sizes are smaller due to comparison within colony resulting in reduced samples when a control fragment was not present. 
+```{r table of N}
+
+## Create sample size table (phys)
+N_phys_table <- as.data.frame(table(df_90$colony, paste(df_90$fpco2, df_90$ftemp, sep = "_"))) %>%
+  separate(Var1, c("Species", "reef")) %>% 
+  separate(Var2, c("pCO2", "Treatment")) %>% 
+  mutate(colony = substr(Species, 2, 2),
+         Species = substr(Species, 1, 1),
+         pCO2 = factor(pCO2, levels = c("300", "420", "3290", "680"), labels = c("pre industrial (uatm)", "current day (uatm)", "end-of-century (uatm)", "extreme (uatm)")),
+         Treatment = factor(Treatment, labels = c("28C", "31C"))) %>% 
+  group_by(Species, reef, pCO2, Treatment) %>% 
+  summarise(n = sum(Freq)) %>% 
+  filter(Species != "T") %>% 
+  spread(reef, n) %>% 
+  mutate(group = paste(Species, pCO2, Treatment, sep = "_")) %>% 
+  rename(`Offshore` = "F", `Inshore` = "N", ` ` = pCO2)
+
+
+## Create sample size table (plasticity)
+N_plast_table <- rbind(ssid_boot, pstr_boot, past_boot) 
+
+N_plast_table <- as.data.frame(table(N_plast_table$colony, paste(N_plast_table$fpco2, N_plast_table$ftemp, sep = "_"))) %>%
+  separate(Var1, c("Species", "reef")) %>% 
+  separate(Var2, c("pCO2", "Treatment")) %>% 
+  mutate(colony = substr(Species, 2, 2),
+         ` Species` = substr(Species, 1, 1),
+         pCO2 = factor(pCO2, levels = c("300", "420", "3290", "680"), labels = c("pre industrial (uatm)", "current day (uatm)", "end-of-century (uatm)", "extreme (uatm)")),
+         ` Treatment` = factor(Treatment, labels = c("28C", "31C"))) %>% 
+  group_by(` Species`, reef, pCO2, ` Treatment`) %>% 
+  summarise(n = sum(Freq)) %>% 
+  filter(` Species` != "T") %>% 
+  spread(reef, n) %>% 
+  mutate(group = paste(` Species`, pCO2, ` Treatment`, sep = "_")) %>% 
+  rename(` Offshore` = "F", ` Inshore` = "N", `  ` = pCO2)
+
+
+## Combine both tables into single one
+N_table <- merge(N_phys_table, N_plast_table, by = "group", all = TRUE)
+
+
+## Update with nice formatting
+kable(N_table[c(-1, -2, -7:-9)], booktabs = TRUE, row.names = FALSE) %>%
+  kable_styling(font_size = 12, full_width = FALSE) %>% 
+  add_header_above(c(" " = 2, "Physiology N" = 2, "Plasticity N" = 2)) %>% 
+  pack_rows("Siderastrea Siderea", 17, 24, italic = TRUE) %>%
+  pack_rows("Pseudodiploria strigosa", 9, 16, italic = TRUE) %>%
+  pack_rows("Porites astreoides", 1, 8, italic = TRUE)
+
+```
+
+<br/>
+<br/>
+
+
 ### Table S1
 
 **Table S1.** Model performance comparisons of generalized linear mixed effects models (GLMM) for plasticity assessments to select the best-fit model per species using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model per species. The performance score computes indices of model performance for all models per species at once for comparison across models. The models highlighted in grey were used for bootstrapping estimates and 95% confidence intervals. 
+
 ```{r table S1 for markdown}
 
 ## Make table S1 with correct labels
@@ -2241,7 +2363,7 @@ table_s1 <- kable(plast_aic[c(-1, -3, -8:-11)], booktabs = TRUE, row.names = FAL
   pack_rows("Siderastrea Siderea", 1, 7, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 8, 11, italic = TRUE) %>%
   pack_rows("Porites astreoides", 12, 18, italic = TRUE) %>% 
-  row_spec(c(2,11,17), bold = TRUE, background = "lightgrey")
+  row_spec(c(1,11,17), bold = TRUE, background = "lightgrey")
 table_s1
 
 ```
