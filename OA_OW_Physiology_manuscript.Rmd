@@ -42,13 +42,14 @@ options(warn = -1)
 #install.packages("devtools") # if you need to install this package
 #library("devtools")
 #install_github("vqv/ggbiplot")
-#install_github("cran/rcompanion") 
+
 
 
 ### Used packages that need to be installed to run code (and can be sourced easier from CRAN):
-needed_packages <- c("knitr", "readr", "broom", "ggplot2", "dplyr", "ggbiplot", "tidyr", "corrgram", "openxlsx", "plotly", "tidyverse", "vegan", "shiny", "Rmisc", "cowplot", "ggfortify", "finalfit", "kableExtra", "readr", "lmerTest", "vroom", "ggpubr", "magick", "Hmisc", "corrplot", "gridGraphics", "grid", "RColorBrewer", "wesanderson", "performance", "MASS", "png", "car", "rcompanion", "janitor") # Specify necessary packages
+needed_packages <- c("devtools", "knitr", "readr", "broom", "ggplot2", "dplyr", "ggbiplot", "tidyr", "corrgram", "openxlsx", "plotly", "tidyverse", "vegan", "shiny", "Rmisc", "cowplot", "ggfortify", "finalfit", "kableExtra", "readr", "lmerTest", "vroom", "ggpubr", "magick", "Hmisc", "corrplot", "gridGraphics", "grid", "RColorBrewer", "wesanderson", "performance", "MASS", "png", "car", "rcompanion", "janitor") # Specify necessary packages
 
 not_installed <- needed_packages[!(needed_packages %in% installed.packages()[ , "Package"])] # Extract not installed packages) # Install not installed packages
+if(length(not_installed)) install.packages(not_installed) # Install not installed packages
 
 ```
 
@@ -815,17 +816,17 @@ ggarrange(species_pca_plot, all_pco2_pca, all_temp_pca, nrow =1, labels = "AUTO"
 
 #### *Principal component analysis*
 
-Two principal components (PCs) explained approximately `r round(sum(summary(s_pca)[["importance"]][2,1] + summary(s_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal symbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and color intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p = `r format(s_pval[1,1], digits = 1)`; **Table S2**), while temperature and reef environment did not explain as much variation in physiological responses (p = `r format(s_pval[2,1], digits = 1)` and p = `r format(s_pval[3,1], digits = 1)`, respectively; **Table S2; Figure S1A**).  
+Two principal components (PCs) explained approximately `r round(sum(summary(s_pca)[["importance"]][2,1] + summary(s_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal symbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and color intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p = `r format(s_pval[1,1], digits = 1)`; **Table S3**), while temperature and reef environment did not explain as much variation in physiological responses (p = `r format(s_pval[2,1], digits = 1)` and p = `r format(s_pval[3,1], digits = 1)`, respectively; **Table S3; Figure S1A**).  
 
-For *P. strigosa*, `r round(sum(summary(p_pca)[["importance"]][2,1] + summary(p_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was reduced under warming (p = `r format(p_pval[2,1], digits = 1)`; **Table S2**) and in offshore samples (p = `r format(p_pval[1,1], digits = 1)`; **Table S2; Figure S1B**), however, *p*CO~2~ did not clearly impact holobiont physiology (**Figure 1B**; p = `r format(p_pval[3,1], digits = 1)`; **Table S2**). 
+For *P. strigosa*, `r round(sum(summary(p_pca)[["importance"]][2,1] + summary(p_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was reduced under warming (p = `r format(p_pval[2,1], digits = 1)`; **Table S3**) and in offshore samples (p = `r format(p_pval[1,1], digits = 1)`; **Table S3; Figure S1B**), however, *p*CO~2~ did not clearly impact holobiont physiology (**Figure 1B**; p = `r format(p_pval[3,1], digits = 1)`; **Table S3**). 
 
-For *P. astreoides*, the first two PCs explained about `r round(sum(summary(a_pca)[["importance"]][2,1] + summary(a_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance in holobiont response to treatment (**Figure 1C**). Samples separated most clearly along PC1 driven primarily by calcification rate and algal symbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and color intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p = `r format(a_pval[2,1], digits = 1)`; **Table S2**) and *p*CO~2~ (p = `r format(a_pval[3,1], digits = 1)`; **Table S2**) clearly altered  *P. astreoides* holobiont physiology, while reef environment was not significant (p = `r format(a_pval[1,1], digits = 1)`; **Table S2; Figure S1C**).  
+For *P. astreoides*, the first two PCs explained about `r round(sum(summary(a_pca)[["importance"]][2,1] + summary(a_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance in holobiont response to treatment (**Figure 1C**). Samples separated most clearly along PC1 driven primarily by calcification rate and algal symbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and color intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p = `r format(a_pval[2,1], digits = 1)`; **Table S3**) and *p*CO~2~ (p = `r format(a_pval[3,1], digits = 1)`; **Table S3**) clearly altered  *P. astreoides* holobiont physiology, while reef environment was not significant (p = `r format(a_pval[1,1], digits = 1)`; **Table S3; Figure S1C**).  
 
 <br/>
 
 #### *Species differences in coral holobiont physiology*
 
-The first two PCs of the combined holobiont physiology explained about `r round(sum(summary(all_pca)[["importance"]][2,1] + summary(all_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied by higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S5**). Despite being different coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S5**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited convergent physiological responses under stress. Furthermore, corals from the inshore reef environment exhibited more constrained physiology than their offshore counterparts (**Figure S7; Table S5**).
+The first two PCs of the combined holobiont physiology explained about `r round(sum(summary(all_pca)[["importance"]][2,1] + summary(all_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied by higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S6**). Despite being different coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S6**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited convergent physiological responses under stress. Furthermore, corals from the inshore reef environment exhibited more constrained physiology than their offshore counterparts (**Figure S7; Table S6**).
 
 <br/>
 <br/>
@@ -963,7 +964,7 @@ Compared to both *S. siderea* and *P. strigosa*, fewer physiological traits were
 ## Plasticity analyses {.tabset} 
 
 #### *Methods:*
-Physiological plasticity of each experimental fragment was calculated for each species using all seven PCs calculated above as the distance between an experimental fragment and the control (420 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear mixed effects models (function *lmer*) with a Gamma distribution and log-link and a random effect for colony. The best-fit model was selected as the model with the lowest AIC for each species (**Table S1**). Natal reef environment was only a significant predictor of plasticity in *S. siderea* so samples were pooled across reef environments for both *P. strigosa* and *P. astreoides*. Parametric bootstraps were performed to model mean response and 95% confidence intervals with 1500 iterations and significant effects were identified as non-overlapping confidence intervals. Marginal and conditional R^2^ values were calculated using the *r2_nakagawa* function in the rcompanion package (version `r packageVersion("rcompanion")` (Mangiafico, 2021)). All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Team, 2018) and the accompanying data and code can be freely accessed on GitHub  ([github.com/seabove7/Bove_CoralPhysiology](github.com/seabove7/Bove_CoralPhysiology)) and Zenodo (*DOI here when close to finished*).
+Physiological plasticity of each experimental fragment was calculated for each species using all seven PCs calculated above as the distance between an experimental fragment and the control (420 $\mu$atm; 28$^\circ$C) fragment from that same colony. The effects of treatment (*p*CO~2~ and temperature) and natal reef environment on calculated distances were assessed using generalized linear mixed effects models (function *lmer*) with a Gamma distribution and log-link and a random effect for colony. The best-fit model was selected as the model with the lowest AIC for each species (**Table S2**). Natal reef environment was only a significant predictor of plasticity in *S. siderea* so samples were pooled across reef environments for both *P. strigosa* and *P. astreoides*. Parametric bootstraps were performed to model mean response and 95% confidence intervals with 1500 iterations and significant effects were identified as non-overlapping confidence intervals. Marginal and conditional R^2^ values were calculated using the *r2_nakagawa* function in the rcompanion package (version `r packageVersion("rcompanion")` (Mangiafico, 2021)). All figures and statistical analyses were carried out in `r paste0("R version ", R.Version()$major, ".", R.Version()$minor)` (R Core Team, 2018) and the accompanying data and code can be freely accessed on GitHub  ([github.com/seabove7/Bove_CoralPhysiology](github.com/seabove7/Bove_CoralPhysiology)) and Zenodo (*DOI here when close to finished*).
 
 
 <br/>
@@ -994,7 +995,7 @@ ssid_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = G
 ssid_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist) # best fit
 
 # check for best-fit model
-ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod2b, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
+ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod2b, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6)
 #plot(ssid_plast_aic)
 
 
@@ -1097,7 +1098,7 @@ pstr_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gam
 pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # best fit model
 
 # check for best-fit model
-pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, rank = TRUE)
+pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6)
 #plot(pstr_plast_aic)
 
 
@@ -1196,7 +1197,7 @@ past_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link
 past_dist_mod6b <- glmer(dist ~ fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist) 
 
 # check for best-fit model
-past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, past_dist_mod6b, rank = TRUE)
+past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, past_dist_mod6b)
 #plot(past_plast_aic)
 
 
@@ -1285,11 +1286,11 @@ ggarrange(ssid_plast_plot, pstr_plast_plot, past_plast_plot, common.legend = TRU
 
 #### *Coral holobiont physiological plasticity*
 
-Physiological plasticity of offshore *S. siderea* fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C (**Figure 3A**). Further, offshore *S. siderea* fragments exhibited higher plasticity in the extreme *p*CO~2~ treatment than in inshore fragments reared in the pre-industrial, current-day, and extreme *p*CO~2~ treatments, regardless of temperature (**Figure 3A; Table S3**).  
+Physiological plasticity of offshore *S. siderea* fragments exhibited a positive linear trend with increasing *p*CO~2~ while the inshore fragments appear to respond in a parabolic pattern to *p*CO~2~, with the lowest calculated distances occurring at 420 $\mu$atm, 31$^\circ$C and 680 $\mu$atm, 28$^\circ$C (**Figure 3A**). Further, offshore *S. siderea* fragments exhibited higher plasticity in the extreme *p*CO~2~ treatment than in inshore fragments reared in the pre-industrial, current-day, and extreme *p*CO~2~ treatments, regardless of temperature (**Figure 3A; Table S4**).  
 
-Plasticity of *P. strigosa* and *P. astreoides* was not clearly different between colonies based on natal reef environments (see **Table S1**). No clear differences in physiological plasticity in response to treatment were identified in *P.strigosa* (**Figure 3B; Table S3**), however, this is likely due to reduced sample sizes in this analysis as a result of only five colonies (N~offshore~ = 3, N~inshore~ = 2) present in the control treatment for distance calculations.  
+Plasticity of *P. strigosa* and *P. astreoides* was not clearly different between colonies based on natal reef environments (see **Table S2**). No clear differences in physiological plasticity in response to treatment were identified in *P.strigosa* (**Figure 3B; Table S4**), however, this is likely due to reduced sample sizes in this analysis as a result of only five colonies (N~offshore~ = 3, N~inshore~ = 2) present in the control treatment for distance calculations.  
 
-Elevated temperatures generally resulted in higher plasticity of *P. astreoides* compared to control temperatures (**Figure 3C; Table S3**), however, this trend was not clearly different within each *p*CO~2~ treatment. Physiological plasticity of *P. astreoides* was significantly lower in both the pre-industrial and end-of-century *p*CO~2~ treatments at control temperatures than that measured in the extreme *p*CO~2~ treatment combined with the elevated temperature. 
+Elevated temperatures generally resulted in higher plasticity of *P. astreoides* compared to control temperatures (**Figure 3C; Table S4**), however, this trend was not clearly different within each *p*CO~2~ treatment. Physiological plasticity of *P. astreoides* was significantly lower in both the pre-industrial and end-of-century *p*CO~2~ treatments at control temperatures than that measured in the extreme *p*CO~2~ treatment combined with the elevated temperature. 
 
 
 <br/>
@@ -1317,8 +1318,8 @@ chem <- read.csv("Data/Raw_data/Exp_waterchem.csv") %>%
   mutate(date = as.Date(date, format = "%m/%d/%Y"), # convert date to date format)
          pco2 = factor(pco2, labels = c("pre industrial", "pre industrial", "current", "current", "end-of-century", "end-of-century", "extreme", "extreme")), # convert to factors
          temp = factor(temp, labels = c("28C", "31C"))) %>% 
-  group_by(date, pco2, temp, param, treat) %>% 
-  summarise(mean = mean(value),
+  dplyr::group_by(date, pco2, temp, param, treat) %>% 
+  dplyr::summarise(mean = mean(value),
             sd = sd(value),
             n = n())
   
@@ -2070,7 +2071,7 @@ comb_dist_mod10 <- glmer(dist ~ species * part * (fpco2 + ftemp) + reef + (1 | c
 comb_dist_mod11 <- glmer(dist ~ species * part * (fpco2 + ftemp + reef) + (1 | colony), family = Gamma(link = "log"), data = combined_dist)
 
 # check for best-fit model
-comb_plast_aic <- compare_performance(comb_dist_mod, comb_dist_mod2, comb_dist_mod3, comb_dist_mod4, comb_dist_mod5, comb_dist_mod6, comb_dist_mod7, comb_dist_mod8, comb_dist_mod9, comb_dist_mod10, comb_dist_mod11, rank = TRUE)
+comb_plast_aic <- compare_performance(comb_dist_mod, comb_dist_mod2, comb_dist_mod3, comb_dist_mod4, comb_dist_mod5, comb_dist_mod6, comb_dist_mod7, comb_dist_mod8, comb_dist_mod9, comb_dist_mod10, comb_dist_mod11)
 #plot(comb_plast_aic)
 
 ```
@@ -2267,9 +2268,9 @@ ggarrange(all_reef_pca, all_pt_pca, ncol = 2, labels = "AUTO", widths = c(0.6, 1
 
 ## Supplemental Tables{.tabset} 
 
-### Table SX
+### Table S1
 
-**Table SXX.** Number samples per species per treatment assessed in physiological and plasticity analyses. Note that plasticity sample sizes are smaller due to comparison within colony resulting in reduced samples when a control fragment was not present. 
+**Table S1.** Number samples per species per treatment assessed in physiological and plasticity analyses. Note that plasticity sample sizes are smaller due to comparison within colony resulting in reduced samples when a control fragment was not present. 
 ```{r table of N}
 
 ## Create sample size table (phys)
@@ -2280,12 +2281,12 @@ N_phys_table <- as.data.frame(table(df_90$colony, paste(df_90$fpco2, df_90$ftemp
          Species = substr(Species, 1, 1),
          pCO2 = factor(pCO2, levels = c("300", "420", "3290", "680"), labels = c("pre industrial (uatm)", "current day (uatm)", "end-of-century (uatm)", "extreme (uatm)")),
          Treatment = factor(Treatment, labels = c("28C", "31C"))) %>% 
-  group_by(Species, reef, pCO2, Treatment) %>% 
-  summarise(n = sum(Freq)) %>% 
+  dplyr::group_by(Species, reef, pCO2, Treatment) %>% 
+  dplyr::summarise(n = sum(Freq)) %>% 
   filter(Species != "T") %>% 
   spread(reef, n) %>% 
   mutate(group = paste(Species, pCO2, Treatment, sep = "_")) %>% 
-  rename(`Offshore` = "F", `Inshore` = "N", ` ` = pCO2)
+  dplyr::rename(`Offshore` = `F`, `Inshore` = `N`, ` ` = `pCO2`)
 
 
 ## Create sample size table (plasticity)
@@ -2298,12 +2299,12 @@ N_plast_table <- as.data.frame(table(N_plast_table$colony, paste(N_plast_table$f
          ` Species` = substr(Species, 1, 1),
          pCO2 = factor(pCO2, levels = c("300", "420", "3290", "680"), labels = c("pre industrial (uatm)", "current day (uatm)", "end-of-century (uatm)", "extreme (uatm)")),
          ` Treatment` = factor(Treatment, labels = c("28C", "31C"))) %>% 
-  group_by(` Species`, reef, pCO2, ` Treatment`) %>% 
-  summarise(n = sum(Freq)) %>% 
+  dplyr::group_by(` Species`, reef, pCO2, ` Treatment`) %>% 
+  dplyr::summarise(n = sum(Freq)) %>% 
   filter(` Species` != "T") %>% 
   spread(reef, n) %>% 
   mutate(group = paste(` Species`, pCO2, ` Treatment`, sep = "_")) %>% 
-  rename(` Offshore` = "F", ` Inshore` = "N", `  ` = pCO2)
+  dplyr::rename(` Offshore` = "F", ` Inshore` = "N", `  ` = pCO2)
 
 
 ## Combine both tables into single one
@@ -2311,12 +2312,13 @@ N_table <- merge(N_phys_table, N_plast_table, by = "group", all = TRUE)
 
 
 ## Update with nice formatting
-kable(N_table[c(-1, -2, -7:-9)], booktabs = TRUE, row.names = FALSE) %>%
+Table_S1 <- kable(N_table[c(-1, -2, -7:-9)], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   add_header_above(c(" " = 2, "Physiology N" = 2, "Plasticity N" = 2)) %>% 
   pack_rows("Siderastrea Siderea", 17, 24, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 9, 16, italic = TRUE) %>%
   pack_rows("Porites astreoides", 1, 8, italic = TRUE)
+Table_S1
 
 ```
 
@@ -2324,13 +2326,13 @@ kable(N_table[c(-1, -2, -7:-9)], booktabs = TRUE, row.names = FALSE) %>%
 <br/>
 
 
-### Table S1
+### Table S2
 
-**Table S1.** Model performance comparisons of generalized linear mixed effects models (GLMM) for plasticity assessments to select the best-fit model per species using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model per species. The performance score computes indices of model performance for all models per species at once for comparison across models. The models highlighted in grey were used for bootstrapping estimates and 95% confidence intervals. 
+**Table S2.** Model performance comparisons of generalized linear mixed effects models (GLMM) for plasticity assessments to select the best-fit model per species using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model per species. The performance score computes indices of model performance for all models per species at once for comparison across models. The models highlighted in grey were used for bootstrapping estimates and 95% confidence intervals. 
 
-```{r table S1 for markdown}
+```{r Table S2 for markdown}
 
-## Make table S1 with correct labels
+## Make Table S2 with correct labels
 plast_aic <- ssid_plast_aic %>% 
   bind_rows(pstr_plast_aic, past_plast_aic) %>% # combine all PERMANOVA model outputs
   separate(Name, c("Species", NA, "Formula")) %>% # create column for species ID and formula 
@@ -2349,22 +2351,20 @@ plast_aic <- ssid_plast_aic %>%
   mutate(AIC = round(AIC, 1), # round the columns
          BIC = round(BIC, 1),
          R2_conditional = round(R2_conditional, 3),
-         R2_marginal = round(R2_marginal, 3),
-         Performance_Score = (100 * round(Performance_Score, 3))) %>% 
-  rename(`Performance score` = Performance_Score,
-         `Model formula` = Formula,
+         R2_marginal = round(R2_marginal, 3)) %>% 
+  dplyr::rename(`Model formula` = Formula,
          `Conditional R2` = R2_conditional,
          `Marginal R2` = R2_marginal)
   
  
 ## combine them with format
-table_s1 <- kable(plast_aic[c(-1, -3, -8:-11)], booktabs = TRUE, row.names = FALSE) %>%
+Table_S2 <- kable(plast_aic[c(-1, -3, -5:-7, -10:-12)], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 7, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 8, 11, italic = TRUE) %>%
   pack_rows("Porites astreoides", 12, 18, italic = TRUE) %>% 
   row_spec(c(1,11,17), bold = TRUE, background = "lightgrey")
-table_s1
+Table_S2
 
 ```
 
@@ -2375,10 +2375,10 @@ table_s1
 
 <br/>
 
-### Table S2
+### Table S3
 
-**Table S2.** PERMANOVA model output from each species using the *adonis2* function with 1500 iterations.
-```{r table S2 for markdown}
+**Table S3.** PERMANOVA model output from each species using the *adonis2* function with 1500 iterations.
+```{r Table S3 for markdown}
 
 ## combine model output
 pca_mod_out <- rbind(s_pca_mod, p_pca_mod, a_pca_mod) # combine all PERMANOVA model outputs
@@ -2397,18 +2397,18 @@ pca_mod_out <- pca_mod_out %>%
          treat = gsub("fpco", "pCO2", treat),
          treat = gsub("ftemp", "temperature", treat),
          treat = gsub("reef", "reef environment", treat)) %>% 
-  rename("P-value" = `Pr(>F)`, # rename columns
+  dplyr::rename("P-value" = `Pr(>F)`, # rename columns
          " " = treat,
          "Sum of Squares" = SumOfSqs)
   
 ## combine them with format
-table_s2 <- kable(pca_mod_out[-7], booktabs = TRUE, row.names = FALSE) %>%
+Table_S3 <- kable(pca_mod_out[-7], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 5, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 6, 10, italic = TRUE) %>%
   pack_rows("Porites astreoides", 11, 15, italic = TRUE) %>% 
   row_spec(c(4:5,9:10,14:15), italic = TRUE)
-table_s2
+Table_S3
 
 ```
 
@@ -2419,10 +2419,10 @@ table_s2
 
 <br/>
 
-### Table S3
+### Table S4
 
-**Table S3.** GLMM output from plasticity assessments for each species. The intercept of each model was set as 300 $\mu$atm, 28$^\circ$C, and inshore reef environment.
-```{r table S3 for markdown}
+**Table S4.** GLMM output from plasticity assessments for each species. The intercept of each model was set as 300 $\mu$atm, 28$^\circ$C, and inshore reef environment.
+```{r Table S4 for markdown}
 
 ## combine model output per species
 dist_mod_out <- rbind.fill(data.frame(treat = rownames(ssid_glm_out[["coefficients"]]), ssid_glm_out[["coefficients"]]),
@@ -2452,19 +2452,19 @@ dist_mod_out <- dist_mod_out %>%
          treat = gsub("reefN", "reef environment (offshore)", treat),
          treat = gsub("R_conditionalConditionalR", "Conditional R2", treat),
          treat = gsub("R_marginalMarginalR", "Marginal R2", treat)) %>% 
-  rename(" " = treat, # rename columns
+  dplyr::rename(" " = treat, # rename columns
         "Standard error" = Std..Error,
         "Statistic" = t.value,
         "P-value" = Pr...z..)
   
 ## combine them with format
-table_s3 <- kable(dist_mod_out[,-6], booktabs = TRUE, row.names = FALSE) %>%
+Table_S4 <- kable(dist_mod_out[,-6], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   pack_rows("Siderastrea Siderea", 1, 11, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 12, 17, italic = TRUE) %>%
   pack_rows("Porites astreoides", 18, 24, italic = TRUE) %>% 
   row_spec(c(10:11,16:17,23:24), italic = TRUE)
-table_s3
+Table_S4
 
 ```
 
@@ -2475,10 +2475,10 @@ table_s3
 
 <br/>
 
-### Table S4
+### Table S5
 
-**Table S4.** PERMANOVA model output across species using the *adonis2* function with `r bootnum` iterations.
-```{r table S4 for markdown}
+**Table S5.** PERMANOVA model output across species using the *adonis2* function with `r bootnum` iterations.
+```{r Table S5 for markdown}
 
 ## combine model output
 all_pca_mod$treat <- rownames(all_pca_mod) # add column for rownames
@@ -2495,15 +2495,15 @@ all_pca_mod <- all_pca_mod %>%
          treat = gsub("fpco", "pCO2", treat),
          treat = gsub("ftemp", "temperature", treat),
          treat = gsub("reef", "reef environment", treat)) %>% 
-  rename("P-value" = `Pr(>F)`, # rename columns
+  dplyr::rename("P-value" = `Pr(>F)`, # rename columns
          " " = treat,
          "Sum of Squares" = SumOfSqs)
   
 ## combine them with format
-table_s4 <- kable(all_pca_mod, booktabs = TRUE, row.names = FALSE) %>%
+Table_S5 <- kable(all_pca_mod, booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   row_spec(c(8:9), italic = TRUE)
-table_s4
+Table_S5
 
 ```
 
@@ -2515,10 +2515,10 @@ table_s4
 
 <br/>
 
-### Table S5
+### Table S6
 
-**Table S5.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with `r bootnum` iterations depicted in **Figures S2-S4**.
-```{r table S5 for markdown}
+**Table S6.** PERMANOVA model output of coral host or algal symbiont physiology per species using the *adonis2* function with `r bootnum` iterations depicted in **Figures S2-S4**.
+```{r Table S6 for markdown}
 
 ## combine model output
 pca_host_mod_out <- rbind(s_pca_host_mod, p_pca_host_mod, a_pca_host_mod) # combine all PERMANOVA model outputs
@@ -2545,7 +2545,7 @@ pca_host_symb_mod_out <- pca_host_symb_mod_out %>%
          treat = gsub("fpco", "pCO2", treat),
          treat = gsub("ftemp", "temperature", treat),
          treat = gsub("reef", "reef environment", treat)) %>% 
-  rename("P-value" = `Pr(>F)`, # rename columns
+  dplyr::rename("P-value" = `Pr(>F)`, # rename columns
          " " = treat,
          "Sum of Squares" = SumOfSqs,
          "Df " = Df.1,
@@ -2555,14 +2555,14 @@ pca_host_symb_mod_out <- pca_host_symb_mod_out %>%
          "P-value " = `Pr(>F).1`)
   
 ## combine them with format
-table_s5 <- kable(pca_host_symb_mod_out[-12], booktabs = TRUE, row.names = FALSE) %>%
+Table_S6 <- kable(pca_host_symb_mod_out[-12], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   add_header_above(c(" " = 1, "Coral host" = 5, "Algal symbionts" = 5)) %>% 
   pack_rows("Siderastrea Siderea", 1, 5, italic = TRUE) %>%
   pack_rows("Pseudodiploria strigosa", 6, 10, italic = TRUE) %>%
   pack_rows("Porites astreoides", 11, 15, italic = TRUE) %>% 
   row_spec(c(4:5,9:10,14:15), italic = TRUE)
-table_s5
+Table_S6
 
 ```
 
@@ -2572,12 +2572,12 @@ table_s5
 
 ---
 
-### Table S6
+### Table S7
 
-**Table S6.** Model performance comparisons of generalized linear mixed effects models (GLMM) for plasticity assessments to select the best-fit model comparing host and symbiont using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model. The performance score computes indices of model performance for all models per species at once for comparison across models. The models highlighted in grey were used for bootstrapping estimates and 95% confidence intervals. 
-```{r table S6 for markdown}
+**Table S7.** Model performance comparisons of generalized linear mixed effects models (GLMM) for plasticity assessments to select the best-fit model comparing host and symbiont using the package *performance* (version `r packageVersion("performance")`). Akaike information criterion (AIC) was used to select the best-fit model. The performance score computes indices of model performance for all models per species at once for comparison across models. The models highlighted in grey were used for bootstrapping estimates and 95% confidence intervals. 
+```{r Table S7 for markdown}
 
-## Make table S1 with correct labels
+## Make Table S2 with correct labels
 comb_plast_aic <- comb_plast_aic %>% 
   #bind_rows(pstr_plast_aic, past_plast_aic) %>% # combine all PERMANOVA model outputs
   separate(Name, c(NA, NA, "Formula")) %>% # create column for species ID and formula 
@@ -2599,19 +2599,17 @@ comb_plast_aic <- comb_plast_aic %>%
   mutate(AIC = round(AIC, 1), # round the columns
          BIC = round(BIC, 1),
          R2_conditional = round(R2_conditional, 3),
-         R2_marginal = round(R2_marginal, 3),
-         Performance_Score = (100 * round(Performance_Score, 3))) %>% 
-  rename(`Performance score` = Performance_Score,
-         `Model formula` = Formula,
+         R2_marginal = round(R2_marginal, 3)) %>% 
+  dplyr::rename(`Model formula` = Formula,
          `Conditional R2` = R2_conditional,
          `Marginal R2` = R2_marginal)
   
  
 ## combine them with format
-table_s6 <- kable(comb_plast_aic[c(-2, -4, -7:-10)], booktabs = TRUE, row.names = FALSE) %>%
+Table_S7 <- kable(comb_plast_aic[c(-2, -4:-6, -9:-11)], booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   row_spec(6, bold = TRUE, background = "lightgrey")
-table_s6
+Table_S7
 
 ```
 
@@ -2622,10 +2620,10 @@ table_s6
 
 <br/>
 
-### Table S7
+### Table S8
 
-**Table S7.** GLMM output from plasticity assessments for coral host vs. algal symbiont for each species. The intercept of each model was set as coral host, *S. siderea*, 300 $\mu$atm, and 28$^\circ$C.
-```{r table S7 for markdown}
+**Table S8.** GLMM output from plasticity assessments for coral host vs. algal symbiont for each species. The intercept of each model was set as coral host, *S. siderea*, 300 $\mu$atm, and 28$^\circ$C.
+```{r Table S8 for markdown}
 
 ## combine model output per species
 comb_dist_mod_out <- rbind.fill(data.frame(treat = rownames(comb_glm_out[["coefficients"]]),
@@ -2653,16 +2651,16 @@ comb_dist_mod_out <- comb_dist_mod_out %>%
          treat = gsub("partsymb", "symbionts", treat),
          treat = gsub("R_conditionalConditionalR", "Conditional R2", treat),
          treat = gsub("R_marginalMarginalR", "Marginal R2", treat)) %>% 
-  rename(" " = treat, # rename columns
+  dplyr::rename(" " = treat, # rename columns
         "Standard error" = Std..Error,
         "Statistic" = t.value,
         "P-value" = Pr...z..)
   
 ## combine them with format
-table_s7 <- kable(comb_dist_mod_out, booktabs = TRUE, row.names = FALSE) %>%
+Table_S8 <- kable(comb_dist_mod_out, booktabs = TRUE, row.names = FALSE) %>%
   kable_styling(font_size = 12, full_width = FALSE) %>% 
   row_spec(31:32, italic = TRUE)
-table_s7
+Table_S8
 
 ```
 
@@ -2680,39 +2678,44 @@ table_s7
 wb <- createWorkbook()
 
 # add 'Table S1' worksheet
-addWorksheet(wb, "Table S1 - Plasticity AIC") 
-writeData(wb, sheet = 1, x = plast_aic)
-setColWidths(wb, sheet = 1, cols = 1:7, widths = "auto")
+addWorksheet(wb, "Table S1 - Sample Size") 
+writeData(wb, sheet = 1, x = N_table)
+setColWidths(wb, sheet = 1, cols = 1:11, widths = "auto")
 
 # add 'Table S2' worksheet
-addWorksheet(wb, "Table S2 - PERMANOVA") 
-writeData(wb, sheet = 2, x = pca_mod_out)
+addWorksheet(wb, "Table S2 - Plasticity AIC") 
+writeData(wb, sheet = 2, x = plast_aic)
 setColWidths(wb, sheet = 2, cols = 1:7, widths = "auto")
 
 # add 'Table S3' worksheet
-addWorksheet(wb, "Table S3 - Plasticity GLM") 
-writeData(wb, sheet = 3, x = dist_mod_out)
-setColWidths(wb, sheet = 3, cols = 1:6, widths = "auto")
+addWorksheet(wb, "Table S3 - PERMANOVA") 
+writeData(wb, sheet = 3, x = pca_mod_out)
+setColWidths(wb, sheet = 3, cols = 1:7, widths = "auto")
 
 # add 'Table S4' worksheet
-addWorksheet(wb, "Table S4 - Species PERMANOVA") 
-writeData(wb, sheet = 4, x = all_pca_mod)
+addWorksheet(wb, "Table S4 - Plasticity GLM") 
+writeData(wb, sheet = 4, x = dist_mod_out)
 setColWidths(wb, sheet = 4, cols = 1:6, widths = "auto")
 
 # add 'Table S5' worksheet
-addWorksheet(wb, "Table S5 - HostVsymb PERMANOVA") 
-writeData(wb, sheet = 5, x = pca_host_symb_mod_out)
-setColWidths(wb, sheet = 5, cols = 1:12, widths = "auto")
+addWorksheet(wb, "Table S5 - Species PERMANOVA") 
+writeData(wb, sheet = 5, x = all_pca_mod)
+setColWidths(wb, sheet = 5, cols = 1:6, widths = "auto")
 
 # add 'Table S6' worksheet
-addWorksheet(wb, "Table S6 - HostVsymb Plast AIC") 
-writeData(wb, sheet = 6, x = comb_plast_aic)
-setColWidths(wb, sheet = 6, cols = 1:7, widths = "auto")
+addWorksheet(wb, "Table S6 - HostVsymb PERMANOVA") 
+writeData(wb, sheet = 6, x = pca_host_symb_mod_out)
+setColWidths(wb, sheet = 6, cols = 1:12, widths = "auto")
 
 # add 'Table S7' worksheet
-addWorksheet(wb, "Table S7 - HostVsymb Plast GLM") 
-writeData(wb, sheet = 7, x = comb_dist_mod_out)
-setColWidths(wb, sheet = 7, cols = 1:6, widths = "auto")
+addWorksheet(wb, "Table S7 - HostVsymb Plast AIC") 
+writeData(wb, sheet = 7, x = comb_plast_aic)
+setColWidths(wb, sheet = 7, cols = 1:7, widths = "auto")
+
+# add 'Table S8' worksheet
+addWorksheet(wb, "Table S8 - HostVsymb Plast GLM") 
+writeData(wb, sheet = 8, x = comb_dist_mod_out)
+setColWidths(wb, sheet = 8, cols = 1:6, widths = "auto")
 
 
 # save workbook
