@@ -1100,8 +1100,8 @@ pstr_glm_out <- summary(pstr_dist_glm) # summary output of the GLM
 
 ## conditional and marginal R2
 r2_nakagawa(pstr_dist_glm)
-#   Conditional R2: 0.268 -- fixed and random effects
-#      Marginal R2: 0.224 -- fixed effects only
+#   Conditional R2: 0.232 -- fixed and random effects
+#      Marginal R2: 0.188 -- fixed effects only
 
 ```
   
@@ -1133,19 +1133,19 @@ pstr_boot$treat2 <- factor(pstr_boot$treat2,
 
 
 ## Plasticity plot
-pstr_plast_plot <- ggplot(pstr_boot, aes(x = reef, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
+pstr_plast_plot <- ggplot(pstr_boot, aes(x = species, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(aes(x = reef, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.55)) +
+  geom_point(aes(x = species, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.55)) +
   geom_linerange(aes(ymin = lowerci, ymax =upperci), size = 1, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, alpha = 0.8, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
   scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
   scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
-  labs(y = "PC distance from control", x = "") +
+  labs(y = "", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
-  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
+  scale_x_discrete(labels = c("P" = " Reefs pooled")) +
   ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
 
@@ -1174,27 +1174,27 @@ por_dist <- PCAplast(pca = a_pca, # the PCA dataframe containing the PCA eigenva
 
 
 ## Model selection (via AIC)
-past_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) # best fit
+past_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = por_dist)
-past_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) 
-past_dist_mod1b <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist) 
+past_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) # best fit
+past_dist_mod6b <- glmer(dist ~ fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist) 
 
 # check for best-fit model
-past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, past_dist_mod1b, rank = TRUE)
-plot(past_plast_aic)
+past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, past_dist_mod6b, rank = TRUE)
+#plot(past_plast_aic)
 
 
 ## Best-fit GLMM with Gamma log link
-past_dist_glm <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist)
+past_dist_glm <- glmer(dist ~ fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist)
 past_glm_out <- summary(past_dist_glm) # summary output of the GLM
 
 ## conditional and marginal R2
 r2_nakagawa(past_dist_glm)
-#  Conditional R2: 0.485 -- fixed and random effects
-#     Marginal R2: 0.147 -- fixed effects only
+#  Conditional R2: 0.493 -- fixed and random effects
+#     Marginal R2: 0.145 -- fixed effects only
 
 ```
 
@@ -1911,47 +1911,66 @@ ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 
 
 ```{r host v symb plasticity distance calculations }
 
+### Notes for how to use PCAplast function are in earlier uses as well as in the 'CustomFunctions.R' file
+
 #### SSID
 # host
 ssid_host_dist <- PCAplast(pca = s_pca_host,
                            data = s_df[,c(1,7,8, 10,11,12,27)],
+                           sample_ID = "coral", 
+                           num_pca =  "all", 
                            control_col = "treat2",
-                           control_lvl = "420_28")
+                           control_lvl = "420_28",
+                           group = "colony")
 
 # symbiont
 ssid_symb_dist <- PCAplast(pca = s_pca_symb, 
                            data = s_df[,c(1,7,8, 10,11,12,27)],
+                           sample_ID = "coral", 
+                           num_pca =  "all", 
                            control_col = "treat2",
-                           control_lvl = "420_28")
+                           control_lvl = "420_28",
+                           group = "colony")
 
 
 #### PSTR
 # host
 pstr_host_dist <- PCAplast(pca = p_pca_host, 
                            data = p_df[,c(1,7,8, 10,11,12,27)],
+                           sample_ID = "coral", 
+                           num_pca =  "all", 
                            control_col = "treat2",
-                           control_lvl = "420_28")
+                           control_lvl = "420_28",
+                           group = "colony")
 
 # symbiont
 pstr_symb_dist <- PCAplast(pca = p_pca_symb, 
                            data = p_df[,c(1,7,8, 10,11,12,27)],
+                           sample_ID = "coral", 
+                           num_pca =  "all", 
                            control_col = "treat2",
-                           control_lvl = "420_28")
+                           control_lvl = "420_28",
+                           group = "colony")
 
 
 #### PAST
 # host
 past_host_dist <- PCAplast(pca = a_pca_host, 
                            data = a_df[,c(1,7,8, 10,11,12,27)],
+                           sample_ID = "coral", 
+                           num_pca =  "all", 
                            control_col = "treat2",
-                           control_lvl = "420_28")
+                           control_lvl = "420_28",
+                           group = "colony")
 
 # symbiont
 past_symb_dist <- PCAplast(pca = a_pca_symb, 
                            data = a_df[,c(1,7,8, 10,11,12,27)],
+                           sample_ID = "coral", 
+                           num_pca =  "all", 
                            control_col = "treat2",
-                           control_lvl = "420_28")
-
+                           control_lvl = "420_28",
+                           group = "colony")
 
 #### Combined data by host or symbiont
 ## Host:
