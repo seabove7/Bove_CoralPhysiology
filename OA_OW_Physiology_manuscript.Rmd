@@ -183,8 +183,8 @@ df2_T90$treat2 <- paste0(df2_T90$fpco2, df2_T90$temp)
 
 ## Performing the parametric bootstrapping of the model:
 bootnum = 1500 # set number of iterations (we used 2000) between 999 and 9999
-seed = 7 # seed to make results replicatable (our seed was 3)
-set.seed(7)
+seed = 30 # seed to make results replicatable (our seed was 3)
+set.seed(30)
 
 ```
 
@@ -232,7 +232,7 @@ a_df <- subset(df_90, species == "A")
 ## Principal component analyses {.tabset}
 
 #### *Methods:*
-Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal symbiont chlorophyll a, algal symbiont cell density, calcification rate as previously for the same samples in Bove et al (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")` (Oksanen et al., 2020)).
+Principal component analysis (PCA) (function *prcomp*) of scaled and centered physiological parameters (host carbohydrate, host lipid, host protein, algal symbiont chlorophyll a, algal symbiont cell density, calcification rate as previously for the same samples in Bove et al (2019)) were employed to assess the relationship between physiological parameters and treatment conditions for each coral species. Main effects (temperature, *p*CO~2~, reef environment) were evaluated with PERMANOVA using the *adonis2* function (*vegan* package; version `r packageVersion("vegan")` (Oksanen et al., 2020)). No interactions between main effects were identified as significant, so interaction terms were dropped from each model resulting in fully additive models. 
 
 <br/>
   
@@ -960,25 +960,29 @@ Physiological plasticity of each experimental fragment was calculated for each s
 ```{r SSID distance analysis, include=FALSE}
 
 ## Calculate the PCA distance with custom function
-sid_dist <- PCAplast(pca = s_pca,
-                     data = s_df[,c(1,7,8, 10,11,12,27,2)],
-                     control_col = "treat2",
-                     control_lvl = "420_28")
+sid_dist <- PCAplast(pca = s_pca, # the PCA dataframe containing the PCA eigenvalues
+          data = s_df[,c(1,7,8, 10,11,12,27,2)], # the condition/treatment data corresponding to samples
+          sample_ID = "coral", # the name of column that provide unique ID per sample (if blank, will pull rownames for this)
+          num_pca =  "all", # the number of PCAs to include in analysis (default is 'all', but you can specify another number with a minimum of 2 PCAs)
+          control_col = "treat2", # what the 'treatment' column is called
+          control_lvl = "420_28", # control level of the treatment 
+          group = "colony") # the grouping column (i.e., colony)
+
 
 # with strong random effects of colony??
 # marginal R2 --> fixed v random effect variance: likely more variance at colony level over treatment
 
 ssid_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
-ssid_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist) # best fit
+ssid_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod2b <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
 ssid_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
-ssid_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist)
+ssid_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = sid_dist) # best fit
 
 # check for best-fit model
 ssid_plast_aic <- compare_performance(ssid_dist_mod, ssid_dist_mod2, ssid_dist_mod2b, ssid_dist_mod3, ssid_dist_mod4, ssid_dist_mod5, ssid_dist_mod6, rank = TRUE)
-plot(ssid_plast_aic)
+#plot(ssid_plast_aic)
 
 
 ## Best-fit GLMM with Gamma log link
@@ -1013,7 +1017,7 @@ ssid_boot_out <- replicate(bootnum, bootFUN(model = ssid_dist_glm, newdata = new
 
 ## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
 ssid_boot <- cbind(sid_dist, as.data.frame(t(apply(ssid_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
-colnames(ssid_boot)[24:26] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+colnames(ssid_boot)[10:12] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
 save(ssid_boot, file = "Data/Bootstrap/SSID_PlastBoot.rda")
@@ -1062,30 +1066,32 @@ r2_nakagawa(ssid_dist_glm) # conditional and marginal R2
 ```{r PSTR distance analysis, include=FALSE}
 
 ## Calculate the PCA distance with custom function
-dip_dist <- PCAplast(pca = p_pca,
-                     data = p_df[,c(1,7,8, 10,11,12,27,2)],
-                     control_col = "treat2",
-                     control_lvl = "420_28")
-
-dip_dist <- dip_dist %>% filter(fpco2 != "420") %>%  droplevels()
+dip_dist <- PCAplast(pca = p_pca, # the PCA dataframe containing the PCA eigenvalues
+          data = p_df[,c(1,7,8, 10,11,12,27,2)], # the condition/treatment data corresponding to samples
+          sample_ID = "coral", # the name of column that provide unique ID per sample (if blank, will pull rownames for this)
+          num_pca =  "all", # the number of PCAs to include in analysis (default is 'all', but you can specify another number with a minimum of 2 PCAs)
+          control_col = "treat2", # what the 'treatment' column is called
+          control_lvl = "420_28", # control level of the treatment 
+          group = "colony") # the grouping column (i.e., colony)
 
 
 ## Model selection (via AIC)
 pstr_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 pstr_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
 pstr_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist)
-#pstr_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
-#pstr_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular
+#pstr_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular fit 
+#pstr_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # singular fit 
 pstr_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = dip_dist) # best fit model
-#pstr_dist_mod6b <- glmer(dist ~ fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = dip_dist) # singular
-
 
 # check for best-fit model
 pstr_plast_aic <- compare_performance(pstr_dist_mod, pstr_dist_mod2, pstr_dist_mod3, pstr_dist_mod6, rank = TRUE)
-plot(pstr_plast_aic)
+#plot(pstr_plast_aic)
 
 
-### Because N=2 inshore and N=3 offshore for PSTR, going to pool these by RZ for plasticity here
+
+##### NOTE: nly one sample remains in current day at 31C so need to drop this treatment (clarify in the)
+### Also, because N=2 inshore and N=3 offshore for PSTR, going to pool these by RZ for plasticity here (also fits best-fit model)
+dip_dist <- filter(dip_dist, fpco2 != "420") %>% droplevels()
 
 
 ## Best-fit GLMM with Gamma log link
@@ -1109,7 +1115,7 @@ pstr_boot_out <- replicate(bootnum, bootFUN(model = pstr_dist_glm, newdata = new
 
 ## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
 pstr_boot <- cbind(dip_dist, as.data.frame(t(apply(pstr_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
-colnames(pstr_boot)[23:25] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+colnames(pstr_boot)[10:12] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
 save(pstr_boot, file = "Data/PSTR_PlastBoot.rda")
@@ -1127,19 +1133,19 @@ pstr_boot$treat2 <- factor(pstr_boot$treat2,
 
 
 ## Plasticity plot
-pstr_plast_plot <- ggplot(pstr_boot, aes(x = species, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
+pstr_plast_plot <- ggplot(pstr_boot, aes(x = reef, y = estimate, color = treat2, fill = treat2, shape = treat2)) +
   theme_pubr() +
   theme(legend.title = element_blank(), axis.ticks.x = element_blank()) +
   guides(shape = guide_legend(ncol = 1), fill = guide_legend(override.aes = list(linetype = 0)), color = guide_legend(override.aes = list(linetype = 0))) +
-  geom_point(aes(x = species, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.55)) +
+  geom_point(aes(x = reef, y = dist), size = 2, alpha = 0.4, position = position_jitterdodge(jitter.width = 0.3, dodge.width = 0.55)) +
   geom_linerange(aes(ymin = lowerci, ymax =upperci), size = 1, position = position_dodge(width = 0.55)) +
   geom_point(size = 3, alpha = 0.8, stroke = 1, position = position_dodge(width = 0.55)) +
   scale_shape_manual(values = c(21, 21, 23, 24, 24, 22, 22)) +
-  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
-  scale_fill_manual(values = c("#b2abd2", "white", "#fdb863", "white", "#e66101", "white")) + 
-  labs(y = "", x = "") +
+  scale_color_manual(values = c("#b2abd2", "#b2abd2", "#5e3c99", "#fdb863", "#fdb863", "#e66101", "#e66101")) + 
+  scale_fill_manual(values = c("#b2abd2", "white", "white", "#fdb863", "white", "#e66101", "white")) + 
+  labs(y = "PC distance from control", x = "") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 8)) +
-  scale_x_discrete(labels = c("P" = " Reefs pooled")) +
+  scale_x_discrete(labels = c("F" = "Offshore", "N" = "Inshore")) +
   ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
 
 
@@ -1158,29 +1164,31 @@ r2_nakagawa(pstr_dist_glm) # conditional and marginal R2
 ```{r PAST distance analysis, include=FALSE}
 
 ## Calculate the PCA distance with custom function
-por_dist <- PCAplast(pca = a_pca,
-                     data = a_df[,c(1,7,8, 10,11,12,27, 2)],
-                     control_col = "treat2",
-                     control_lvl = "420_28")
+por_dist <- PCAplast(pca = a_pca, # the PCA dataframe containing the PCA eigenvalues
+          data = a_df[,c(1,7,8, 10,11,12,27, 2)], # the condition/treatment data corresponding to samples
+          sample_ID = "coral", # the name of column that provide unique ID per sample (if blank, will pull rownames for this)
+          num_pca =  "all", # the number of PCAs to include in analysis (default is 'all', but you can specify another number with a minimum of 2 PCAs)
+          control_col = "treat2", # what the 'treatment' column is called
+          control_lvl = "420_28", # control level of the treatment 
+          group = "colony") # the grouping column (i.e., colony). If blank, will assume control level grouping only!
 
 
 ## Model selection (via AIC)
-past_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
+past_dist_mod <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) # best fit
 past_dist_mod2 <- glmer(dist ~ reef * fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod3 <- glmer(dist ~ reef + fpco2 * ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod4 <- glmer(dist ~ reef + fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
 past_dist_mod5 <- glmer(dist ~ reef * (fpco2 + ftemp) + (1 | colony), family = Gamma(link = "log"), data = por_dist)
-past_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) # best fit
-past_dist_mod6b <- glmer(dist ~ fpco2 + ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist) 
-
+past_dist_mod6 <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist) 
+past_dist_mod1b <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist) 
 
 # check for best-fit model
-past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, past_dist_mod6b, rank = TRUE)
+past_plast_aic <- compare_performance(past_dist_mod, past_dist_mod2, past_dist_mod3, past_dist_mod4, past_dist_mod5, past_dist_mod6, past_dist_mod1b, rank = TRUE)
 plot(past_plast_aic)
 
 
 ## Best-fit GLMM with Gamma log link
-past_dist_glm <- glmer(dist ~ fpco2 + ftemp + (1 | colony), family = Gamma(link = "log"), data = por_dist)
+past_dist_glm <- glmer(dist ~ reef * fpco2 * ftemp + (1 | colony) + (1 | tank), family = Gamma(link = "log"), data = por_dist)
 past_glm_out <- summary(past_dist_glm) # summary output of the GLM
 
 ## conditional and marginal R2
@@ -1200,7 +1208,7 @@ past_boot_out <- replicate(bootnum, bootFUN(model = past_dist_glm, newdata = new
 
 ## Calculate the mean, 95% lowerCI, and 95% upperCI from the boot matrix and add it to dataframe
 past_boot <- cbind(por_dist, as.data.frame(t(apply(past_boot_out, 1, function(x) c(mean(x), quantile(x, c(0.025, 0.975)))))))
-colnames(past_boot)[23:25] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
+colnames(past_boot)[10:12] <- c("estimate", "lowerci", "upperci") # rename mean/CI columns
 
 ## save as rda object
 save(past_boot, file = "Data/PAST_PlastBoot.rda")
