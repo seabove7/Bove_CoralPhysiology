@@ -816,17 +816,17 @@ ggarrange(species_pca_plot, all_pco2_pca, all_temp_pca, nrow =1, labels = "AUTO"
 
 #### *Principal component analysis*
 
-Two principal components (PCs) explained approximately `r round(sum(summary(s_pca)[["importance"]][2,1] + summary(s_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal symbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and color intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p = `r format(s_pval[1,1], digits = 1)`; **Table S3**), while temperature and reef environment did not explain as much variation in physiological responses (p = `r format(s_pval[2,1], digits = 1)` and p = `r format(s_pval[3,1], digits = 1)`, respectively; **Table S3; Figure S1A**).  
+Two principal components (PCs) explained approximately `r round(sum(summary(s_pca)[["importance"]][2,1] + summary(s_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in physiological responses of the *S. siderea* holobiont to ocean acidification and warming treatments (**Figure 1A**). PC1 was driven by differences in algal symbiont physiology (chlorophyll a, cell density), while PC2 represented an inverse relationship between host energy reserves (lipid, protein, carbohydrate) and calcification rates and color intensities. Overall, lower *p*CO~2~ and temperature resulted in  higher *S. siderea* holobiont physiology (**Figure 1A**). Treatment *p*CO~2~ predominantly drove *S. siderea* physiological responses (p = `r format(s_pval[1,1], digits = 1)`; **Table S3**), while temperature and reef environment did not explain as much variation in physiological responses (p = `r format(s_pval[2,1], digits = 1)` and p = `r format(s_pval[3,1], digits = 1)`, respectively; **Table S3; Figure S3A**).  
 
-For *P. strigosa*, `r round(sum(summary(p_pca)[["importance"]][2,1] + summary(p_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was reduced under warming (p = `r format(p_pval[2,1], digits = 1)`; **Table S3**) and in offshore samples (p = `r format(p_pval[1,1], digits = 1)`; **Table S3; Figure S1B**), however, *p*CO~2~ did not clearly impact holobiont physiology (**Figure 1B**; p = `r format(p_pval[3,1], digits = 1)`; **Table S3**). 
+For *P. strigosa*, `r round(sum(summary(p_pca)[["importance"]][2,1] + summary(p_pca)[["importance"]][2,2]) * 100, 0)`% of the variance in the holobiont responses to treatments was explained by two PCs (**Figure 1B**). PC1 explained most of the variation of physiological parameters with the exception of host lipid content, which was represented in PC2. Holobiont physiology of *P. strigosa* was reduced under warming (p = `r format(p_pval[2,1], digits = 1)`; **Table S3**) and in offshore samples (p = `r format(p_pval[1,1], digits = 1)`; **Table S3; Figure S3B**), however, *p*CO~2~ did not clearly impact holobiont physiology (**Figure 1B**; p = `r format(p_pval[3,1], digits = 1)`; **Table S3**). 
 
-For *P. astreoides*, the first two PCs explained about `r round(sum(summary(a_pca)[["importance"]][2,1] + summary(a_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance in holobiont response to treatment (**Figure 1C**). Samples separated most clearly along PC1 driven primarily by calcification rate and algal symbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and color intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p = `r format(a_pval[2,1], digits = 1)`; **Table S3**) and *p*CO~2~ (p = `r format(a_pval[3,1], digits = 1)`; **Table S3**) clearly altered  *P. astreoides* holobiont physiology, while reef environment was not significant (p = `r format(a_pval[1,1], digits = 1)`; **Table S3; Figure S1C**).  
+For *P. astreoides*, the first two PCs explained about `r round(sum(summary(a_pca)[["importance"]][2,1] + summary(a_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance in holobiont response to treatment (**Figure 1C**). Samples separated most clearly along PC1 driven primarily by calcification rate and algal symbiont density, while PC2 exhibited an inverse relationship between host total carbohydrate and color intensity. Overall, lower *p*CO~2~ drove higher *P. astreoides* holobiont physiology, while elevated temperature resulted in greater holobiont physiology (**Figure 1C**). Temperature (p = `r format(a_pval[2,1], digits = 1)`; **Table S3**) and *p*CO~2~ (p = `r format(a_pval[3,1], digits = 1)`; **Table S3**) clearly altered  *P. astreoides* holobiont physiology, while reef environment was not significant (p = `r format(a_pval[1,1], digits = 1)`; **Table S3; Figure S3C**).  
 
 <br/>
 
 #### *Species differences in coral holobiont physiology*
 
-The first two PCs of the combined holobiont physiology explained about `r round(sum(summary(all_pca)[["importance"]][2,1] + summary(all_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied by higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S6**). Despite being different coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S6**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited convergent physiological responses under stress. Furthermore, corals from the inshore reef environment exhibited more constrained physiology than their offshore counterparts (**Figure S7; Table S6**).
+The first two PCs of the combined holobiont physiology explained about `r round(sum(summary(all_pca)[["importance"]][2,1] + summary(all_pca)[["importance"]][2,2]) * 100, 0)`% of the total variance across samples (**Figure 4**). In general, fragments of *S. siderea* contained higher chlorophyll a content, host carbohydrate, and host lipid content, while *P. strigosa* fragments typically had greater host protein content accompanied by higher calcification rates, and fragments of *P. astreoides* were differentiated by their high symbiont densities (**Figure 4A; Table S6**). Despite being different coral species, coral holobiont physiology exhibited similar physiological responses to *p*CO~2~ and temperature treatments (**Figure 4B, 4C; Table S6**). As *p*CO~2~ or temperature increased, coral holobiont physiology was more constrained and exhibited convergent physiological responses under stress. Furthermore, corals from the inshore reef environment exhibited more constrained physiology than their offshore counterparts (**Figure S9; Table S6**).
 
 <br/>
 <br/>
@@ -977,7 +977,7 @@ Physiological plasticity of each experimental fragment was calculated for each s
 sid_dist <- PCAplast(pca = s_pca, # the PCA dataframe containing the PCA eigenvalues
           data = s_df[,c(1,7,8, 10,11,12,27,2)], # the condition/treatment data corresponding to samples
           sample_ID = "coral", # the name of column that provide unique ID per sample (if blank, will pull rownames for this)
-          num_pca =  "all", # the number of PCAs to include in analysis (default is 'all', but you can specify another number with a minimum of 2 PCAs)
+          num_pca =  "all", # the number of PCAs to include in analysis (default is 'all', but you can specify another number with a minimum of "2" PCAs)
           control_col = "treat2", # what the 'treatment' column is called
           control_lvl = "420_28", # control level of the treatment 
           group = "colony") # the grouping column (i.e., colony)
@@ -1299,19 +1299,19 @@ Elevated temperatures generally resulted in higher plasticity of *P. astreoides*
 
 ## Supplemental Figures{.tabset}
 
-### Figure SXX
+### Figure S1
 
-![](Figures/Supplemental_Figures/FigureSXX_TankArray.jpg)
+![](Figures/Supplemental_Figures/FigureS1_TankArray.jpg)
 
-**Figure SXX.** Diagram showing allocation of coral fragments for a single species throughout experimental tank array. Color represent a different colony and shape represents reef environment. Four colonies (two from each reef environment) are reared within each tank (grey box), with three tanks comprising a treatment (white box). This is repeated for each *p*CO~2~ treatment at both temperatures. This same experimental design was used for all species. Figure taken from Bove et al. 2019.
+**Figure S1.** Diagram showing allocation of coral fragments for a single species throughout experimental tank array. Color represent a different colony and shape represents reef environment. Four colonies (two from each reef environment) are reared within each tank (grey box), with three tanks comprising a treatment (white box). This is repeated for each *p*CO~2~ treatment at both temperatures. This same experimental design was used for all species. Figure taken from Bove et al. 2019.
 
 <br/>
 <br/>
 
 
-### Figure SXX
+### Figure S2
 
-```{r water chem through time}
+```{r water chem through time, fig.width = 12, fig.height = 8}
 
 ## Read in the water chem values from the experiment
 chem <- read.csv("Data/Raw_data/Exp_waterchem.csv") %>% 
@@ -1339,18 +1339,18 @@ ggplot(data = chem, aes(x = date, y = mean, colour = pco2, shape = temp, group =
   labs(x = "", y = "") +
   theme(legend.position = c(0.83, 0.11), legend.box = "horizontal", legend.title = element_blank())
 
-ggsave("Figures/Supplemental_Figures/FigureSXX_waterchem.pdf", width = 12, height = 8)  
-ggsave("Figures/Supplemental_Figures/FigureSXX_waterchem.png", width = 12, height = 8)
+ggsave("Figures/Supplemental_Figures/FigureS2_waterchem.pdf", width = 12, height = 8)  
+ggsave("Figures/Supplemental_Figures/FigureS2_waterchem.png", width = 12, height = 8)
 
 ```
 
-**Figure SXX.** Calculated and measured seawater parameters over the entire experimental period. 
+**Figure S2.** Calculated and measured seawater parameters over the entire experimental period. 
 
 <br/>
 <br/>
 
 
-### Figure S1
+### Figure S3
 
 ```{r PCA plot reefs, fig.height = 8, fig.width = 13}
 
@@ -1358,18 +1358,18 @@ reef_pca_all <- ggarrange(s_reef_pca, p_reef_pca, a_reef_pca, ncol = 3, common.l
 trt_pca_all <- ggarrange(s_pt_pca, p_pt_pca, a_pt_pca, ncol = 3, common.legend = TRUE, legend = "bottom", labels = c("D)", "E)", "F)"))
 
 ggarrange(reef_pca_all, trt_pca_all, ncol = 1)
-  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA.pdf", width = 13, height = 8)
-  ggsave("Figures/Supplemental_Figures/FigureS1_PhysPCA.png", width = 13, height = 8)
+  ggsave("Figures/Supplemental_Figures/FigureS3_PhysPCA.pdf", width = 13, height = 8)
+  ggsave("Figures/Supplemental_Figures/FigureS3_PhysPCA.png", width = 13, height = 8)
 
 ```
 
-**Figure S1.** Principal component analysis (PCA) of all coral physiological parameters for *S. siderea*, *P. strigosa*, and  *P. astreoides* depicted by natal reef environment (**A-C**; offshore green, inshore yellow) and the combination of *p*CO~2~ and temperature treatment (**D-F**). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S3.** Principal component analysis (PCA) of all coral physiological parameters for *S. siderea*, *P. strigosa*, and  *P. astreoides* depicted by natal reef environment (**A-C**; offshore green, inshore yellow) and the combination of *p*CO~2~ and temperature treatment (**D-F**). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
 
 
-### Figure S2
+### Figure S4
 
 ```{r SSID PCAs by host versus symbiont}
 
@@ -1558,19 +1558,19 @@ ssid_host_symb_reef <- ggarrange(sid_host_reef_pca, sid_symb_reef_pca,ncol = 2, 
 
 ## Add all together for final figure:
 ggarrange(ssid_host_symb_temp, ssid_host_symb_pco2, ssid_host_symb_reef, nrow = 3)
-  ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.pdf", width = 9, height = 10)
-  ggsave("Figures/Supplemental_Figures/FigureS2_SSID_PCA_hostVsymb.png", width = 9, height = 10)
+  ggsave("Figures/Supplemental_Figures/FigureS4_SSID_PCA_hostVsymb.pdf", width = 9, height = 10)
+  ggsave("Figures/Supplemental_Figures/FigureS4_SSID_PCA_hostVsymb.png", width = 9, height = 10)
 
 
 ```
 
-**Figure S2.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S4.** Principal component analysis (PCA) of *S. siderea* coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
 
 
-### Figure S3
+### Figure S5
 
 ```{r PSTR PCAs by host versus symbiont}
 
@@ -1759,19 +1759,19 @@ PSTR_host_symb_reef <- ggarrange(dip_host_reef_pca, dip_symb_reef_pca,ncol = 2, 
 
 ## Add all together for final figure:
 ggarrange(PSTR_host_symb_temp, PSTR_host_symb_pco2, PSTR_host_symb_reef, nrow = 3)
-  ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.pdf", width = 9, height = 10)
-  ggsave("Figures/Supplemental_Figures/FigureS3_PSTR_PCA_hostVsymb.png", width = 9, height = 10)
+  ggsave("Figures/Supplemental_Figures/FigureS5_PSTR_PCA_hostVsymb.pdf", width = 9, height = 10)
+  ggsave("Figures/Supplemental_Figures/FigureS5_PSTR_PCA_hostVsymb.png", width = 9, height = 10)
 
 
 ```
 
-**Figure S3.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S5.** Principal component analysis (PCA) of P. strigosa coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
 
 
-### Figure S4
+### Figure S6
 
 ```{r PAST PCAs by host versus symbiont}
 
@@ -1960,19 +1960,19 @@ PAST_host_symb_reef <- ggarrange(por_host_reef_pca, por_symb_reef_pca,ncol = 2, 
 
 ## Add all together for final figure:
 ggarrange(PAST_host_symb_temp, PAST_host_symb_pco2, PAST_host_symb_reef, nrow = 3)
-  ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.pdf", width = 9, height = 10)
-  ggsave("Figures/Supplemental_Figures/FigureS4_PAST_PCA_hostVsymb.png", width = 9, height = 10)
+  ggsave("Figures/Supplemental_Figures/FigureS6_PAST_PCA_hostVsymb.pdf", width = 9, height = 10)
+  ggsave("Figures/Supplemental_Figures/FigureS6_PAST_PCA_hostVsymb.png", width = 9, height = 10)
 
 
 ```
 
-**Figure S4.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S6.** Principal component analysis (PCA) of P. asteroides coral host (protein, lipid, carbohydrate; left) or algal symbiont (chlorophyll a, symbiont density, color intensity; right) physiological parameters by temperature (28$^\circ$C blue; 31$^\circ$C red), *p*CO~2~ (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange), and natal reef environment (offshore green; inshore yellow). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
 
 
-### Figure S5
+### Figure S7
 
 ```{r host v symb plasticity distance calculations }
 
@@ -2139,18 +2139,18 @@ ggplot(comb_boot, aes(x = part, y = estimate, color = treat, fill = treat, shape
   #facet_grid(species ~ part, labeller = label_parsed) +
   facet_grid( ~ species, labeller = label_parsed)
 
-ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.pdf", width = 11, height = 3.5)
-ggsave("Figures/Supplemental_Figures/FigureS5_hostVsymb_plasticity.png", width = 11, height = 3.5)
+ggsave("Figures/Supplemental_Figures/FigureS7_hostVsymb_plasticity.pdf", width = 11, height = 3.5)
+ggsave("Figures/Supplemental_Figures/FigureS7_hostVsymb_plasticity.png", width = 11, height = 3.5)
 
 ```
 
-**Figure S5.** Coral host vs. algal symbiont physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 μatm], light purple; current day [420 μatm], dark purple; end-of-century [680 μatm], light orange; extreme [3290 μatm], dark orange) and temperature is represented as either closed (28 °C) or open (31 °C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
+**Figure S7.** Coral host vs. algal symbiont physiological plasticity of (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93-day exposure to experimental treatments. Higher values represent greater plasticity in coral holobiont samples. *p*CO~2~ treatment is depicted by color and shape (pre industrial [300 μatm], light purple; current day [420 μatm], dark purple; end-of-century [680 μatm], light orange; extreme [3290 μatm], dark orange) and temperature is represented as either closed (28 °C) or open (31 °C) symbols. Symbols and bars indicate modeled means and 95% confidence intervals.
 
 <br/>
 <br/>
 
 
-### Figure S6
+### Figure S8
 
 ```{r all coral physiology plot, fig.width = 10, fig.height = 13}
 
@@ -2176,28 +2176,28 @@ ggplot(df_noT_phys, aes(x = fpco2, y = value, color = ftemp)) +
   guides(color = guide_legend(override.aes = list(linetype = c(0, 0)))) +
   labs(y = "", x = alab)
 
-ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.pdf", width = 10, height = 13)
-ggsave("Figures/Supplemental_Figures/FigureS6_AllPhysiology.png", width = 10, height = 13) 
+ggsave("Figures/Supplemental_Figures/FigureS8_AllPhysiology.pdf", width = 10, height = 13)
+ggsave("Figures/Supplemental_Figures/FigureS8_AllPhysiology.png", width = 10, height = 13) 
 
 ```
 
-**Figure S6.** Mean ($\pm$SE) physiological parameter (each row) measured for (**A**) *S. siderea*, (**B**) *P. strigosa*, and  (**C**) *P. astreoides* at the completion of the 93-day experimental period. *p*CO~2~ treatment is represented along the x axis and the temperature is depicted by color (28$^\circ$C blue; 31$^\circ$C red).
+**Figure S8.** Mean ($\pm$SE) physiological parameter (each row) measured for (**A**) *S. siderea*, (**B**) *P. strigosa*, and  (**C**) *P. astreoides* at the completion of the 93-day experimental period. *p*CO~2~ treatment is represented along the x axis and the temperature is depicted by color (28$^\circ$C blue; 31$^\circ$C red).
 
 <br/>
 <br/>
 
 
-### Figure S7
+### Figure S9
 
-![](Figures/Supplemental_Figures/FigureS7_BleachingImages.png)
+![](Figures/Supplemental_Figures/FigureS9_BleachingImages.png)
 
-**Figure S7.** Coral color changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral color over time in either control (420 μatm; 28 °C) or warming (420 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
+**Figure S9.** Coral color changes over the experimental period. Representative images of fragments of (**A**) *P. astreoides*, (**B**) *S. siderea*, and (**C**) *P. strigosa* from the same colonies demonstrating change in coral color over time in either control (420 μatm; 28 °C) or warming (420 μatm; 31 °C) treatments from the start of the experiment (T0) to the end (T90).
 
 <br/>
 <br/>
 
 
-### Figure S8
+### Figure S10
 
 ```{r species PCA by reef plot}
 
@@ -2251,15 +2251,15 @@ all_pt_pca <- autoplot(all_pca, data = all_df,
 
 ```
 
-```{r save fig s8, fig.width = 10, fig.height = 4.5, fig.align = 'center'}
+```{r save fig s10, fig.width = 10, fig.height = 4.5, fig.align = 'center'}
 
 ggarrange(all_reef_pca, all_pt_pca, ncol = 2, labels = "AUTO", widths = c(0.6, 1))
-  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA.pdf", width = 10, height = 4.5)
-  ggsave("Figures/Supplemental_Figures/FigureS8_speciesPCA.png", width = 10, height = 4.5)
+  ggsave("Figures/Supplemental_Figures/FigureS10_speciesPCA.pdf", width = 10, height = 4.5)
+  ggsave("Figures/Supplemental_Figures/FigureS10_speciesPCA.png", width = 10, height = 4.5)
 
 ```
 
-**Figure S8.** Principal component analysis (PCA) comparing the physiology of all three species at the end of the experiment depicted by (**A**) reef environment and (**B**) combined *p*CO~2~ and temperature treatment. Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure S10.** Principal component analysis (PCA) comparing the physiology of all three species at the end of the experiment depicted by (**A**) reef environment and (**B**) combined *p*CO~2~ and temperature treatment. Arrows represent significant (p < 0.05) correlation vectors for physiological parameters and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
