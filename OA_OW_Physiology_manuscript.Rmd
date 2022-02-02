@@ -1299,6 +1299,167 @@ Elevated temperatures generally resulted in higher plasticity of *P. astreoides*
 
 ## Supplemental Figures{.tabset}
 
+```{r potential SST figure for supps, eval=FALSE, include=FALSE}
+
+#####################################################################################################
+########## R script containing walkthrough of how satellite data was obtained and compiled ##########
+################ Script written by Colleen B. Bove and last updated 26 October 2021 #################
+#####################################################################################################
+
+####### This first portion details how satellite data was obtained from MODIS using BU's SCC:
+
+## Modules to load
+# module load python3
+# module load udunits/2.2.26
+# module load netcdf/4.6.1
+# module load nco
+
+
+### Chlorophyll a and photosynthetically active radiation data download using EarthData
+# Data can be found here and specific date ranges and resolution can be selested using the UI
+# Data is downloaded using the created scripts from the server
+# Website: https://wiki.earthdata.nasa.gov/display/EDSC/How+To%3A+Use+the+Download+Access+Script
+
+## Create a .sh file with the provided script named 'download.sh'
+# nano download.sh
+
+## Need to run the following command before able to run the download script:
+# chmod 777 download.sh
+
+## Run the code (you can also submit it as a job) (it will ask for NASA credentials)
+# ./download.sh
+
+
+
+## After all files have been downloaded, need to concatenate all together and then download to local computer
+## SST
+# ncecat *.nc sst_BZ_full.nc
+
+## crop to just the southern Belize area
+# ncks -d lat,15.,17. -d lon,-90.,-86. sst_BZ_full.nc -O sst_BZ_cropped.nc
+
+
+## Salinity
+# ncecat *.nc salinity_BZ_full.nc
+
+## crop to just the southern Belize area
+# ncks -d lat,15.,17. -d lon,-90.,-86. salinity_BZ_full.nc -O salinity_BZ_cropped.nc
+
+
+
+
+
+
+### Load required packages:
+library(ncdf4)
+library(raster)
+library(xts)
+library(tidyverse)
+library(rnaturalearth)
+library(ggpubr)
+library(ggrepel)
+
+
+### Load the site lat/lon locations from .csv
+sites <- data.frame(Site = c("PHMR", "SCMR"),
+                    lon = c(-88.572760, -88.261440),
+                    lat = c(16.189870, 16.116670))
+
+
+
+## convert sampling points to spatial points and applying projection to points
+LongLat <- cbind(sites$lon, sites$lat) # make lat/lon data frame
+sitePTS <- SpatialPoints(LongLat) # convert data frame to spatialpoints object
+proj <- "+proj=longlat +ellps=WGS84 +datum=WGS84" # this is the projection that will be applied to data
+projection(sitePTS) <- proj # apply specified projection
+
+## Create the map for site locations:
+world <- ne_countries(scale = "medium", returnclass = "sf") # world shapefile from Natural Earth
+map <- ggplot() + 
+  geom_sf(data = world) + # plots the map layers
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.text=element_text(size=12), legend.title=element_text(size=14), axis.text = element_text(size = 10)) +
+  guides(colour = guide_legend(override.aes = list(size = 4))) +
+  geom_point(data = sites, aes(x = lon, y = lat), colour = "red", size = 2) + # add the site locations (with the buffer area)
+  geom_label_repel(data = sites, aes(x = lon, y = lat, label = Site)) + # adds site labels
+  coord_sf(xlim = c(-90, -86), ylim = c(15, 18)) + # plot constraints for lat/lon
+  ylab("") +
+  xlab("")
+
+
+#################################
+#### Working with SST data:
+
+### Open sst_BZ_cropped.nc file
+raster_path <- "/Users/colleen/Downloads/sst_BZ_cropped.nc" # specify the path to the Day SST netCDF (no path here since its in current working directory)
+sst_raster <- brick(raster_path, varname = "sst") # create raster brick of daily SST data
+# plot(sst_raster) # sometimes I plot to quickly have R plot this to make sure I am getting multiple layers and reasonable values
+
+netCDF <- nc_open(raster_path) # next, 'open' the netCDF to pull the time element that is extracted from the 'history' parameter
+history <- ncatt_get(netCDF,0,"history")[[2]] # pull the 'history' parameter (this has all the file names that we can pull dates per layer from)
+
+# create a dataframe of the pulled file name and then removed text strings per file (now each layer in the raster brick)
+dates <- data.frame(time = strsplit(history, " ")[[1]][c(-1:-20, -249:-250)]) %>% # Range for night: -3290:-3296; Range for day: -3291:-3297)
+  mutate(time = gsub("AQUA_MODIS.", "", time), # removes 'AQUA_MODIS.' from the file names
+         time = gsub(".L3m.MO.SST.sst.4km.nc", "", time)) # removes '.L3m.DAY.SST4.sst4.4km_subset.nc' from the file names
+
+# make new column of above data frame that converts the numbers to a date string
+dates$date_time <- as.Date(paste(substr(dates$time, 1, 4), substr(dates$time, 5, 6), substr(dates$time, 7, 8), sep = "-"))
+
+
+### Extract SST from raster by site (plus the 5 km buffer) and convert to usable data frame
+site_SST <- raster::extract(sst_raster, sitePTS, fun = mean) # this will take the mean SST within the buffer per site, resulting in one value per layer
+
+
+# convert the extracted matrix to final data frame
+site_SST_xts <- xts(t(site_SST), dates$date_time) # creates extensible time-series object, t is used to transpose the matrix because xts assumes dates are along lines, not columns. This also adds the time element of the layers since it was not present in the matrix
+site_SST_df <- data.frame(date=index(t(site_SST_xts)), coredata(t(site_SST_xts))) # convert xts object to data frame
+site_SST_df$site <- factor(seq(1, length(site_SST_df$date), 1)) # add ID to identify unique sampling sites
+site_SST_df$date <- NULL # remove this column since it is repetitive 
+site_SST_long <- gather(site_SST_df, date, sst, X2002.12.01:X2021.11.01) # convert from wide to long format (note the first date is 31 Dec 2004 so this can be removed downstream)
+
+# update the data frame for for better dates and site IDs
+sst_gps <- site_SST_long %>% separate(date, c("year", "month", "day")) # create year, month, and day column columns
+sst_gps$date <- paste(sst_gps$month, sst_gps$day, sst_gps$year, sep = "/") # creates a combined date column (XYear.Month)
+sst_gps <- spread(sst_gps, site, sst) # converts from long to wide format
+
+sst_gps <- sst_gps %>% 
+  rename(
+    PHMR = `1`,
+    SCMR = `2`,
+  )
+
+
+
+sst_long <- gather(sst_gps, site, sst, PHMR:SCMR) %>% 
+  mutate(date = as.Date(gsub("X2", "2", date), format = "%m/%d/%Y"))
+
+p_mean <- sst_long %>% filter(site == "PHMR") %>% 
+  summarise(mean = mean(sst, na.rm = TRUE))
+
+s_mean <- sst_long %>% filter(site == "SCMR") %>% 
+  summarise(mean = mean(sst, na.rm = TRUE))
+
+ggplot(data = sst_long, aes(x = date, y = sst, colour = site)) +
+  geom_hline(aes(yintercept = 28), colour = "#4393c3", size = 1, alpha = 0.2, linetype = "dashed") +
+  annotate("text", x = max(sst_long$date), y = 31.2, label = "31C treat", colour = "#b2182b") +
+  geom_hline(aes(yintercept = 31), colour = "#b2182b", size = 1, alpha = 0.2, linetype = "dashed") +
+  annotate("text", x = max(sst_long$date), y = 27.8, label = "28C treat", colour = "#4393c3") +
+  geom_hline(data = sst_long %>% filter(site == "PHMR"), aes(yintercept = mean(sst, na.rm = TRUE)), colour = "#e9aa2b", size = 2, alpha = 0.5) +
+  #annotate("text", x = min(sst_long$date), y = p_mean[[1]] + 0.2, label = paste0("mean: ", round(p_mean[[1]], 2), "C"), colour = "#e9aa2b") +
+  geom_hline(data = sst_long %>% filter(site == "SCMR"), aes(yintercept = mean(sst, na.rm = TRUE)), colour = "#00a08b", size = 2, alpha = 0.5) +
+  #annotate("text", x = min(sst_long$date), y = s_mean[[1]] - 0.2, label = paste0("mean: ", round(s_mean[[1]], 2), "C"), colour = "#00a08b") +  
+  geom_line(aes(group = site)) +
+  scale_color_manual("", labels = c("PHMR (inshore)", "SCMR (offshore)"), values = c("#e9aa2b", "#00a08b")) +
+  labs(x = "", y = "SST (C)") +
+  theme_classic() +
+  theme(legend.position = c(0.9, 0.1))
+
+
+
+```
+
+
 ### Figure S1
 
 ![](Figures/Supplemental_Figures/FigureS1_TankArray.jpg)
