@@ -77,7 +77,7 @@ options(warn = -1)
 
 
 ### Used packages that need to be installed to run code (and can be sourced easier from CRAN):
-needed_packages <- c("devtools", "knitr", "readr", "broom", "ggplot2", "dplyr", "ggbiplot", "tidyr", "corrgram", "openxlsx", "plotly", "tidyverse", "vegan", "shiny", "Rmisc", "cowplot", "ggfortify", "finalfit", "kableExtra", "readr", "lmerTest", "vroom", "ggpubr", "magick", "Hmisc", "corrplot", "gridGraphics", "grid", "RColorBrewer", "wesanderson", "performance", "MASS", "png", "car", "rcompanion", "janitor") # Specify necessary packages
+needed_packages <- c("devtools", "knitr", "readr", "broom", "ggplot2", "dplyr", "ggbiplot", "tidyr", "corrgram", "openxlsx", "plotly", "tidyverse", "vegan", "shiny", "Rmisc", "cowplot", "ggfortify", "finalfit", "kableExtra", "readr", "lmerTest", "vroom", "ggpubr", "magick", "Hmisc", "corrplot", "gridGraphics", "grid", "RColorBrewer", "wesanderson", "performance", "MASS", "png", "car", "rcompanion", "janitor", "ncdf4", "raster", "xts", "ggrepel") # Specify necessary packages
 
 not_installed <- needed_packages[!(needed_packages %in% installed.packages()[ , "Package"])] # Extract not installed packages) # Install not installed packages
 if(length(not_installed)) install.packages(not_installed) # Install not installed packages
@@ -122,6 +122,10 @@ library(png)
 library(car)
 library(rcompanion)
 library(janitor)
+library(ncdf4)
+library(raster)
+library(xts)
+library(ggrepel)
 
 ## Source the custom functions necessary for running this script
 source("Code/CustomFunctions.R")
@@ -1358,7 +1362,7 @@ Elevated temperatures generally resulted in higher plasticity of *P. astreoides*
 # module load nco
 
 
-### Chlorophyll a and photosynthetically active radiation data download using EarthData
+### SST data download using EarthData
 # Data can be found here and specific date ranges and resolution can be selested using the UI
 # Data is downloaded using the created scripts from the server
 # Website: https://wiki.earthdata.nasa.gov/display/EDSC/How+To%3A+Use+the+Download+Access+Script
@@ -1389,25 +1393,17 @@ Elevated temperatures generally resulted in higher plasticity of *P. astreoides*
 # ncks -d lat,15.,17. -d lon,-90.,-86. salinity_BZ_full.nc -O salinity_BZ_cropped.nc
 
 
+####
+# CITATION: NASA OBPG. 2020. MODIS Aqua Global Level 3 Mapped SST. Ver. 2019.0. PO.DAAC, CA, USA. Dataset accessed [2021-02-02] at https://doi.org/10.5067/MODSA-MO4D9
 
+```
 
-
-
-### Load required packages:
-library(ncdf4)
-library(raster)
-library(xts)
-library(tidyverse)
-library(rnaturalearth)
-library(ggpubr)
-library(ggrepel)
-
+```{r SST plot for Fig S1, warning=FALSE, fig.height = 4, fig.width = 10}
 
 ### Load the site lat/lon locations from .csv
 sites <- data.frame(Site = c("PHMR", "SCMR"),
                     lon = c(-88.572760, -88.261440),
                     lat = c(16.189870, 16.116670))
-
 
 
 ## convert sampling points to spatial points and applying projection to points
@@ -1416,25 +1412,9 @@ sitePTS <- SpatialPoints(LongLat) # convert data frame to spatialpoints object
 proj <- "+proj=longlat +ellps=WGS84 +datum=WGS84" # this is the projection that will be applied to data
 projection(sitePTS) <- proj # apply specified projection
 
-## Create the map for site locations:
-world <- ne_countries(scale = "medium", returnclass = "sf") # world shapefile from Natural Earth
-map <- ggplot() + 
-  geom_sf(data = world) + # plots the map layers
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank(), strip.background = element_blank(), panel.border = element_rect(colour = "black", fill=NA, size=1), legend.text=element_text(size=12), legend.title=element_text(size=14), axis.text = element_text(size = 10)) +
-  guides(colour = guide_legend(override.aes = list(size = 4))) +
-  geom_point(data = sites, aes(x = lon, y = lat), colour = "red", size = 2) + # add the site locations (with the buffer area)
-  geom_label_repel(data = sites, aes(x = lon, y = lat, label = Site)) + # adds site labels
-  coord_sf(xlim = c(-90, -86), ylim = c(15, 18)) + # plot constraints for lat/lon
-  ylab("") +
-  xlab("")
-
-
-#################################
-#### Working with SST data:
 
 ### Open sst_BZ_cropped.nc file
-raster_path <- "/Users/colleen/Downloads/sst_BZ_cropped.nc" # specify the path to the Day SST netCDF (no path here since its in current working directory)
+raster_path <- "Data/Raw_data/sst_BZ_cropped.nc" # specify the path to the Day SST netCDF (no path here since its in current working directory)
 sst_raster <- brick(raster_path, varname = "sst") # create raster brick of daily SST data
 # plot(sst_raster) # sometimes I plot to quickly have R plot this to make sure I am getting multiple layers and reasonable values
 
@@ -1473,7 +1453,7 @@ sst_gps <- sst_gps %>%
   )
 
 
-
+## convert data from wide to long
 sst_long <- gather(sst_gps, site, sst, PHMR:SCMR) %>% 
   mutate(date = as.Date(gsub("X2", "2", date), format = "%m/%d/%Y"))
 
@@ -1482,6 +1462,7 @@ p_mean <- sst_long %>% filter(site == "PHMR") %>%
 
 s_mean <- sst_long %>% filter(site == "SCMR") %>% 
   summarise(mean = mean(sst, na.rm = TRUE))
+
 
 ggplot(data = sst_long, aes(x = date, y = sst, colour = site)) +
   geom_hline(aes(yintercept = 28), colour = "#4393c3", size = 1, alpha = 0.2, linetype = "dashed") +
@@ -1496,13 +1477,14 @@ ggplot(data = sst_long, aes(x = date, y = sst, colour = site)) +
   scale_color_manual("", labels = c("PHMR (inshore)", "SCMR (offshore)"), values = c("#e9aa2b", "#00a08b")) +
   labs(x = "", y = "SST (C)") +
   theme_classic() +
-  theme(legend.position = c(0.9, 0.1))
+  theme(legend.position = c(0.9, 0.13))
 
-
+ggsave("Figures/Supplemental_Figures/FigureS1_SST.pdf", width = 10, height = 4)
+ggsave("Figures/Supplemental_Figures/FigureS1_SST.png", width = 10, height = 4)
 
 ```
 
-**Figure S1.**
+**Figure S1.** Monthly MODIS satellite SST data from 2002 to 2021 for both the inshore (Port Honduras Marine Reserve; yellow) and the offshore (Sapodilla Cayes Marine Reserve; green) coral collection locations. Solid horizontal lines represent corresponding reef environment mean SST across duration. The blue dashed line represents the experimental control treatment temperature (28 $^\circ$C) and the red dashed line represents the experimental elevated temperature treatment (31 $^\circ$C). Note the temperature variability of the inshore site exceeding the offshore location. [Data accessability: *NASA OBPG. 2020. MODIS Aqua Global Level 3 Mapped SST. Ver. 2019.0. PO.DAAC, CA, USA. Dataset accessed [2021-02-02] at https://doi.org/10.5067/MODSA-MO4D9*]
 
 
 <br/>
@@ -2464,8 +2446,8 @@ all_pt_pca <- autoplot(all_pca, data = all_df,
 ```{r save fig s11, fig.width = 10, fig.height = 4.5, fig.align = 'center'}
 
 ggarrange(all_reef_pca, all_pt_pca, ncol = 2, labels = "AUTO", widths = c(0.6, 1))
-  ggsave("Figures/Supplemental_Figures/FigureS21_speciesPCA.pdf", width = 10, height = 4.5)
-  ggsave("Figures/Supplemental_Figures/FigureS21_speciesPCA.png", width = 10, height = 4.5)
+  ggsave("Figures/Supplemental_Figures/FigureS11_speciesPCA.pdf", width = 10, height = 4.5)
+  ggsave("Figures/Supplemental_Figures/FigureS11_speciesPCA.png", width = 10, height = 4.5)
 
 ```
 
