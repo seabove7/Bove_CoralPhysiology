@@ -1,5 +1,5 @@
 ---
-title: "Global change differentially modulates Caribbean coral physiology and suggests future ‘winners’ and ‘losers’"
+title: "Global change differentially modulates Caribbean coral physiology and suggests future winners and losers"
 date: "*Last run on `r format(Sys.time(), '%d %B %Y')`*"
 output: 
   html_document:
@@ -16,13 +16,13 @@ output:
 
 <br/>
 
-##### **Colleen B Bove^1,2\*^, Sarah W Davies^1^, Justin B Ries^3^, James Umbanhowar^2,4^, Bailey C Thomasson^4,5^, Elizabeth B Farquhar^2,6^, Jessica A McCoppin^4, Karl D Castillo^2,7^**
+##### **Colleen B Bove^1,2\*^, Sarah W Davies^1^, Justin B Ries^3^, James Umbanhowar^2,4^, Bailey C Thomasson^4,5^, Elizabeth B Farquhar^2,6^, Jess A McCoppin^4^, Karl D Castillo^2,7^**
 
 ^1^ The Department of Biology, Boston University, Boston, Massachusetts, USA   
 ^2^ Environment, Ecology, and Energy Program, The University of North Carolina at Chapel Hill, Chapel Hill, North Carolina, USA    
 ^3^ Department of Marine and Environmental Sciences, Northeastern University, Nahant, MA, USA   
 ^4^ The Department of Biology, The University of North Carolina at Chapel Hill, Chapel Hill, North Carolina, USA    
-^5^ Florida Fish and Wildlife Conservation Commission, St. Petersburg, Florida, USA   
+^5^ Coral Restoration Foundation, Key Largo, Florida, USA   
 ^6^ Center for Marine Science, University of North Carolina Wilmington, Wilmington, NC, USA   
 ^7^ The Department of Marine Science, The University of North Carolina at Chapel Hill, Chapel Hill, North Carolina, USA    
 
@@ -32,7 +32,7 @@ output:
 
 #### **Abstract:**
 
-Global change driven by anthropogenic carbon emissions is altering ecosystems at unprecedented rates, especially coral reefs, whose symbiosis with algal endosymbionts is particularly vulnerable to increasing ocean temperatures and altered carbonate chemistry. Here, we assess the physiological responses of three Caribbean coral (animal host + algal symbiont) species from an inshore and offshore reef environment after exposure to simulated ocean warming (28, 31 °C), acidification (300 - 3290 µatm), and the combination of stressors for 93 days. We used multidimensional analyses to assess how multiple coral physiological parameters respond to ocean acidification and warming. Our results demonstrate significantly diminishing physiology in *Siderastrea siderea* and *Porites astreoides* in response to projected ocean acidification, while future warming elicited severe declines in *Pseudodiploria strigosa*. Offshore *S. siderea* fragments exhibited higher physiological plasticity than inshore counterparts, suggesting that this offshore population has the capacity to modulate their physiology in response to changing conditions, but at a cost to the coral. Plasticity of *P. strigosa* and *P. astreoides* was not clearly different between natal reef environments, however, temperature evoked a greater plastic response in both species. Interestingly, while these species exhibit unique physiological responses to ocean acidification and warming, when data from all three species are modeled together, convergent stress responses to these conditions are observed, highlighting the overall sensitivities of tropical corals to these stressors. Our results demonstrate that while ocean warming is a severe acute stressor that will have dire consequences for coral reefs globally, chronic exposure to acidification may also impact coral physiology to a greater extent than previously assumed. The variety of responses to global change we observe across species will likely manifest in altered Caribbean reef assemblages in the future. 
+Global change driven by anthropogenic carbon emissions is altering ecosystems at unprecedented rates, especially coral reefs, whose symbiosis with algal symbionts is particularly vulnerable to increasing ocean temperatures and altered carbonate chemistry. Here, we assess the physiological responses of three Caribbean coral (animal host + algal symbiont) species from an inshore and offshore reef environment after exposure to simulated ocean warming (28, 31 °C), acidification (300 - 3290 µatm), and the combination of stressors for 93 days. We used multidimensional analyses to assess how a variety of coral physiological parameters respond to ocean acidification and warming. Our results demonstrate reductions in coral health in *Siderastrea siderea* and *Porites astreoides* in response to projected ocean acidification, while future warming elicited severe declines in *Pseudodiploria strigosa*. Offshore *S. siderea* fragments exhibited higher physiological plasticity than inshore counterparts, suggesting that this offshore population was more susceptible to changing conditions. There were no plasticity differences in *P. strigosa* and *P. astreoides* between natal reef environments, however, temperature evoked stronger responses in both species. Interestingly, while each species exhibited unique physiological responses to ocean acidification and warming, when data from all three species are modelled together, convergent stress responses to these conditions are observed, highlighting the overall sensitivities of tropical corals to these stressors. Our results demonstrate that while ocean warming is a severe acute stressor that will have dire consequences for coral reefs globally, chronic exposure to acidification may also impact coral physiology to a greater extent in some species than previously assumed. The species-specific responses to global change we observe will likely manifest in altered Caribbean reef assemblages in the future. 
 
 **Keywords**   
 coral physiology; ocean acidification; ocean warming; plasticity; symbiosis; global change
@@ -372,7 +372,7 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
     scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
     theme(legend.background = element_rect(fill = "transparent", color = NA)) +
-    annotate("text", x = -0.30, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3)
+    annotate("text", x = -0.27, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3)
 
 # reef
 s_reef_pca <- autoplot(s_pca, data = s_df, 
@@ -661,7 +661,7 @@ a_pco2_pca <- autoplot(a_pca, data = a_df,
     scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
     guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
     theme(legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.167, y = -0.5, label = deparse(a_pco2_pval), parse = TRUE, size = 3)
+  annotate("text", x = -0.160, y = -0.5, label = deparse(a_pco2_pval), parse = TRUE, size = 3)
 
 # reef
 a_reef_pca <- autoplot(a_pca, data = a_df, 
@@ -726,8 +726,8 @@ temp_PCA <- ggarrange(s_temp_pca, p_temp_pca, a_temp_pca, ncol = 3, common.legen
 pCO2_PCA <- ggarrange(s_pco2_pca, p_pco2_pca, a_pco2_pca, ncol = 3, common.legend = TRUE, legend = "bottom", labels = c("D", "E", "F"))
 
 ggarrange(temp_PCA, pCO2_PCA, nrow = 2) 
-  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 13, height = 8.5)
-  ggsave("Figures/Final_Figures/Figure1_PhysPCA.png", width = 13, height = 8.5)
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 10, height = 7)
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.png", width = 10, height = 7)
 
 ```
 
