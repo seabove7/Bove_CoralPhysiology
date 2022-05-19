@@ -294,6 +294,7 @@ s_df <- unique(s_df) # remove any duplicate rows
 s_df_l <- gather(s_df, param, value, c(14:17,21:23))
 s_df$fpco2 <- factor(s_df$fpco2, levels = c("300", "420", "680", "3290"))
 sid_pca_df <- s_df[,c(14:17,21:23)]
+sid_pca_df <- rename(sid_pca_df, colour = sum) # renaming the 'sum' column to 'colour'
 
 # run the adonis
 s_pca_mod_full <- adonis2(sid_pca_df ~ reef * ftemp * fpco2, data = s_df, method = 'eu', permutations = bootnum) # below is the model with non sig interactions removed:
@@ -437,6 +438,7 @@ p_df <- unique(p_df) # remove duplicate rows
 p_df_l <- gather(p_df, param, value, c(14:16,21:23))
 p_df$fpco2 <- factor(p_df$fpco2, levels = c("300", "420", "680", "3290"))
 dip_pca_df <- p_df[,c(14:17,21:23)]
+dip_pca_df <- rename(dip_pca_df, colour = sum) # renaming the 'sum' column to 'colour'
 
 # run the adonis
 p_pca_mod_full <- adonis2(dip_pca_df ~ reef * ftemp * fpco2, data = p_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
@@ -583,6 +585,7 @@ a_df <- a_df[-17,] # we have two from the same colony in 400_28 that are perform
 a_df_l <- gather(a_df, param, value, c(14:16,21:23))
 a_df$fpco2 <- factor(a_df$fpco2, levels = c("300", "420", "680", "3290"))
 por_pca_df <- a_df[,c(14:16,18,21:23)]
+por_pca_df <- rename(por_pca_df, colour = red) # renaming the 'sum' column to 'colour'
 
 # run the adonis
 a_pca_mod_full <- adonis2(por_pca_df ~ fpco2 * ftemp * reef, data = a_df, method = 'eu', permutations = 1000) # below is the model with non sig interactions removed:
@@ -731,7 +734,7 @@ ggarrange(temp_PCA, pCO2_PCA, nrow = 2)
 
 ```
 
-**Figure 1.** Principal component analysis (PCA) of all coral physiological parameters for (**A**) *S. siderea*, (**B**) *P. strigosa*, and (**C**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (28$^\circ$C blue; 31$^\circ$C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters (rate = calcification rate; den = symbiont density; chla = chlorophyll a; pro = protein; carb = carbohydrate; lipid = lipid; sum/red = color intensity) and ellipses represent 95% confidence based on multivariate t-distributions.
+**Figure 1.** Principal component analysis (PCA) of all coral physiological parameters for (**A, D**) *S. siderea*, (**B, E**) *P. strigosa*, and (**C, F**) *P. astreoides* after 93 days of exposure to different temperature and *p*CO~2~ treatments. PCAs in the top row are depicted by temperature treatment for each species (**AーC**: 28$^\circ$C blue; 31$^\circ$C red) and the bottom row of PCAs are depicted by *p*CO~2~ for each species (**DーF**: pre industrial [300 $\mu$atm], light purple; current day [420 $\mu$atm], dark purple; end-of-century [680 $\mu$atm], light orange; extreme [3290 $\mu$atm], dark orange). Arrows represent significant (p < 0.05) correlation vectors for physiological parameters (rate = calcification rate; den = symbiont density; chla = chlorophyll a; pro = protein; carb = carbohydrate; lipid = lipid; colour = color intensity) and ellipses represent 95% confidence based on multivariate t-distributions.
 
 <br/>
 <br/>
