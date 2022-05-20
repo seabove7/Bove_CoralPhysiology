@@ -420,8 +420,53 @@ s_pt_pca <- autoplot(s_pca, data = s_df,
   scale_fill_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
   scale_colour_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
   scale_shape_manual("", values = c(19, 19, 17, 17, 15, 15, 8, 8)) +
-  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA))
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 4, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
+
+
+
+### Trying a single PCA with colour for pCO2 and shape for temp:
+# ellipse by pco2
+s_pco2_pca2 <- autoplot(s_pca, data = s_df, 
+         colour = "fpco2",
+         shape = "ftemp",
+         frame = FALSE, 
+         loadings = TRUE, 
+         loadings.colour = "grey29", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
+         loadings.label.repel = TRUE) +
+    stat_ellipse(type = "t", aes(colour = fpco2)) +
+    scale_shape_manual("", labels = c("28 C", "31 C"), values = c(19, 1)) +
+    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+    guides(linetype = "none", shape = guide_legend(order = 1, nrow = 2)) +
+    guides(color = guide_legend(order = 2, nrow = 2, override.aes = list(linetype = c(0, 0, 0, 0)))) +
+    theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
+
+
+# ellipse by temp
+s_temp_pca2 <- autoplot(s_pca, data = s_df, 
+         colour = "fpco2",
+         shape = "ftemp",
+         frame = FALSE, 
+         loadings = TRUE, 
+         loadings.colour = "grey29", 
+         loadings.label = TRUE,
+         loadings.label.colour = "black",         
+         loadings.label.size = 4, 
+         loadings.label.hjust = 1.5, 
+         loadings.label.vjust = 0.5,
+         loadings.label.repel = TRUE) +
+    stat_ellipse(type = "t", aes(lty = ftemp, colour = ftemp)) +
+    scale_linetype_manual(values = c("solid", "dashed")) +
+    scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19, 1)) +
+    scale_color_manual("", labels = c("28 C", "31 C", "pre industrial", "current", "end-of-century", "extreme"), values = c("#4393c3", "#b2abd2", "#b2182b", "#5e3c99", "#fdb863", "#e66101")) +
+    guides(linetype = "none", shape = "none") +
+    guides(color = guide_legend(nrow = 2, override.aes = list(linetype = c(1, 2, 0, 0, 0, 0), shape = c(19, 1, 19, 19, 19, 19), colour = c("#4393c3", "#b2182b", "#b2abd2", "#5e3c99", "#fdb863", "#e66101")))) +
+    theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
 
 ```
 
