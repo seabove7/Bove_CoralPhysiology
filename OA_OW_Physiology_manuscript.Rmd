@@ -322,43 +322,11 @@ s_temp_pval <-substitute(italic(P[temp])==p, list(p = format(s_pval[2,1], digits
 s_reef_pval <-substitute(italic(P[reef])==p, list(p = format(s_pval[3,1], digits = 1)))
 
 
-# temperature
-s_temp_pca <- autoplot(s_pca, data = s_df, 
-         colour = "ftemp",
-         #shape = "fpco2",
-         shape = "ftemp",
-         fill = "ftemp",               
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1.5, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
-  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_colour_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "transparent"))+
-  guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.30, y = -0.38, label = deparse(s_temp_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(italic("S. siderea"))))
-
-# pco2
-s_pco2_pca <- autoplot(s_pca, data = s_df, 
+# temperature = shape; pco2 = colours
+s_pca_plot <- autoplot(s_pca, data = s_df, 
          colour = "fpco2",
-         #shape = "ftemp",
-         fill = "fpco2",
-         shape = "fpco2",
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
+         shape = "ftemp",
+         frame = FALSE, 
          loadings = TRUE, 
          loadings.colour = "grey29", 
          loadings.label = TRUE,
@@ -367,13 +335,22 @@ s_pco2_pca <- autoplot(s_pca, data = s_df,
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
-    #scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
-    scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
-    scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(legend.background = element_rect(fill = "transparent", color = NA)) +
-    annotate("text", x = -0.27, y = -0.38, label = deparse(s_pco2_pval), parse = TRUE, size = 3)
+    stat_ellipse(type = "t", aes(colour = fpco2)) +
+    scale_shape_manual("", labels = c("28 C", "31 C"), values = c(19, 1)) +
+    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+    guides(linetype = "none", shape = guide_legend(keyheight = 0.7, keywidth = 0.1, order = 1, nrow = 2)) +
+    guides(color = guide_legend(keyheight = 0.7, keywidth = 0.1, order = 2, nrow = 2, override.aes = list(linetype = c(0, 0, 0, 0)))) +
+    annotate("text", x = -0.338, y = -0.39, label = deparse(s_temp_pval), parse = TRUE, size = 3) +  
+    annotate("text", x = -0.33, y = -0.345, label = deparse(s_pco2_pval), parse = TRUE, size = 3) +
+    xlim(-0.4, 0.4) +
+    theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.08, 0.97))
+
+guide_pco2_color <- get_legend(s_pca_plot + guides(linetype = "none", shape = "none")) # extract the temp colour legend
+
+s_pca_plot <- s_pca_plot + # add colour guide to new location and save
+  guides(color = "none") +
+  annotation_custom(guide_pco2_color, xmax = 0.78, ymax = -0.28)
+
 
 # reef
 s_reef_pca <- autoplot(s_pca, data = s_df, 
@@ -424,49 +401,27 @@ s_pt_pca <- autoplot(s_pca, data = s_df,
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
 
 
-
 ### Trying a single PCA with colour for pCO2 and shape for temp:
-# ellipse by pco2
-s_pco2_pca2 <- autoplot(s_pca, data = s_df, 
-         colour = "fpco2",
-         shape = "ftemp",
-         frame = FALSE, 
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1.5, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-    stat_ellipse(type = "t", aes(colour = fpco2)) +
-    scale_shape_manual("", labels = c("28 C", "31 C"), values = c(19, 1)) +
-    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
-    guides(linetype = "none", shape = guide_legend(order = 1, nrow = 2)) +
-    guides(color = guide_legend(order = 2, nrow = 2, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
-
-
-# ellipse by temp
-s_temp_pca2 <- autoplot(s_pca, data = s_df, 
-         colour = "fpco2",
-         shape = "ftemp",
-         frame = FALSE, 
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1.5, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-    stat_ellipse(type = "t", aes(lty = ftemp, colour = ftemp)) +
-    scale_linetype_manual(values = c("solid", "dashed")) +
-    scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19, 1)) +
-    scale_color_manual("", labels = c("28 C", "31 C", "pre industrial", "current", "end-of-century", "extreme"), values = c("#4393c3", "#b2abd2", "#b2182b", "#5e3c99", "#fdb863", "#e66101")) +
-    guides(linetype = "none", shape = "none") +
-    guides(color = guide_legend(nrow = 2, override.aes = list(linetype = c(1, 2, 0, 0, 0, 0), shape = c(19, 1, 19, 19, 19, 19), colour = c("#4393c3", "#b2182b", "#b2abd2", "#5e3c99", "#fdb863", "#e66101")))) +
-    theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
+# ellipse by temp, points by pCO2
+# s_temp_pca2 <- autoplot(s_pca, data = s_df, 
+#          colour = "fpco2",
+#          shape = "ftemp",
+#          frame = FALSE, 
+#          loadings = TRUE, 
+#          loadings.colour = "grey29", 
+#          loadings.label = TRUE,
+#          loadings.label.colour = "black",         
+#          loadings.label.size = 4, 
+#          loadings.label.hjust = 1.5, 
+#          loadings.label.vjust = 0.5,
+#          loadings.label.repel = TRUE) +
+#     stat_ellipse(type = "t", aes(lty = ftemp, colour = ftemp)) +
+#     scale_linetype_manual(values = c("solid", "dashed")) +
+#     scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19, 1)) +
+#     scale_color_manual("", labels = c("28 C", "31 C", "pre industrial", "current", "end-of-century", "extreme"), values = c("#4393c3", "#b2abd2", "#b2182b", "#5e3c99", "#fdb863", "#e66101")) +
+#     guides(linetype = "none", shape = "none") +
+#     guides(color = guide_legend(nrow = 2, override.aes = list(linetype = c(1, 2, 0, 0, 0, 0), shape = c(19, 1, 19, 19, 19, 19), colour = c("#4393c3", "#b2182b", "#b2abd2", "#5e3c99", "#fdb863", "#e66101")))) +
+#     theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
 
 ```
 
@@ -511,95 +466,11 @@ p_temp_pval <-substitute(italic(P[temp])==p, list(p = format(p_pval[2,1], digits
 p_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(p_pval[3,1], digits = 2)))
 
 
-# temperature
-p_temp_pca <- autoplot(p_pca, data = p_df, 
-         colour = "ftemp",
-         #shape = "fpco2",
-         shape = "ftemp",
-         fill = "ftemp",               
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
-  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "transparent"))+
-  guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.13, y = -0.38, label = deparse(p_temp_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(italic("P. strigosa"))))
-
-
-# pco2
-p_pco2_pca <- autoplot(p_pca, data = p_df, 
-         colour = "fpco2",
-         fill = "fpco2",
-         #shape = "ftemp",
+# temperature = colour; pco2 = shape
+p_pca_plot <- autoplot(p_pca, data = p_df, 
          shape = "fpco2",
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-    #scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
-    scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
-    scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(legend.background = element_rect(fill = "transparent", color = NA)) +
-    annotate("text", x = -0.28, y = -0.38, label = deparse(p_pco2_pval), parse = TRUE, size = 3)
-
-# reef
-p_reef_pca <- autoplot(p_pca, data = p_df, 
-         colour = "reef",
-         fill = "reef",
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
-  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.17, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(bold("B)   "), italic("P. strigosa"))))
-
-
-# pco2 * temp
-p_df$pco2_f <- factor(p_df$pco2, labels = c("pre industrial; 28C", "pre industrial; 31C", "current; 31C", "current; 28C", "end-of-century; 28C", "end-of-century; 31C", "extreme; 28C", "extreme; 31C"))
-p_pt_pca <- autoplot(p_pca, data = p_df, 
-         colour = "pco2_f",
-         fill = "pco2_f",
-         shape = "pco2_f",
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         frame.size = 5,
+         colour = "ftemp",
+         frame = FALSE, 
          loadings = TRUE, 
          loadings.colour = "grey29", 
          loadings.label = TRUE,
@@ -608,11 +479,94 @@ p_pt_pca <- autoplot(p_pca, data = p_df,
          loadings.label.hjust = 1.5, 
          loadings.label.vjust = 0.5,
          loadings.label.repel = TRUE) +
+  stat_ellipse(type = "t", aes(colour = ftemp)) +
+  scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(19, 17, 15, 8)) +
+  scale_color_manual("", labels = c("28 C", "31 C"), values = c("#4393c3", "#b2182b")) +
+  guides(linetype = "none", shape = guide_legend(keyheight = 0.7, keywidth = 0.1, order = 2, nrow = 4)) +
+  guides(color = guide_legend(keyheight = 0.7, keywidth = 0.1, order = 1, nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  annotate("text", x = -0.150, y = -0.39, label = deparse(p_temp_pval), parse = TRUE, size = 3) +  
+  annotate("text", x = -0.155, y = -0.33, label = deparse(p_pco2_pval), parse = TRUE, size = 3) +
+  theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.18, 0.95))
+
+guide_temp_color <- get_legend(p_pca_plot + guides(linetype = "none", shape = "none")) # extract the temp colour legend
+
+p_pca_plot <- p_pca_plot + # add colour guide to new location and save
+  guides(color = "none") +
+  annotation_custom(guide_temp_color, xmax = 0.95, ymax = -0.25)
+
+
+# reef
+p_reef_pca <- autoplot(p_pca, data = p_df, 
+                       colour = "reef",
+                       fill = "reef",
+                       frame = TRUE, 
+                       frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
+                       frame.level = 0.95, # using 95% CI for all ellipses
+                       frame.alpha = 0.01,
+                       loadings = TRUE, 
+                       loadings.colour = "grey29", 
+                       loadings.label = TRUE,
+                       loadings.label.colour = "black",         
+                       loadings.label.size = 4, 
+                       loadings.label.hjust = 1.5, 
+                       loadings.label.vjust = 0.5,
+                       loadings.label.repel = TRUE) +
+  scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
+  annotate("text", x = -0.3, y = -0.38, label = deparse(p_reef_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste(bold("A)   "), italic("S. siderea"))))
+
+# pco2 * temp
+p_df$pco2_f <- factor(p_df$pco2, labels = c("pre industrial; 28C", "pre industrial; 31C", "current; 31C", "current; 28C", "end-of-century; 28C", "end-of-century; 31C", "extreme; 28C", "extreme; 31C"))
+p_pt_pca <- autoplot(p_pca, data = p_df, 
+                     colour = "pco2_f",
+                     fill = "pco2_f",
+                     shape = "pco2_f",
+                     frame = TRUE, 
+                     frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
+                     frame.level = 0.95, # using 95% CI for all ellipses
+                     frame.alpha = 0.01,
+                     frame.size = 5,
+                     loadings = TRUE, 
+                     loadings.colour = "grey29", 
+                     loadings.label = TRUE,
+                     loadings.label.colour = "black",         
+                     loadings.label.size = 4, 
+                     loadings.label.hjust = 1.5, 
+                     loadings.label.vjust = 0.5,
+                     loadings.label.repel = TRUE) +
   scale_fill_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
   scale_colour_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
   scale_shape_manual("", values = c(19, 19, 17, 17, 15, 15, 8, 8)) +
-  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA))
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 4, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
+
+
+
+
+### Trying a single PCA with colour for pCO2 and shape for temp:
+# ellipse by temp, points by pCO2
+# p_temp_pca2 <- autoplot(p_pca, data = p_df, 
+#          colour = "fpco2",
+#          shape = "ftemp",
+#          frame = FALSE, 
+#          loadings = TRUE, 
+#          loadings.colour = "grey29", 
+#          loadings.label = TRUE,
+#          loadings.label.colour = "black",         
+#          loadings.label.size = 4, 
+#          loadings.label.hjust = 1.5, 
+#          loadings.label.vjust = 0.5,
+#          loadings.label.repel = TRUE) +
+#     stat_ellipse(type = "t", aes(lty = ftemp, colour = ftemp)) +
+#     scale_linetype_manual(values = c("solid", "dashed")) +
+#     scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19, 1)) +
+#     scale_color_manual("", labels = c("28 C", "31 C", "pre industrial", "current", "end-of-century", "extreme"), values = c("#4393c3", "#b2abd2", "#b2182b", "#5e3c99", "#fdb863", "#e66101")) +
+#     guides(linetype = "none", shape = "none") +
+#     guides(color = guide_legend(nrow = 2, override.aes = list(linetype = c(1, 2, 0, 0, 0, 0), shape = c(19, 1, 19, 19, 19, 19), colour = c("#4393c3", "#b2182b", "#b2abd2", "#5e3c99", "#fdb863", "#e66101")))) +
+#     theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
 
 ```
 
@@ -658,107 +612,104 @@ a_temp_pval <-substitute(italic(P[temp])==p, list(p = format(a_pval[2,1], digits
 a_pco2_pval <-substitute(italic(P[pCO[2]])==p, list(p = format(a_pval[3,1], digits = 1)))
 
 
-# temperature
-a_temp_pca <- autoplot(a_pca, data = a_df, 
-         colour = "ftemp",
-         #shape = "fpco2",
-         shape = "ftemp",
-         fill = "ftemp",               
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-  #scale_shape_manual("pCO2", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
-  scale_shape_manual("temperature", labels = c("28C", "31C"), values = c(21, 21)) +
-  scale_color_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "#b2182b"))+
-  scale_fill_manual("temperature", labels = c("28C", "31C"), values = c("#4393c3", "transparent"))+
-  guides(color = guide_legend(keyheight = 0.3, nrow = 4, byrow = TRUE, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.22, y = -0.44, label = deparse(a_temp_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(italic("P. astreoides"))))
+# temperature = shape; pco2 = colours
+a_pca_plot <- autoplot(a_pca, data = a_df, 
+                       colour = "fpco2",
+                       shape = "ftemp",
+                       frame = FALSE, 
+                       loadings = TRUE, 
+                       loadings.colour = "grey29", 
+                       loadings.label = TRUE,
+                       loadings.label.colour = "black",         
+                       loadings.label.size = 4, 
+                       loadings.label.hjust = 1.5, 
+                       loadings.label.vjust = 0.5,
+                       loadings.label.repel = TRUE) +
+  stat_ellipse(type = "t", aes(colour = fpco2)) +
+  scale_shape_manual("", labels = c("28 C", "31 C"), values = c(19, 1)) +
+  scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101")) +
+  lims(y = c(-0.41, 0.4), x = c(-0.3, 0.6)) +
+  guides(linetype = "none", shape = guide_legend(keyheight = 0.7, keywidth = 0.1, order = 1, nrow = 2)) +
+  guides(color = guide_legend(keyheight = 0.7, keywidth = 0.1, order = 2, nrow = 2, override.aes = list(linetype = c(0, 0, 0, 0)))) +
+  annotate("text", x = -0.235, y = -0.408, label = deparse(a_temp_pval), parse = TRUE, size = 3) +  
+  annotate("text", x = -0.235, y = -0.358, label = deparse(a_pco2_pval), parse = TRUE, size = 3) +
+  theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = c(0.08, 0.97))
 
-# pco2
-a_pco2_pca <- autoplot(a_pca, data = a_df, 
-         colour = "fpco2",
-         fill = "fpco2",
-         #shape = "ftemp",
-         shape = "fpco2",
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
-    #scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19,21)) +
-    scale_shape_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c(21, 23, 24, 22)) +
-    scale_fill_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    scale_color_manual("", labels = c("pre industrial", "current", "end-of-century", "extreme"), values = c("#b2abd2", "#5e3c99", "#fdb863", "#e66101"))+
-    guides(color = guide_legend(nrow = 4, override.aes = list(linetype = c(0, 0, 0, 0)))) +
-    theme(legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.160, y = -0.5, label = deparse(a_pco2_pval), parse = TRUE, size = 3)
+a_pca_plot <- a_pca_plot + # add colour guide to new location and save
+  guides(color = "none") +
+  annotation_custom(guide_pco2_color, xmax = 0.98, ymax = -0.28)
+
 
 # reef
 a_reef_pca <- autoplot(a_pca, data = a_df, 
-         colour = "reef",
-         fill = "reef",
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
+                       colour = "reef",
+                       fill = "reef",
+                       frame = TRUE, 
+                       frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
+                       frame.level = 0.95, # using 95% CI for all ellipses
+                       frame.alpha = 0.01,
+                       loadings = TRUE, 
+                       loadings.colour = "grey29", 
+                       loadings.label = TRUE,
+                       loadings.label.colour = "black",         
+                       loadings.label.size = 4, 
+                       loadings.label.hjust = 1.5, 
+                       loadings.label.vjust = 0.5,
+                       loadings.label.repel = TRUE) +
   scale_color_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   scale_fill_manual("reef environment", labels = c("offshore", "inshore"), values = c("#00a08b", "#e9aa2b")) +
   guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
   theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA)) +
-  annotate("text", x = -0.245, y = -0.38, label = deparse(a_reef_pval), parse = TRUE, size = 3) +
-  ggtitle(expression(paste(bold("C)   "), italic("P. astreoides"))))
-
+  annotate("text", x = -0.3, y = -0.38, label = deparse(a_reef_pval), parse = TRUE, size = 3) +
+  ggtitle(expression(paste(bold("A)   "), italic("S. siderea"))))
 
 # pco2 * temp
 a_df$pco2_f <- factor(a_df$pco2, labels = c("pre industrial; 28C", "pre industrial; 31C", "current; 31C", "current; 28C", "end-of-century; 28C", "end-of-century; 31C", "extreme; 28C", "extreme; 31C"))
 a_pt_pca <- autoplot(a_pca, data = a_df, 
-         colour = "pco2_f",
-         fill = "pco2_f",
-         shape = "pco2_f",
-         frame = TRUE, 
-         frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
-         frame.level = 0.95, # using 95% CI for all ellipses
-         frame.alpha = 0.01,
-         frame.size = 5,
-         loadings = TRUE, 
-         loadings.colour = "grey29", 
-         loadings.label = TRUE,
-         loadings.label.colour = "black",         
-         loadings.label.size = 4, 
-         loadings.label.hjust = 1.5, 
-         loadings.label.vjust = 0.5,
-         loadings.label.repel = TRUE) +
+                     colour = "pco2_f",
+                     fill = "pco2_f",
+                     shape = "pco2_f",
+                     frame = TRUE, 
+                     frame.type = "t", # displaying ellipses with multivariate t-distributions for small n producing heavier tails
+                     frame.level = 0.95, # using 95% CI for all ellipses
+                     frame.alpha = 0.01,
+                     frame.size = 5,
+                     loadings = TRUE, 
+                     loadings.colour = "grey29", 
+                     loadings.label = TRUE,
+                     loadings.label.colour = "black",         
+                     loadings.label.size = 4, 
+                     loadings.label.hjust = 1.5, 
+                     loadings.label.vjust = 0.5,
+                     loadings.label.repel = TRUE) +
   scale_fill_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
   scale_colour_manual("", values = c("#d1e5f0", "#fddbc7", "#f4a582", "#92c5de", "#4393c3", "#d6604d", "#2166ac", "#b2182b")) +
   scale_shape_manual("", values = c(19, 19, 17, 17, 15, 15, 8, 8)) +
-  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 2, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
-  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA))
+  guides(fill = FALSE, color = guide_legend(keyheight = 0.3, nrow = 4, override.aes = list(linetype = c(0, 0))), shape = guide_legend(nrow = 2, override.aes = list(linetype = c(0, 0)))) +
+  theme(legend.title = element_blank(), legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
+
+
+### Trying a single PCA with colour for pCO2 and shape for temp:
+# ellipse by temp, points by pCO2
+# a_temp_pca2 <- autoplot(a_pca, data = a_df, 
+#          colour = "fpco2",
+#          shape = "ftemp",
+#          frame = FALSE, 
+#          loadings = TRUE, 
+#          loadings.colour = "grey29", 
+#          loadings.label = TRUE,
+#          loadings.label.colour = "black",         
+#          loadings.label.size = 4, 
+#          loadings.label.hjust = 1.5, 
+#          loadings.label.vjust = 0.5,
+#          loadings.label.repel = TRUE) +
+#     stat_ellipse(type = "t", aes(lty = ftemp, colour = ftemp)) +
+#     scale_linetype_manual(values = c("solid", "dashed")) +
+#     scale_shape_manual("temperature", labels = c("28 C", "31 C"), values = c(19, 1)) +
+#     scale_color_manual("", labels = c("28 C", "31 C", "pre industrial", "current", "end-of-century", "extreme"), values = c("#4393c3", "#b2abd2", "#b2182b", "#5e3c99", "#fdb863", "#e66101")) +
+#     guides(linetype = "none", shape = "none") +
+#     guides(color = guide_legend(nrow = 2, override.aes = list(linetype = c(1, 2, 0, 0, 0, 0), shape = c(19, 1, 19, 19, 19, 19), colour = c("#4393c3", "#b2182b", "#b2abd2", "#5e3c99", "#fdb863", "#e66101")))) +
+#     theme(legend.background = element_rect(fill = "transparent", color = NA), legend.position = "bottom")
 
 ```
 
@@ -770,12 +721,12 @@ a_pt_pca <- autoplot(a_pca, data = a_df,
 
 ```{r PCA plot, fig.height=7, fig.width=13}
 
-temp_PCA <- ggarrange(s_temp_pca, p_temp_pca, a_temp_pca, ncol = 3, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
-pCO2_PCA <- ggarrange(s_pco2_pca, p_pco2_pca, a_pco2_pca, ncol = 3, common.legend = TRUE, legend = "bottom", labels = c("D", "E", "F"))
+ggarrange(s_pca_plot, p_pca_plot, a_pca_plot, ncol = 3, labels = c("A", "B", "C")) + 
+  theme(plot.background = element_rect(fill = "white", colour = NA))
 
-ggarrange(temp_PCA, pCO2_PCA, nrow = 2) 
-  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 10, height = 7)
-  ggsave("Figures/Final_Figures/Figure1_PhysPCA.png", width = 10, height = 7)
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.pdf", width = 14, height = 4, dpi = 1200)
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.png", width = 14, height = 4, dpi = 1200)
+  ggsave("Figures/Final_Figures/Figure1_PhysPCA.tiff", width = 14, height = 4, dpi = 1200)
 
 ```
 
